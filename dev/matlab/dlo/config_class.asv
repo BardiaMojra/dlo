@@ -50,7 +50,7 @@ classdef config_class < matlab.System
         mkdir(obj.toutDir);
         disp("[config]->> directory has been created!");
       end 
-      obj.dat = dat_class(btype = obj.btype, datDir = obj.datDir);
+      obj.dat = dat_class(btype = obj.btype, );
       obj.dat.load_cfg(obj);
     end
   

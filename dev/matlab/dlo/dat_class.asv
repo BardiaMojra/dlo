@@ -62,7 +62,7 @@ classdef dat_class < matlab.System
     function init(obj)
       %init 
       if strcmp(obj.btype, 'dlo_shape_control')
-        obj.datDir = [obj.datDir '/shape_control_of_dlos/3D_txt/state_' ...
+        obj.datDir = [obj.datDir 'shape_control_of_dlos/3D_txt/state_' ...
           num2str(obj.bnum, '%d') '.txt'];
       else
         error('undefined dataset...')
