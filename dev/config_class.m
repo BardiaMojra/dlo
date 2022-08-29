@@ -56,6 +56,8 @@ classdef config_class < matlab.System
 
       obj.dat = dat_class(btype = obj.btype, datDir = obj.datDir); % load data
       obj.dat.load_cfg(obj);
+      obj.st_frame = obj.dat.st_frame;
+      obj.end_frame = obj.dat.end_frame;
     end
   end % methods (Access = private)
 end

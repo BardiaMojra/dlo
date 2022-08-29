@@ -47,7 +47,6 @@ if strcmp(method,'exact') || strcmp(method,'exactSVDS')
     end
 
 elseif strcmp(method,'orthogonal')
-    
     if nargin>3
         r = varargin{1}; 
     else 

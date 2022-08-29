@@ -2,6 +2,7 @@
 %  This example applies energy-preserving piDMD to reconstruct the trajectory of
 %  a double pendulum from noisy measurements.
 %addpath('../src')
+close all; clear; clc;
 addpath(genpath('./'));
 rng(1); % Set random seed
 
@@ -34,6 +35,7 @@ y0=[theta1 theta1_prime theta2 theta2_prime];
 % Extract data
 th1 = y(:,1); th2 = y(:,3); th1dt = y(:,2); th2dt = y(:,4);
 x = [th1'; th2'; th1dt'; th2dt'];
+
 xn = x + 1e-1*std(x,[],2).*randn(size(x)); % Add noise
 data = C*xn; % Rescale measurements into energy norm
 nTrain = nt-1;
@@ -49,8 +51,8 @@ Y = data(:,2:nTrain+1);
 piRec = zeros(4,nt); piRec(:,1) = data(:,1);
 exRec = zeros(4,nt); exRec(:,1) = data(:,1);
 for j = 2:nt
-piRec(:,j) = piA(piRec(:,j-1));
-exRec(:,j) = exA(exRec(:,j-1));
+  piRec(:,j) = piA(piRec(:,j-1));
+  exRec(:,j) = exA(exRec(:,j-1));
 end
 
 % Rescale reconstructions back into physical norm
@@ -100,8 +102,8 @@ yp(4)= (a*f-c*e)/(a*d-c*b) ;
 end
 
 function trajPlot(j) % Nice plot of trajectories
-yticks([-pi/4,0,pi/4]); yticklabels([{'$-\pi/4$'},{'0'},{'$\pi/4$'}])
-set(gca,'TickLabelInterpreter','Latex','FontSize',20);grid on
-ylim([-1,1])
-ylabel(j,'Interpreter','latex','FontSize',20)
+  yticks([-pi/4,0,pi/4]); yticklabels([{'$-\pi/4$'},{'0'},{'$\pi/4$'}])
+  set(gca,'TickLabelInterpreter','Latex','FontSize',20);grid on
+  ylim([-1,1])
+  ylabel(j,'Interpreter','latex','FontSize',20)
 end
