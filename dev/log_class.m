@@ -1,28 +1,41 @@
 classdef log_class < matlab.System
   properties
-    % features 
+    %% features 
     logs_sav_en     = true
     plts_sav_en     = true
     plts_shw_en     = false
-    sliding_ref_en  % cfg argin
-    % config (argin)
+    %sliding_ref_en  % cfg argin
+    %% cfg (argin)
     TID     
     ttag    
     toutDir 
-    btype  % single benchmark    
-    kframes  % corresponding keyframes 
-    pos_algs
-    vel_algs
+    btype  
+    bnum
+    %% dat (argin)
+    %freq
+    delT
+    tspan
+    nSamps
+    nVars
+    varNames % keep where dat vars are selected 
     dat
-    % cfg (private constants)
-    d_T = 3
-    d_Q = 4
-    d_V = 3
-    d_W = 3
-    d_Z = 10
-    d_U = 3
-    d_X = 10
-    d_Y = 10
+    %% alg class (argin)
+    cName
+
+
+
+
+
+    %% var dims
+    d_T 
+    d_Q 
+    d_V 
+    d_W 
+    d_Z 
+    d_U 
+
+    d_X 
+    d_Y 
     %d_P 
     %d_K
     %% plt cfg
@@ -34,7 +47,6 @@ classdef log_class < matlab.System
     plt_ylim          = "auto" %= [-2 2] 
 
     %% private vars
-    numKF
     pos_numAlgs
     vel_numAlgs
     pfeat_logs % pfeat mod
@@ -86,7 +98,6 @@ classdef log_class < matlab.System
                  "v", ">", "<", "h"]
   end
   methods  % constructor
-    
     function obj = log_class(varargin) % init obj w name-value args
       setProperties(obj,nargin,varargin{:}) 
     end
@@ -95,10 +106,7 @@ classdef log_class < matlab.System
       obj.TID            = cfg.TID;
       obj.ttag           = cfg.ttag;
       obj.toutDir        = cfg.toutDir;
-      obj.btype          = cfg.benchmark;
-      obj.pos_algs       = cfg.pos_algs;
-      obj.vel_algs       = cfg.vel_algs;
-      obj.sliding_ref_en = cfg.sliding_ref_en;
+      obj.btype          = cfg.btype;
       obj.init();
     end 
   
@@ -106,22 +114,7 @@ classdef log_class < matlab.System
   methods (Access = public) 
 
     function log_state(obj, cntr, kfi, TQVW_sols, st_sols)
-      obj.cntr_hist(cntr, 1)    = cntr;
-      obj.kf_hist(cntr, 1)      = kfi;
-      for a = 1:obj.pos_numAlgs % log pose algs
-        assert(strcmp(obj.pos_algs{a}, TQVW_sols{1, a}{1}), ... 
-          "[log_class.log_state()]--> alg mismatch"); 
-        obj.T_hist{cntr,a}  = TQVW_sols{2,a}; % quest
-        obj.Q_hist{cntr,a}  = TQVW_sols{3,a};
-        obj.V_hist{cntr,1}  = TQVW_sols{4,1}; % vest
-        obj.W_hist{cntr,1}  = TQVW_sols{5,1};
-        obj.Z_hist{cntr,a}  = st_sols{2,a}; % qekf
-        obj.U_hist{cntr,a}  = st_sols{3,a};
-        obj.X_hist{cntr,a}  = st_sols{4,a};
-        obj.Y_hist{cntr,a}  = st_sols{5,a};
-        obj.P_hist{cntr,a}  = st_sols{6,a};
-        obj.K_hist{cntr,a}  = st_sols{7,a};
-      end
+     
     end % function log_state(obj, cntr, frame_idx, TQVW_sols, st_sols)
 
     function pos_logs = get_pos_logs(obj)
@@ -133,7 +126,7 @@ classdef log_class < matlab.System
       for a = 1:obj.pos_numAlgs+1% logs for pos_alg + gt
         if ~isequal(a, size(pos_logs, 2)) % -->> pos_algs
           pos_logs{1,a} = obj.pos_algs{a};
-          TQ = nan(obj.numKF, 2 + obj.d_T+obj.d_Q); % cntr, kfi, Txyz, Qwxyz
+          TQ = nan(obj.nSamps, 2 + obj.d_T+obj.d_Q); % cntr, kfi, Txyz, Qwxyz
           TQ(:,1) = cnts(:,1);
           TQ(:,2) = kfs(:,1);
           for c = 1:length(kfs)
@@ -149,7 +142,7 @@ classdef log_class < matlab.System
           end
         else % -->> groundtruth 
           pos_logs{1,a} = "groundtruth";
-          TQ = nan(obj.numKF, 2 + obj.d_T+obj.d_Q); % cntr, kfi, Txyz, Qwxyz
+          TQ = nan(obj.nSamps, 2 + obj.d_T+obj.d_Q); % cntr, kfi, Txyz, Qwxyz
           TQ(:,1) = cnts(:,1);
           TQ(:,2) = kfs(:,1);
           qTru    = obj.dat.dataset.qTru;
@@ -185,7 +178,7 @@ classdef log_class < matlab.System
         "[log.get_vel_logs]-->> cnts n kfs not equal in length!");
       for a = 1:obj.vel_numAlgs% logs for vel_alg
         vel_logs{1,a} = obj.vel_algs{a};
-        VW = nan(obj.numKF, 2+obj.d_V+obj.d_W); % cntr, kfi, Vxyz, Wrpy
+        VW = nan(obj.nSamps, 2+obj.d_V+obj.d_W); % cntr, kfi, Vxyz, Wrpy
         VW(:,1) = cnts(:,1);
         VW(:,2) = kfs(:,1);
         for c = 1:length(kfs)
@@ -235,10 +228,10 @@ classdef log_class < matlab.System
         "[log.get_qekf_log]-->> cnts n kfs not equal in length!");
       %disp("size(log_hist{1,a},1)"); disp(size(log_hist{1,a},1));
       numRows = size(log_hist{1,a},1)+2;
-      log = nan(obj.numKF, numRows); % cntr, kfi, log vec length
+      log = nan(obj.nSamps, numRows); % cntr, kfi, log vec length
       log(:,1) = cnts(:,1);
       log(:,2) = kfs(:,1);
-      for c = 1:obj.numKF
+      for c = 1:obj.nSamps
         log(c,3:end) = log_hist{c,a}';
       end
       %disp(log);
@@ -315,7 +308,7 @@ classdef log_class < matlab.System
         logNameB = "meas";
         obj.plot_qekf_log(a, "Z vs. X", logA, logNameA, logB, logNameB);
         logA = obj.qekf_logs{4,a+1}; % Y
-        logB = zeros(obj.numKF,size(logA,2)); % zero
+        logB = zeros(obj.nSamps,size(logA,2)); % zero
         logNameA = "residual";
         logNameB = "zero";
         obj.plot_qekf_log(a, " residual", logA, logNameA, logB, logNameB);
@@ -405,25 +398,25 @@ classdef log_class < matlab.System
       % consider changing to matrices instead of cells, (matrix runs faster)
       obj.pos_numAlgs         = length(obj.pos_algs);
       obj.vel_numAlgs         = length(obj.vel_algs);
-      obj.numKF               = length(obj.kframes);
-      obj.cntr_hist           = NaN(obj.numKF,1);
-      obj.kf_hist             = NaN(obj.numKF,1);
+      obj.nSamps               = length(obj.kframes);
+      obj.cntr_hist           = NaN(obj.nSamps,1);
+      obj.kf_hist             = NaN(obj.nSamps,1);
       %% --->> logs
-      obj.T_hist              = cell(obj.numKF,obj.pos_numAlgs); % quest
-      obj.Q_hist              = cell(obj.numKF,obj.pos_numAlgs); 
-      obj.V_hist              = cell(obj.numKF,obj.vel_numAlgs); % vest
-      obj.W_hist              = cell(obj.numKF,obj.vel_numAlgs);
-      obj.Z_hist              = cell(obj.numKF,obj.pos_numAlgs); % qekf
-      obj.U_hist              = cell(obj.numKF,obj.pos_numAlgs); 
-      obj.X_hist              = cell(obj.numKF,obj.pos_numAlgs); 
-      obj.Y_hist              = cell(obj.numKF,obj.pos_numAlgs); 
-      obj.P_hist              = cell(obj.numKF,obj.pos_numAlgs); 
-      obj.K_hist              = cell(obj.numKF,obj.pos_numAlgs); 
+      obj.T_hist              = cell(obj.nSamps,obj.pos_numAlgs); % quest
+      obj.Q_hist              = cell(obj.nSamps,obj.pos_numAlgs); 
+      obj.V_hist              = cell(obj.nSamps,obj.vel_numAlgs); % vest
+      obj.W_hist              = cell(obj.nSamps,obj.vel_numAlgs);
+      obj.Z_hist              = cell(obj.nSamps,obj.pos_numAlgs); % qekf
+      obj.U_hist              = cell(obj.nSamps,obj.pos_numAlgs); 
+      obj.X_hist              = cell(obj.nSamps,obj.pos_numAlgs); 
+      obj.Y_hist              = cell(obj.nSamps,obj.pos_numAlgs); 
+      obj.P_hist              = cell(obj.nSamps,obj.pos_numAlgs); 
+      obj.K_hist              = cell(obj.nSamps,obj.pos_numAlgs); 
       %% --->> errs    
-      obj.T_errs              = NaN(obj.numKF,obj.pos_numAlgs); % quest
-      obj.Q_errs              = NaN(obj.numKF,obj.pos_numAlgs); 
-      obj.VEst_T_errs         = NaN(obj.numKF,obj.vel_numAlgs); % vest
-      obj.VEst_Q_errs         = NaN(obj.numKF,obj.vel_numAlgs); 
+      obj.T_errs              = NaN(obj.nSamps,obj.pos_numAlgs); % quest
+      obj.Q_errs              = NaN(obj.nSamps,obj.pos_numAlgs); 
+      obj.VEst_T_errs         = NaN(obj.nSamps,obj.vel_numAlgs); % vest
+      obj.VEst_Q_errs         = NaN(obj.nSamps,obj.vel_numAlgs); 
     end % function init(obj)
 
     function plot_something(obj)
