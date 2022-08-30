@@ -92,7 +92,7 @@ classdef dlogger_class < matlab.System
           save fname A
         end
         if ~isempty(mdl.vals)
-          fname = strcat(obj.toutDir,"log_",tag,"_vals.csv"); % sav vals
+          fname = strcat(obj.toutDir,"log_",tag,"_vals.mat"); % sav vals
           writematrix(mdl.vals, fname);
         end
         fname = strcat(obj.toutDir,"log_",tag,"_rec.csv"); % sav rec
@@ -100,6 +100,20 @@ classdef dlogger_class < matlab.System
       end
     end
 
+    function save_logs(obj) 
+      % log table {'num', 'name', 'A_mdl', 'vals', 'rec'}
+      
+      for l = 1:size(obj.logs,1)-1
+
+      end
+      % make 
+      len = size(obj.logs,1);
+      obj.logs{len+1, 1} = len;
+      obj.logs{len+1, 2} = mdl.name;
+      obj.logs{len+1, 3} = mdl.A_mdl;
+      obj.logs{len+1, 4} = mdl.vals;
+      obj.logs{len+1, 5} = mdl.rec;
+    end
 
     function plt_KFs_grid(obj)
       nAlgs = size(obj.logs,1)-1;

@@ -56,7 +56,7 @@ classdef dat_class < matlab.System
     function init(obj) %init 
       if strcmp(obj.btype, 'dlo_shape_control')
         obj.datDir = [obj.datDir '/shape_control_of_dlos/3D_txt/state_' ...
-          num2str(obj.bnum, '%d') '.txt'];
+          num2str(obj.bnum,'%d') '.txt'];
         obj.freq  = 10; % 10Hz given
         obj.delT  = 1/obj.freq;
       else
