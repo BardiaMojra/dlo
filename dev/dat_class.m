@@ -62,11 +62,8 @@ classdef dat_class < matlab.System
       else
         error('undefined dataset...')
       end    
-
       obj.load_dat(); 
       obj.select_dat();
-
-
     end
 
     function load_dat(obj)
@@ -127,7 +124,7 @@ classdef dat_class < matlab.System
                  %"RG_Wrpy",  ...
                  ] ;
 
-        % set start and end 
+        % cut dat per st:end n finish init 
         obj.dat     = obj.dat(obj.st_frame:obj.end_frame,:);
         obj.nSamps  = size(obj.dat,1);
         obj.nVars   = size(obj.dat,2);

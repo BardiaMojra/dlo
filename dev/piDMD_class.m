@@ -45,6 +45,16 @@ classdef piDMD_class < matlab.System
       obj.init();
       obj.load_dat(cfg.dat.dat);
     end
+
+    function m = est(obj, X, Y, label, piDMD_label)
+      [A,vals] = piDMD(X, Y, piDMD_label); % est
+      rec = zeros(obj.nVars, obj.nSamps); % reconstruct dat
+      rec(:,1) = obj.dat(:,1); 
+      for j = 2:obj.nSamps
+        rec(:,j) = A(rec(:,j-1));
+      end
+      m = model_class(label,A,vals,rec); % create model obj
+    end
   
   end 
   methods  (Access = private)
