@@ -84,34 +84,36 @@ classdef dlogger_class < matlab.System
     end
 
     function plt_KFs_grid(obj)
-      nAlgs = size(obj.logs)-1;
+      nAlgs = size(obj.logs,1)-1;
       TX='$T_{x}$'; TY='$T_{y}$'; TZ='$T_{z}$';
       IN="Interpreter";LT="latex";MK="Marker";
-      FS='fontsize';Cr="Color";LW ='LineWidth';
+      FS='fontsize';Cr="Color";LW ='LineWidth';EA='EdgeAlpha';
       fig = figure(); % 10*3 subplots 10 KFs * 3 Txyz 
       sgtitle("Key Feature Pose Reconstruction",IN,LT);
       fig.Units    = obj.fig_units;
       fig.Position = obj.fig_pos;
       hold on
+      algNames = cell(nAlgs,0);
       for kf = 1:10 % 10 KFs, 10 rows
         for a = 1:nAlgs % nAlgs colors
           % log table {'num', 'name', 'A-model', 'vals', 'rec'} 
+          algNames{a} = obj.logs{a+1,2};
           dat_a = obj.logs{a+1,5};
           Txyz = dat_a((((kf-1)*3)+1):(((kf-1)*3)+3),:);
           subplot(10,3,  1+((kf-1)*3)); hold on; % Tx 
+          %set(gca,EA,.1);
           subtitle(TX,IN,LT,FS,obj.fig_txt_size); grid on;
-          plot(1:obj.nSamps,Txyz(  1,:),Cr,obj.plt_lclrs(a),MK,obj.plt_mrkrs(a),LW,2);
+          plot(1:obj.nSamps,Txyz(  1,:),Cr,obj.plt_lclrs(a),LW,2);
           subplot(10,3,  2+((kf-1)*3)); hold on; % Ty 
           subtitle(TY,IN,LT,FS,obj.fig_txt_size); grid on;
-          plot(1:obj.nSamps,Txyz(  2,:),Cr,obj.plt_lclrs(a),MK,obj.plt_mrkrs(a),LW,2);
+          plot(1:obj.nSamps,Txyz(  2,:),Cr,obj.plt_lclrs(a),LW,2);
           subplot(10,3,  3+((kf-1)*3)); hold on; % Tz 
           subtitle(TZ,IN,LT,FS,obj.fig_txt_size); grid on;
-          plot(1:obj.nSamps,Txyz(  3,:),Cr,obj.plt_lclrs(a),MK,obj.plt_mrkrs(a),LW,2);
+          plot(1:obj.nSamps,Txyz(  3,:),Cr,obj.plt_lclrs(a),LW,2);
         end
       end
       hold off
-      algNames    = obj.logs{2:end,2};
-      lg          = legend(["Ground truth"; algNames]); 
+      lg          = legend(algNames); 
       lg.Units    = obj.fig_leg_units;
       lg.Position = obj.fig_leg_pos;
       lg.FontSize = obj.fig_txt_size-4;
