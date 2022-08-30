@@ -2,7 +2,7 @@
 % Code by Steven L. Brunton
 clear all, close all, clc
 figpath = './figures/';
-addpath('./utils');
+addpath(genpath('./'));
 
 % generate Data
 sigma = 10;  % Lorenz's parameters (chaotic)

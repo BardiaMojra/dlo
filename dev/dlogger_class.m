@@ -89,7 +89,7 @@ classdef dlogger_class < matlab.System
         if ~isempty(mdl.A_mdl)
           fname = strcat(obj.toutDir,"log_",tag,"_A_mdl.mat"); % sav A_mod
           A = mdl.A_mdl;
-          save fname A
+          %save(fname, A);
         end
         if ~isempty(mdl.vals)
           fname = strcat(obj.toutDir,"log_",tag,"_vals.csv"); % sav vals
@@ -143,7 +143,7 @@ classdef dlogger_class < matlab.System
       if obj.plt_shw_en
         waitforbuttonpress;
       end
-      close(fig);
+      %close(fig);
     end % plt_KFs_grid(obj)
   end % methods (Access = public) 
 end

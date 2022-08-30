@@ -2,7 +2,7 @@
 
 %% init
 close all; clear; clc;
-cfg   = config_class(TID        = 'T00001', ...
+cfg   = config_class(TID        = 'T00002', ...
                      btype      = 'dlo_shape_control', ...
                      bnum       = 1, ...
                      end_frame  = 1000  );
@@ -16,11 +16,13 @@ pi = piDMD_class(); pi.load_cfg(cfg);
 gt_mld      = model_class('ground truth', [], [], pi.dat);
 piOrth_mdl  = pi.est(pi.X, pi.Y, 'piDMD orthogonal', 'orthogonal'); % piDMD orthogonal: Energy preserving DMD
 piExct_mdl  = pi.est(pi.X, pi.Y, 'piDMD exact', 'exact'); % piDMD base line
+piCirSkSymt_mdl  = pi.est(pi.X, pi.Y, 'piDMD circulantskewsymmetric', 'circulantskewsymmetric'); % circular skewsymmetric
 
 
 dlgr.add_mdl(gt_mld);
 dlgr.add_mdl(piOrth_mdl);
 dlgr.add_mdl(piExct_mdl);
+dlgr.add_mdl(piCirSkSymt_mdl);
 dlgr.logs % show logs
 dlgr.plt_KFs_grid();
 
