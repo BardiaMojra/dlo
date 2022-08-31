@@ -60,4 +60,6 @@ crashlytics-build.properties
 data/
 Data/
 DATA/
+*.csv
+*.asv
 
