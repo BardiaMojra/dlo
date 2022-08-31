@@ -1,0 +1,11 @@
+TID: T00004
+brief: Testing sampling window, at 500.
+projDir: /home/smerx/git/dlo/dev
+outDir: /home/smerx/git/dlo/dev/out
+datDir: ~/data
+ttag: T00004_dlo_shape_control_01
+toutDir: /home/smerx/git/dlo/dev/out/T00004_dlo_shape_control_01/
+btype: dlo_shape_control
+bnum: 1
+st_frame: 1
+end_frame: 500

@@ -18,7 +18,7 @@ classdef dlogger_class < matlab.System
     dat % ground truth
     %% logs
     freq    
-    delT    
+    dt    
     tspan   
     nSamps  
     nVars   
@@ -57,7 +57,7 @@ classdef dlogger_class < matlab.System
       obj.logs{1,4}     = obj.lcols{4};
       obj.logs{1,5}     = obj.lcols{5};
       obj.freq          = obj.dat.freq;
-      obj.delT          = obj.dat.delT;
+      obj.dt          = obj.dat.dt;
       obj.tspan         = obj.dat.tspan;
       obj.nSamps        = obj.dat.nSamps; 
       obj.nVars         = obj.dat.nVars;
@@ -116,17 +116,17 @@ classdef dlogger_class < matlab.System
         for a = 1:nAlgs % nAlgs colors
           % log table {'num', 'name', 'A-model', 'vals', 'rec'} 
           algNames{a} = obj.logs{a+1,2};
+          RL = strcat("$KF_", num2str(kf, "{%02.f}$"));
           dat_a = obj.logs{a+1,5};
           Txyz = dat_a((((kf-1)*3)+1):(((kf-1)*3)+3),:);
-          subplot(10,3,  1+((kf-1)*3)); hold on; % Tx 
-          RL = "KF_"+num2str(kf, '{%02.f}');
+          subplot(10,3,  1+((kf-1)*3) ); hold on; % Tx 
           subtitle(TX,IN,LT,FS,obj.fig_FS); grid on;
           ylabel(RL,IN,LT,FS,obj.fig_FS);
           plot(1:obj.nSamps,Txyz(  1,:),Cr,obj.plt_clrs(a),LW,2);
-          subplot(10,3,  2+((kf-1)*3)); hold on; % Ty 
+          subplot(10,3,  2+((kf-1)*3) ); hold on; % Ty 
           subtitle(TY,IN,LT,FS,obj.fig_FS); grid on;
           plot(1:obj.nSamps,Txyz(  2,:),Cr,obj.plt_clrs(a),LW,2);
-          subplot(10,3,  3+((kf-1)*3)); hold on; % Tz 
+          subplot(10,3,  3+((kf-1)*3) ); hold on; % Tz 
           subtitle(TZ,IN,LT,FS,obj.fig_FS); grid on;
           plot(1:obj.nSamps,Txyz(  3,:),Cr,obj.plt_clrs(a),LW,2);
         end
@@ -137,13 +137,14 @@ classdef dlogger_class < matlab.System
       lg.Position = obj.fig_leg_pos;
       lg.FontSize = obj.fig_leg_FS;
       if obj.plt_sav_en
-        figname = strcat(obj.toutDir,"plt_KFs_grid_recs.png");
-        saveas(fig, figname);
+        figname = strcat(obj.toutDir,"plt_KFs_grid_recs");
+        saveas(fig, figname); % sav as fig file
+        saveas(fig, strcat(figname,'.png')); % sav as png file
       end
-      if obj.plt_shw_en
-        waitforbuttonpress;
+      if ~obj.plt_shw_en
+        close(fig);
       end
-      %close(fig);
+      
     end % plt_KFs_grid(obj)
   end % methods (Access = public) 
 end

@@ -3,7 +3,6 @@ classdef dat_class < matlab.System
     %% class
     class       = 'dat'
     note        = ''
-    %% features
     %% cfg (argin)
     toutDir         
     datDir            
@@ -14,7 +13,7 @@ classdef dat_class < matlab.System
     %% obj init
     dat 
     freq
-    delT
+    dt
     tspan
     nSamps
     nVars
@@ -58,7 +57,7 @@ classdef dat_class < matlab.System
         obj.datDir = [obj.datDir '/shape_control_of_dlos/3D_txt/state_' ...
           num2str(obj.bnum,'%d') '.txt'];
         obj.freq  = 10; % 10Hz given
-        obj.delT  = 1/obj.freq;
+        obj.dt  = 1/obj.freq;
       else
         error('undefined dataset...')
       end    
@@ -85,7 +84,7 @@ classdef dat_class < matlab.System
 
       % get st, end
       if isnan(obj.st_frame); obj.st_frame = 1; end
-      if isnan(obj.end_frame); obj.end_frame = size(obj.dat,1); end
+      if isnan(obj.end_frame); obj.end_frame = size(data,1); end
     end
 
     function select_dat(obj)
@@ -128,7 +127,7 @@ classdef dat_class < matlab.System
         obj.dat     = obj.dat(obj.st_frame:obj.end_frame,:);
         obj.nSamps  = size(obj.dat,1);
         obj.nVars   = size(obj.dat,2);
-        obj.tspan   = obj.nSamps*obj.delT;
+        obj.tspan   = obj.nSamps*obj.dt;
     end
   end
 end

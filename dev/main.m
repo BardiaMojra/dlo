@@ -2,48 +2,35 @@
 
 %% init
 close all; clear; clc;
-cfg   = config_class(TID        = 'T00002', ...
-                     btype      = 'dlo_shape_control', ...
-                     bnum       = 1, ...
-                     end_frame  = 1000  );
-
+cfg   = config_class(TID        = 'T00005', ...
+                     brief      = 'adding HAVOK.', ...
+                     bnum       = 1 );%...
+                     %end_frame  = 1000);
+pi    = piDMD_class(); pi.load_cfg(cfg); 
+hvk   = HAVOK_class(); hvk.load_cfg(cfg);
+%knc   = KRONIC_class(); knc.load_cfg(cfg);
 dlgr  = dlogger_class(); dlgr.load_cfg(cfg);
-pi = piDMD_class(); pi.load_cfg(cfg);
 %rpt   = report_class(); rpt.load_cfg(cfg);
 
+%% run
+gt_mld      = model_class('ground truth', [], [], pi.dat); % gt
+% piDMD methods
+piOrth_mdl  = pi.est(pi.X, pi.Y, 'piDMD orth', 'orthogonal'); % Energy preserving DMD
+piExct_mdl  = pi.est(pi.X, pi.Y, 'piDMD exact', 'exact'); % piDMD baseline
+%piCirSkSymt_mdl  = pi.est(pi.X, pi.Y, 'piDMD cirSkwSym', 'circulantskewsymmetric'); 
+% HAVOK methods
+% @todo investiage basis functions 
+hvk_mdl  = hvk.est(hvk.x, hvk.r, 'HAVOK');
 
-%% model and est dat
-gt_mld      = model_class('ground truth', [], [], pi.dat);
-piOrth_mdl  = pi.est(pi.X, pi.Y, 'piDMD orthogonal', 'orthogonal'); % piDMD orthogonal: Energy preserving DMD
-piExct_mdl  = pi.est(pi.X, pi.Y, 'piDMD exact', 'exact'); % piDMD base line
-piCirSkSymt_mdl  = pi.est(pi.X, pi.Y, 'piDMD circulantskewsymmetric', 'circulantskewsymmetric'); % circular skewsymmetric
-
-
+%% results
 dlgr.add_mdl(gt_mld);
 dlgr.add_mdl(piOrth_mdl);
 dlgr.add_mdl(piExct_mdl);
-dlgr.add_mdl(piCirSkSymt_mdl);
+dlgr.add_mdl(hvk_mdl);
+%dlgr.add_mdl(piCirSkSymt_mdl);
 dlgr.logs % show logs
 dlgr.plt_KFs_grid();
 
-% Rescale reconstructions back into physical norm
-%fpiRec = C\piRec; fexRec = C\exRec;
-
-%% Plot results
-
-%plot_hd_dat()
-
-
-
-%% run
-%piDMD.get_model();
-
-% Train the models
-%[piA, piVals] = piDMD.train(Xn,Yn,'orthogonal'); % Energy preserving DMD
-%[exA, exVals] = piDMD(Xn,Yn,'exact'); % Exact DMD
-
-
-%% results
 %dlog.get_logs();
 %dlog.plot_logs();
 %dlog.save_logs();

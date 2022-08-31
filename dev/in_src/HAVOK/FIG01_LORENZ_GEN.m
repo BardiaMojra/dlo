@@ -22,6 +22,9 @@ stackmax = 100;  % the number of shift-stacked rows
 lambda = 0;   % threshold for sparse regression (use 0.02 to kill terms)
 rmax = 15;       % maximum singular vectors to include
 
+
+%% xdat 2000x3
+
 %% EIGEN-TIME DELAY COORDINATES
 clear V, clear dV, clear H
 H = zeros(stackmax,size(xdat,1)-stackmax);
@@ -47,6 +50,7 @@ end
 % concatenate
 x = V(3:end-3,1:r);
 dx = dV;
+
 
 %%  BUILD HAVOK REGRESSION MODEL ON TIME DELAY COORDINATES
 % This implementation uses the SINDY code, but least-squares works too

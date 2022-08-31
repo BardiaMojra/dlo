@@ -6,22 +6,33 @@ classdef HAVOK_class < matlab.System
     %% features
     %% cfg.dat (argin)
     dat % dat 
-    delT
+    dt
     nVars % x and dx from raw data
     nSamps
     st_frame
     end_frame
-    %% properties
-    nss % x state vars (dont include dx)
-    x_cols % col #s for state data
-    xd_cols % col #s for state derivative data
+    %% HAVOK config
+    stackmax = 100 % the number of shift-stacked rows
+    lambda = 0 % threshold for sparse regression (use 0.02 to kill terms)
+    rmax = 15 % maximum singular vectors to include
+    polyorder = 1
+    sin_bs_en = 0 
+    %% vars
+    nss % 30 x state vars (dont include dx)
+    xdat
+    x_cols
+    xd_cols
     x % states
-    xd % state derivatives 
-    ndat % dat normalized 
-    nTrain % num training samps
-    tspan
-    X % state in ss 
-    Y % state est 
+    dx % (=V) -- time series
+    r % optimal number of roots 
+    Theta
+    normTheta
+    Xi
+    A % mdl
+    B % control input mapping 
+    sys % recon ODE 
+    y % reconstruction 
+    t % (nSamps-1)*dt
   end
   methods % constructor
     function obj = HAVOK_class(varargin) 
@@ -32,7 +43,7 @@ classdef HAVOK_class < matlab.System
   methods (Access = public) 
     
     function load_cfg(obj, cfg) 
-      obj.delT        = cfg.dat.delT;  
+      obj.dt          = cfg.dat.dt;  
       obj.nVars       = cfg.dat.nVars;  
       obj.nSamps      = cfg.dat.nSamps;       
       obj.st_frame    = cfg.dat.st_frame;   
@@ -42,48 +53,77 @@ classdef HAVOK_class < matlab.System
       obj.load_dat(cfg.dat.dat);
     end
 
-    function m = est(obj, X, Y, label, piDMD_label)
-
-
-
-
-
-      
-      [A,vals] = piDMD(X, Y, piDMD_label); % est
-      rec = zeros(obj.nVars, obj.nSamps); % reconstruct dat
-      rec(:,1) = obj.dat(:,1); 
-      for j = 2:obj.nSamps
-        rec(:,j) = A(rec(:,j-1));
+    function m = est(obj, x, r, label)
+      if ~isinteger(r); r = obj.r; else; obj.r = r; end
+      %%  BUILD HAVOK REGRESSION MODEL ON TIME DELAY COORDINATES
+      % This implementation uses the SINDY code, but least-squares works too
+      % Build library of nonlinear time series
+      obj.Theta = poolData(x,r,obj.polyorder,obj.sin_bs_en); 
+      % normalize columns of Theta (required in new time-delay coords)
+      for k=1:size(obj.Theta,2)
+        obj.normTheta(k) = norm(obj.Theta(:,k));
+        obj.Theta(:,k) = obj.Theta(:,k)/obj.normTheta(k);
+      end 
+      m = size(obj.Theta,2);
+      % compute Sparse regression: sequential least squares
+      % requires different lambda parameters for each column
+      clear Xi
+      for k = 1:r-1
+        Xi(:,k) = sparsifyDynamics(obj.Theta,obj.dx(:,k),obj.lambda*k,1);  % lambda = 0 gives better results 
       end
-      m = model_class(label,A,vals,rec); % create model obj
+      obj.Theta = poolData(x,r,obj.polyorder,obj.sin_bs_en);
+      for k = 1:length(Xi)
+        Xi(k,:) = Xi(k,:)/obj.normTheta(k);
+      end
+      obj.Xi = Xi;
+      obj.A = obj.Xi(2:r+1, 1:r-1)'; % model A
+      obj.B = obj.A(:,r);
+      obj.A = obj.A(:,1:r-1);
+      %
+      L = 1:obj.nSamps;
+      obj.sys = ss(obj.A,obj.B,eye(r-1),0*obj.B);
+      [obj.y, obj.t] = lsim(obj.sys,obj.x(L,r),obj.dt*(L-1),obj.x(1,1:r-1));
+      m = model_class(label,obj.A,[],obj.y,obj.B); % create model obj
     end
   
   end 
   methods  (Access = private)
     function init(obj)
       obj.nss       = obj.nVars/2;
-      obj.nTrain    = obj.nSamps - 1; 
       obj.x_cols    = 1:obj.nss; 
       obj.xd_cols   = obj.nss+1:obj.nVars; 
-      obj.tspan     = obj.delT*obj.nSamps;
     end
     function load_dat(obj, dat)
       assert(isequal(mod(size(dat,2),2),0), ...
         "-->>> odd num of state vars: %d", size(dat,2));
-      obj.x       = dat(:,obj.x_cols); % state vars 
-      obj.xd      = dat(:,obj.xd_cols); % state vars time derivative (vel)
-      obj.dat     = [obj.x'; obj.xd']; % reorganize data in state space (ss) formulation 
-      obj.ndat    = obj.dat + 1e-1*std(obj.dat,[],2); % norm dat
-      obj.X       = obj.dat(:,1:obj.nTrain);
-      obj.Y       = obj.dat(:,2:obj.nTrain+1);
-    end
-
-    function trajPlot(~,j) % Nice plot of trajectories
-      yticks([-pi/4,0,pi/4]); yticklabels([{'$-\pi/4$'},{'0'},{'$\pi/4$'}])
-      set(gca,'TickLabelInterpreter','Latex','FontSize',20);grid on
-      ylim([-1,1])
-      ylabel(j,'Interpreter','latex','FontSize',20)
-    end
+      xdat    = dat(:,obj.x_cols); % state vars (x) -- [nSamps * nVars]  
+      %% EIGEN-TIME DELAY COORDINATES
+      clear V, clear dV, clear histcounts2
+      H = zeros(obj.stackmax,size(xdat,1)-obj.stackmax);
+      for k = 1:obj.stackmax
+        H(k,:) = xdat(k:end-obj.stackmax-1+k,1);
+      end
+      [U,S,V] = svd(H,'econ');
+      sigs = diag(S);
+      beta = size(H,1)/size(H,2);
+      thresh = optimal_SVHT_coef(beta,0) * median(sigs);
+      r = length(sigs(sigs>thresh));
+      r = min(obj.rmax,r);
+      %% COMPUTE DERIVATIVES
+      % compute derivative using fourth order central difference
+      % use TVRegDiff if more error 
+      dV = zeros(length(V)-5,r);
+      for i=3:length(V)-3
+        for k=1:r
+          dV(i-2,k) = (1/(12*obj.dt))*(-V(i+2,k)+8*V(i+1,k)-8*V(i-1,k)+V(i-2,k));
+        end
+      end  
+      % concatenate
+      obj.xdat = xdat;
+      obj.x = V(3:end-3,1:r);
+      obj.dx = dV;
+      obj.r = r; % optimal number of roots 
+    end % load_dat()
   end
 end
  

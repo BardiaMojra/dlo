@@ -3,17 +3,16 @@ classdef piDMD_class < matlab.System
     %% class
     cName       = 'piDMD'
     note        = ''
-    %% features
     %% cfg (argin)
     
     %% dat (argin)
     dat % dat 
-    delT
+    dt
     nVars % x and dx from raw data
     nSamps
     st_frame
     end_frame
-    %% properties
+    %% dat n state 
     nss % x state vars (dont include dx)
     x_cols
     xd_cols
@@ -24,6 +23,8 @@ classdef piDMD_class < matlab.System
     tspan
     X % state in ss 
     Y % state est 
+    %% mdl (argout)
+
 
   end
   methods % constructor
@@ -36,7 +37,7 @@ classdef piDMD_class < matlab.System
   methods (Access = public) 
     
     function load_cfg(obj, cfg) 
-      obj.delT        = cfg.dat.delT;  
+      obj.dt        = cfg.dat.dt;  
       obj.nVars       = cfg.dat.nVars;  
       obj.nSamps      = cfg.dat.nSamps;       
       obj.st_frame    = cfg.dat.st_frame;   
@@ -63,7 +64,7 @@ classdef piDMD_class < matlab.System
       obj.nTrain    = obj.nSamps - 1; 
       obj.x_cols    = 1:obj.nss; 
       obj.xd_cols   = obj.nss+1:obj.nVars; 
-      obj.tspan     = obj.delT*obj.nSamps;
+      obj.tspan     = obj.dt*obj.nSamps;
     end
     function load_dat(obj, dat)
       assert(isequal(mod(size(dat,2),2),0), ...

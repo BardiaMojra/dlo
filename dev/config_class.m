@@ -4,6 +4,7 @@ classdef config_class < matlab.System
     class       = 'config'
     note        = ''
     %% features
+    sav_cfg_en  = true % sav cfg as txt file
     %% configs --->> write to other modules
     TID         = '_test_'
     brief       = '' % test brief 
@@ -13,7 +14,7 @@ classdef config_class < matlab.System
     ttag        % test tag [TID]_[btype]_[bnum]% dset
     toutDir     % outDir+ttag
     % dataset 
-    btype       = ''
+    btype       = 'dlo_shape_control'
     bnum        = nan % btype subset
     st_frame    = nan % start frame index
     end_frame   = nan % end frame index
@@ -45,19 +46,35 @@ classdef config_class < matlab.System
         mkdir(obj.toutDir);
         disp("[config]->> directory has been created!");
       end 
+      
+      obj.load_dat(); % 
+      obj.sav_cfg(); % sav cfg to file
+    end
 
-      if ~isempty(obj.brief) % write test brief
-        fPath = strcat(obj.toutDir,'/brief.txt');        
-        file = fopen(fPath,'wt');
-        fprintf(file, obj.TID);
-        fprintf(file, obj.brief);
-        fclose(file);
-      end
-
+    function load_dat(obj)
       obj.dat = dat_class(btype = obj.btype, datDir = obj.datDir); % load data
       obj.dat.load_cfg(obj);
       obj.st_frame = obj.dat.st_frame;
       obj.end_frame = obj.dat.end_frame;
+    end
+    function sav_cfg(obj)
+      if ~isempty(obj.brief) || obj.sav_cfg_en
+        fname = strcat(obj.toutDir,'cfg.txt'); 
+        file = fopen(fname,'wt');
+        fprintf(file, ['TID: ', obj.TID, '\n']);
+        fprintf(file, ['brief: ', obj.brief, '\n']);
+        fprintf(file, ['projDir: ', obj.projDir, '\n']);
+        fprintf(file, ['outDir: ', obj.outDir, '\n']);
+        fprintf(file, ['datDir: ', obj.datDir, '\n']);
+        fprintf(file, ['ttag: ', obj.ttag, '\n']);
+        fprintf(file, ['toutDir: ', obj.toutDir, '\n']);
+        fprintf(file, ['btype: ', obj.btype, '\n']);
+        fprintf(file, ['bnum: ', num2str(obj.bnum), '\n']);
+        fprintf(file, ['st_frame: ', num2str(obj.st_frame), '\n']);
+        fprintf(file, ['end_frame: ', num2str(obj.end_frame), '\n']);
+        fclose(file);
+        save strcat(obj.toutDir,'cfg.mat')
+      end
     end
   end % methods (Access = private)
 end
