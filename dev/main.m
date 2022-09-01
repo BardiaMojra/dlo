@@ -1,25 +1,18 @@
 %% XEst main
-
 %% init sys
 close all; clear; clc;
-cfg  = cfg_class(TID    = 'T00007_piDMD_exact_vs_exactSVDS', ...
-                 brief  = 'evaluating different piDMD decompositions.', ...
+cfg  = cfg_class(TID    = 'T00014_piDMD_exact_vs_BCCB', ...
+                 brief  = ['Methods under BCCB require additional inputs.'], ...
                  bnum   = 1, ...
                  end_frame  = 1000);
 dlgr  = dlgr_class(); dlgr.load_cfg(cfg);
 %rpt   = report_class(); rpt.load_cfg(cfg);
-
 %% init app modules
 pi    = piDMD_class(); pi.load_cfg(cfg); 
 hvk   = HAVOK_class(); hvk.load_cfg(cfg);
 %knc   = KRONIC_class(); knc.load_cfg(cfg);
-
-
 %% run
-% gt
-gt_mld      = model_class(name = 'ground truth', rec = pi.dat); % gt
-
-%% piDMD methods
+% piDMD methods
 % "exact", "exactSVDS", ...
 % "orthogonal", ...
 % "uppertriangular", "lowertriangular" , ... % 
@@ -27,25 +20,21 @@ gt_mld      = model_class(name = 'ground truth', rec = pi.dat); % gt
 % "circulant", "circulantTLS", "circulantunitary", "circulantsymmetric","circulantskewsymmetric", ...
 % "BCCB", "BCCBtls", "BCCBskewsymmetric", "BCCBunitary", "hankel", "toeplitz", ...
 % "symmetric", "skewsymmetric"]
-%piOrth_mdl  = pi.est(pi.X, pi.Y, 'piDMD orth', 'orthogonal'); % Energy preserving DMD
+gt_mld      = model_class(name = 'ground truth', rec = pi.dat); % gt
 piExct_mdl  = pi.est(pi.X, pi.Y, 'piDMD exact', 'exact'); % piDMD baseline
-
 % test
 %A_mdl  = pi.est(pi.X, pi.Y, 'piDMD upTri', 'uppertriangular'); 
 %B_mdl  = pi.est(pi.X, pi.Y, 'piDMD loTri', 'lowertriangular'); 
-C_mdl  = pi.est(pi.X, pi.Y, 'piDMD exactSVDS', 'exactSVDS'); 
+C_mdl  = pi.est(pi.X, pi.Y, 'piDMD BCCB', 'BCCB'); 
 
-
-
-% HAVOK methods
-% @todo investiage basis functions 
+% HAVOK methods @todo investiage basis functions 
 %hvk_mdl  = hvk.est(hvk.x, hvk.r, 'HAVOK');
 
 %% results
 % piDMD models
 dlgr.add_mdl(gt_mld);
+dlgr.add_mdl(piExct_mdl); % baseline
 %dlgr.add_mdl(piOrth_mdl);
-dlgr.add_mdl(piExct_mdl);
 %
 %dlgr.add_mdl(A_mdl);
 %dlgr.add_mdl(B_mdl);

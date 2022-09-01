@@ -36,7 +36,8 @@ classdef cfg_class < matlab.System
       if isnan(obj.bnum) % get test tag and toutDir
         obj.ttag  = strcat(obj.TID,'_',obj.btype);
       else
-        obj.ttag  = strcat(obj.TID,'_',obj.btype,'_',num2str(obj.bnum,'%02.f'));
+        obj.ttag  = strcat(obj.TID );% ...
+                           %,'_', obj.btype,'_', num2str(obj.bnum,'%02.f'));
       end      
       obj.toutDir = strcat(obj.outDir,'/',obj.ttag,'/');
 

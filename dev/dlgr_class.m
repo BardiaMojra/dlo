@@ -32,9 +32,9 @@ classdef dlgr_class < matlab.System
     num_format   = "%1.4f"
     fig_U        = "inches"
     fig_FS       = 10
-    fig_pos      = [0 0 7 10]
+    fig_pos      = [0 0 10 10]
     fig_leg_U    = "inches"
-    fig_leg_pos  = [6 9 .8 .8]
+    fig_leg_pos  = [9 9 .8 .8]
     fig_leg_FS   = 8
     fig_LW       = 1.5
     fig_ylim     = "auto" %= [-2 2] 
@@ -107,7 +107,7 @@ classdef dlgr_class < matlab.System
 
 
     function plt_recons_grid(obj)
-      nAlgs = size(obj.logs,1)-1;
+      nSet = size(obj.logs,1)-1;
       TX='$T_{x}$'; TY='$T_{y}$'; TZ='$T_{z}$';
       IN="Interpreter";LT="latex";MK="Marker";
       FS='fontsize';Cr="Color";LW ='LineWidth';
@@ -116,24 +116,26 @@ classdef dlgr_class < matlab.System
       fig.Units    = obj.fig_U;
       fig.Position = obj.fig_pos;
       hold on
-      algNames = cell(nAlgs,0);
+      algNames = cell(nSet,0);
       for kf = 1:10 % 10 KFs, 10 rows
-        for a = 1:nAlgs % nAlgs colors
+        for s = 1:nSet % nAlgs colors
           % log table {'num', 'name', 'A-model', 'vals', 'rec'} 
-          algNames{a} = obj.logs{a+1,2};
+          algNames{s} = obj.logs{s+1,2};
           RL = strcat("$KF_", num2str(kf, "{%02.f}$"));
-          dat_a = obj.logs{a+1,5};
+          dat_a = obj.logs{s+1,5};
           Txyz = dat_a((((kf-1)*3)+1):(((kf-1)*3)+3),:);
+          %fprintf("from row %d to %d, all cols\n", ...
+          %  (((kf-1)*3)+1),(((kf-1)*3)+3)); % keep for debugging
           subplot(10,3,  1+((kf-1)*3) ); hold on; % Tx 
           subtitle(TX,IN,LT,FS,obj.fig_FS); grid on;
           ylabel(RL,IN,LT,FS,obj.fig_FS);
-          plot(1:obj.nSamps,Txyz(  1,:),Cr,obj.fig_Cr(a),LW,obj.fig_LW);
+          plot(1:obj.nSamps,Txyz(  1,:),Cr,obj.fig_Cr(s),LW,obj.fig_LW);
           subplot(10,3,  2+((kf-1)*3) ); hold on; % Ty 
           subtitle(TY,IN,LT,FS,obj.fig_FS); grid on;
-          plot(1:obj.nSamps,Txyz(  2,:),Cr,obj.fig_Cr(a),LW,obj.fig_LW);
+          plot(1:obj.nSamps,Txyz(  2,:),Cr,obj.fig_Cr(s),LW,obj.fig_LW);
           subplot(10,3,  3+((kf-1)*3) ); hold on; % Tz 
           subtitle(TZ,IN,LT,FS,obj.fig_FS); grid on;
-          plot(1:obj.nSamps,Txyz(  3,:),Cr,obj.fig_Cr(a),LW,obj.fig_LW);
+          plot(1:obj.nSamps,Txyz(  3,:),Cr,obj.fig_Cr(s),LW,obj.fig_LW);
         end
       end
       hold off
