@@ -19,8 +19,10 @@ classdef model_class < matlab.System
     % method specific vars
     B_frcin % HAVOK
     %% private vars
+    st_err % state errors 
     err_L1
     err_L2
+
     % piDMD
     A_vec % eigenFunc state stransition vec
     A_mat % eigenFunc sysmmetric matrix model 
@@ -28,15 +30,13 @@ classdef model_class < matlab.System
   end
   methods  % constructor
     function obj = model_class(varargin) % init obj w name-value args
-      setProperties(obj,nargin,varargin{:}) 
-      % set toutDir via varargin
+      setProperties(obj,nargin,varargin{:}) % set toutDir via varargin
       obj.init();
-      obj.sav(); 
     end
     
     function init(obj)
-      
-      obj.get_eigenFunc_Rep(); 
+      obj.get_eigenFunc_Rep();
+      obj.sav(); 
     end
   
     function get_eigenFunc_Rep(obj)

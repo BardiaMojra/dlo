@@ -1,7 +1,7 @@
 %% XEst main
 %% init sys
 close all; clear; clc;
-cfg  = cfg_class(TID    = 'T00014_piDMD_exact_vs_BCCB', ...
+cfg  = cfg_class(TID    = 'D00001_piDMD_exact_vs_orth', ...
                  brief  = ['Methods under BCCB require additional inputs.'], ...
                  bnum   = 1, ...
                  end_frame  = 1000);
@@ -13,28 +13,27 @@ hvk   = HAVOK_class(); hvk.load_cfg(cfg);
 %knc   = KRONIC_class(); knc.load_cfg(cfg);
 %% run
 % piDMD methods
-% "exact", "exactSVDS", ...
-% "orthogonal", ...
-% "uppertriangular", "lowertriangular" , ... % 
+% "exact", "exactSVDS", "orthogonal", "uppertriangular", "lowertriangular" ,  
 % "diagonal", "diagonalpinv", "diagonaltls", "symtridiagonal", ... 
 % "circulant", "circulantTLS", "circulantunitary", "circulantsymmetric","circulantskewsymmetric", ...
 % "BCCB", "BCCBtls", "BCCBskewsymmetric", "BCCBunitary", "hankel", "toeplitz", ...
 % "symmetric", "skewsymmetric"]
+
 gt_mld      = model_class(name = 'ground truth', rec = pi.dat); % gt
 piExct_mdl  = pi.est(pi.X, pi.Y, 'piDMD exact', 'exact'); % piDMD baseline
-% test
-%A_mdl  = pi.est(pi.X, pi.Y, 'piDMD upTri', 'uppertriangular'); 
-%B_mdl  = pi.est(pi.X, pi.Y, 'piDMD loTri', 'lowertriangular'); 
-C_mdl  = pi.est(pi.X, pi.Y, 'piDMD BCCB', 'BCCB'); 
+C_mdl  = pi.est(pi.X, pi.Y, 'piDMD orth', 'orthogonal'); 
 
 % HAVOK methods @todo investiage basis functions 
+% add errs 
+% plot A kernel
+
 %hvk_mdl  = hvk.est(hvk.x, hvk.r, 'HAVOK');
 
 %% results
 % piDMD models
 dlgr.add_mdl(gt_mld);
 dlgr.add_mdl(piExct_mdl); % baseline
-%dlgr.add_mdl(piOrth_mdl);
+
 %
 %dlgr.add_mdl(A_mdl);
 %dlgr.add_mdl(B_mdl);
@@ -46,7 +45,8 @@ dlgr.add_mdl(C_mdl);
 %dlgr.add_mdl(piCirSkSymt_mdl);
 
 %% post processing 
-%dlgr.logs.get_tab(); % get res table
+dlgr.get_errs(); 
+dlgr.get_tab(); % get res table
 %dlgr.logs.sav_tab(); % sav log table - result tab
 dlgr.plt_recons_grid();
 %dlgr.plt_models_grid();

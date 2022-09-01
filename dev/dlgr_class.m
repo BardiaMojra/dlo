@@ -23,7 +23,7 @@ classdef dlgr_class < matlab.System
     nSamps  
     nVars   
     varNames
-    lcols = {'num', 'name', 'A_mdl', 'vals', 'rec'}
+    lcols = {'num', 'name', 'A_mdl', 'vals', 'rec', 'st_errs', 'L1_err', 'L2_err'}
     logs  = cell(1,5) % num of logs by lcols
     %% plot 
     font_style   = 'Times'
@@ -57,6 +57,11 @@ classdef dlgr_class < matlab.System
       obj.logs{1,3}     = obj.lcols{3};
       obj.logs{1,4}     = obj.lcols{4};
       obj.logs{1,5}     = obj.lcols{5};
+
+      obj.logs{1,6}     = obj.lcols{6};
+      obj.logs{1,7}     = obj.lcols{7};
+      obj.logs{1,8}     = obj.lcols{8};
+
       obj.freq          = obj.dat.freq;
       obj.dt            = obj.dat.dt;
       obj.tspan         = obj.dat.tspan;
@@ -86,16 +91,44 @@ classdef dlgr_class < matlab.System
 
     end
 
+        function res = get_res(obj, cfg, dlog)
+      obj.res{1}   = dlog.log.benchtype;
+      obj.res{2}   = obj.get_res_tab(dlog.log, cfg.dat); % returns a table object
+      if obj.res_tab_prt_en
+        disp(strcat(obj.mod_name, ' module:')); disp(obj.rpt_note);
+        disp(obj.res{1}); disp(obj.res{1});
+      end 
+      if obj.res_tab_sav_en
+        fname = strcat(obj.toutDir,'res_', ...
+                       ...%obj.ttag, "_", ...
+                       obj.mod_name,'_tab.csv');
+        writetable(obj.res{2}, fname);
+      end 
+      res = obj.res;
+    end % get_res()      
+
+    function get_errs(obj)
+      gt = obj.logs{2,5};
+      nAlg = size(obj.logs,1);
+      for a = 2:nAlg
+        mrec = obj.logs{a,5};
+        st_err = mrec - gt;
+        L1_err = sum(abs(st_err),2); % get st L1
+        L2_err = sqrt(sum((st_err.^2),2)); % get st L1
+        obj.logs{a,6} = st_err;
+        obj.logs{a,7} = L1_err;
+        obj.logs{a,8} = L2_err;
+        
+      end
+    end
+    
     function get_tab(obj)
       % all tab entries must be col cel and col vec
-      %idx = [1;2;3;4]; % internal use
-      %method = obj.logs{2:end, 2}; % format {'str1';'str2'};
-      %L1_err = get
-      %L2_err = get
-      
-      %tab = table(method, ...
-      %            L1_err,...
-      %            L2_err);
+      obj.tab = table(obj.logs{2:end, 1}, ...
+                  obj.logs{2:end, 2}, ...
+                  obj.logs{2:end, 7},...
+                  obj.logs{2:end, 8}, ...
+                  'VariableNames', obj.lcols{1,2,7,8});
     end
     
     function sav_tab(obj)
