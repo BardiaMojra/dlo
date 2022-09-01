@@ -1,7 +1,7 @@
-classdef config_class < matlab.System 
+classdef cfg_class < matlab.System 
   properties
     %% class
-    class       = 'config'
+    class       = 'cfg'
     note        = ''
     %% features
     sav_cfg_en  = true % sav cfg as txt file
@@ -22,7 +22,7 @@ classdef config_class < matlab.System
     dat  
   end
   methods  % constructor
-    function obj = config_class(varargin)
+    function obj = cfg_class(varargin)
       setProperties(obj,nargin,varargin{:}) % init obj w name-value args
       addpath(genpath('./'));
       init(obj);
@@ -61,19 +61,18 @@ classdef config_class < matlab.System
       if ~isempty(obj.brief) || obj.sav_cfg_en
         fname = strcat(obj.toutDir,'cfg.txt'); 
         file = fopen(fname,'wt');
-        fprintf(file, ['TID: ', obj.TID, '\n']);
-        fprintf(file, ['brief: ', obj.brief, '\n']);
-        fprintf(file, ['projDir: ', obj.projDir, '\n']);
-        fprintf(file, ['outDir: ', obj.outDir, '\n']);
-        fprintf(file, ['datDir: ', obj.datDir, '\n']);
-        fprintf(file, ['ttag: ', obj.ttag, '\n']);
-        fprintf(file, ['toutDir: ', obj.toutDir, '\n']);
-        fprintf(file, ['btype: ', obj.btype, '\n']);
-        fprintf(file, ['bnum: ', num2str(obj.bnum), '\n']);
+        fprintf(file, ['TID:      ', obj.TID, '\n']);
+        fprintf(file, ['brief:    ', obj.brief, '\n']);
+        fprintf(file, ['projDir:  ', obj.projDir, '\n']);
+        fprintf(file, ['outDir:   ', obj.outDir, '\n']);
+        fprintf(file, ['datDir:   ', obj.datDir, '\n']);
+        fprintf(file, ['ttag:     ', obj.ttag, '\n']);
+        fprintf(file, ['toutDir:  ', obj.toutDir, '\n']);
+        fprintf(file, ['btype:    ', obj.btype, '\n']);
+        fprintf(file, ['bnum:     ', num2str(obj.bnum), '\n']);
         fprintf(file, ['st_frame: ', num2str(obj.st_frame), '\n']);
-        fprintf(file, ['end_frame: ', num2str(obj.end_frame), '\n']);
+        fprintf(file, ['end_frame:', num2str(obj.end_frame), '\n']);
         fclose(file);
-        save strcat(obj.toutDir,'cfg.mat')
       end
     end
   end % methods (Access = private)

@@ -1,7 +1,7 @@
-classdef dlogger_class < matlab.System 
+classdef dlgr_class < matlab.System 
   properties
     %% class
-    class       = 'dlogger'
+    class       = 'dlgr'
     note        = 'manages all data logs for uniform plotting and comparison.'
     %% features
     %log_prt_en      = false
@@ -26,25 +26,26 @@ classdef dlogger_class < matlab.System
     lcols = {'num', 'name', 'A_mdl', 'vals', 'rec'}
     logs  = cell(1,5) % num of logs by lcols
     %% plot 
-    font_style        = 'Times'
-    txt_FS            = '12pt'
-    tab_FS            = '10pt'
-    num_format        = "%1.4f"
-    fig_U             = "inches"
-    fig_FS            = 10
-    fig_pos           = [0 0 7 10]
-    fig_leg_U         = "inches"
-    fig_leg_pos       = [6 9 .8 .8]
-    fig_leg_FS        = 8
-    plt_ylim          = "auto" %= [-2 2] 
-    plt_clrs  = ["#A2142F", "#77AC30", "#0072BD", "#7E2F8E", ...
-                 "#EDB120", "#4DBEEE", "#D95319", "#77AC30"] % unique per alg
-    plt_mrkrs = ["o", "+", "*", ".", ...
-                 "x", "s", "d", "^", ...
-                 "v", ">", "<", "h"]
+    font_style   = 'Times'
+    txt_FS       = '12pt'
+    tab_FS       = '10pt'
+    num_format   = "%1.4f"
+    fig_U        = "inches"
+    fig_FS       = 10
+    fig_pos      = [0 0 7 10]
+    fig_leg_U    = "inches"
+    fig_leg_pos  = [6 9 .8 .8]
+    fig_leg_FS   = 8
+    fig_LW       = 1.5
+    fig_ylim     = "auto" %= [-2 2] 
+    fig_Cr       = ["#A2142F", "#77AC30", "#0072BD", "#c451db", ...
+                    "#EDB120", "#4DBEEE", "#D95319", "#77AC30"] % unique per alg
+    fig_MK       = ["o", "+", "*", ".", ...
+                         "x", "s", "d", "^", ...
+                         "v", ">", "<", "h"]
   end
   methods  % constructor
-    function obj = dlogger_class(varargin)
+    function obj = dlgr_class(varargin)
       setProperties(obj,nargin,varargin{:})
     end
   end 
@@ -57,7 +58,7 @@ classdef dlogger_class < matlab.System
       obj.logs{1,4}     = obj.lcols{4};
       obj.logs{1,5}     = obj.lcols{5};
       obj.freq          = obj.dat.freq;
-      obj.dt          = obj.dat.dt;
+      obj.dt            = obj.dat.dt;
       obj.tspan         = obj.dat.tspan;
       obj.nSamps        = obj.dat.nSamps; 
       obj.nVars         = obj.dat.nVars;
@@ -70,7 +71,7 @@ classdef dlogger_class < matlab.System
       obj.toutDir           = cfg.toutDir; 
       obj.btype             = cfg.btype; 
       obj.bnum              = cfg.bnum;   
-      obj.dat              = cfg.dat;
+      obj.dat               = cfg.dat;
       obj.init();
     end
 
@@ -82,26 +83,30 @@ classdef dlogger_class < matlab.System
       obj.logs{len+1, 3} = mdl.A_mdl;
       obj.logs{len+1, 4} = mdl.vals;
       obj.logs{len+1, 5} = mdl.rec;
-      if obj.csv_sav_en % --->> save logs to file
-        tag   = strcat(num2str(len,'%02.f_'), mdl.name); % log tag 
-        tag = strrep(tag,' ','_');
-        tag = strrep(tag,'-','_');
-        if ~isempty(mdl.A_mdl)
-          fname = strcat(obj.toutDir,"log_",tag,"_A_mdl.mat"); % sav A_mod
-          A = mdl.A_mdl;
-          %save(fname, A);
-        end
-        if ~isempty(mdl.vals)
-          fname = strcat(obj.toutDir,"log_",tag,"_vals.csv"); % sav vals
-          writematrix(mdl.vals, fname);
-        end
-        fname = strcat(obj.toutDir,"log_",tag,"_rec.csv"); % sav rec
-        writematrix(mdl.rec, fname);
-      end
+
+    end
+
+    function get_tab(obj)
+      % all tab entries must be col cel and col vec
+      %idx = [1;2;3;4]; % internal use
+      %method = obj.logs{2:end, 2}; % format {'str1';'str2'};
+      %L1_err = get
+      %L2_err = get
+      
+      %tab = table(method, ...
+      %            L1_err,...
+      %            L2_err);
+    end
+    
+    function sav_tab(obj)
+      %fname = strcat(obj.toutDir, 'res_tab.txt');
+      %writetable(tab,fname,'Delimiter',',  ', 'QuoteStrings',true, 'WriteRowNames',true);  
+      %type  fname % disp
+      %tab % disp
     end
 
 
-    function plt_KFs_grid(obj)
+    function plt_recons_grid(obj)
       nAlgs = size(obj.logs,1)-1;
       TX='$T_{x}$'; TY='$T_{y}$'; TZ='$T_{z}$';
       IN="Interpreter";LT="latex";MK="Marker";
@@ -122,13 +127,13 @@ classdef dlogger_class < matlab.System
           subplot(10,3,  1+((kf-1)*3) ); hold on; % Tx 
           subtitle(TX,IN,LT,FS,obj.fig_FS); grid on;
           ylabel(RL,IN,LT,FS,obj.fig_FS);
-          plot(1:obj.nSamps,Txyz(  1,:),Cr,obj.plt_clrs(a),LW,2);
+          plot(1:obj.nSamps,Txyz(  1,:),Cr,obj.fig_Cr(a),LW,obj.fig_LW);
           subplot(10,3,  2+((kf-1)*3) ); hold on; % Ty 
           subtitle(TY,IN,LT,FS,obj.fig_FS); grid on;
-          plot(1:obj.nSamps,Txyz(  2,:),Cr,obj.plt_clrs(a),LW,2);
+          plot(1:obj.nSamps,Txyz(  2,:),Cr,obj.fig_Cr(a),LW,obj.fig_LW);
           subplot(10,3,  3+((kf-1)*3) ); hold on; % Tz 
           subtitle(TZ,IN,LT,FS,obj.fig_FS); grid on;
-          plot(1:obj.nSamps,Txyz(  3,:),Cr,obj.plt_clrs(a),LW,2);
+          plot(1:obj.nSamps,Txyz(  3,:),Cr,obj.fig_Cr(a),LW,obj.fig_LW);
         end
       end
       hold off

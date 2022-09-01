@@ -1,10 +1,13 @@
 classdef piDMD_class < matlab.System 
   properties
     %% class
-    cName       = 'piDMD'
-    note        = ''
+    cName       = 'piDMD' % Physics-informed dynamic mode decompositions
+    desc        = ['Computes a dynamic mode decomposition when the solution ' ...
+      'matrix is constrained to lie in a matrix manifold. The options ' ...
+      'availablefor the "method" so far are listed are "mthds" property.']
+    credit      = ''
     %% cfg (argin)
-    
+    toutDir
     %% dat (argin)
     dat % dat 
     dt
@@ -23,9 +26,14 @@ classdef piDMD_class < matlab.System
     tspan
     X % state in ss 
     Y % state est 
-    %% mdl (argout)
-
-
+    %% piDMD methods (const)
+    mthds   = ["exact", "exactSVDS", ...
+               "orthogonal", ...
+               "uppertriangular", "lowertriangular" , ... % 
+               "diagonal", "diagonalpinv", "diagonaltls", "symtridiagonal", ... 
+               "circulant", "circulantTLS", "circulantunitary", "circulantsymmetric","circulantskewsymmetric", ...
+               "BCCB", "BCCBtls", "BCCBskewsymmetric", "BCCBunitary", "hankel", "toeplitz", ...
+               "symmetric", "skewsymmetric"]
   end
   methods % constructor
     
@@ -37,7 +45,8 @@ classdef piDMD_class < matlab.System
   methods (Access = public) 
     
     function load_cfg(obj, cfg) 
-      obj.dt        = cfg.dat.dt;  
+      obj.toutDir     = cfg.toutDir;
+      obj.dt          = cfg.dat.dt;  
       obj.nVars       = cfg.dat.nVars;  
       obj.nSamps      = cfg.dat.nSamps;       
       obj.st_frame    = cfg.dat.st_frame;   
@@ -47,14 +56,15 @@ classdef piDMD_class < matlab.System
       obj.load_dat(cfg.dat.dat);
     end
 
-    function m = est(obj, X, Y, label, piDMD_label)
+    function m = est(obj, X, Y, name, piDMD_label)
       [A,vals] = piDMD(X, Y, piDMD_label); % est
       rec = zeros(obj.nVars, obj.nSamps); % reconstruct dat
       rec(:,1) = obj.dat(:,1); 
       for j = 2:obj.nSamps
         rec(:,j) = A(rec(:,j-1));
       end
-      m = model_class(label,A,vals,rec); % create model obj
+      m = model_class(name = name, A_mdl = A, vals = vals, rec = rec, ...
+        toutDir=obj.toutDir); % create model obj
     end
   
   end 
