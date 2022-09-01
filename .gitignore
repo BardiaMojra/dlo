@@ -62,4 +62,5 @@ Data/
 DATA/
 *.csv
 *.asv
+out/
 
