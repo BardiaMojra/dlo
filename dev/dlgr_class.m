@@ -195,9 +195,9 @@ classdef dlgr_class < matlab.System
       for kf = 1:10 % 10 KFs, 10 rows
         for s = 1:nSet % nAlgs colors
           % log table {"num", "name", "A-model", "vals", "rec"} 
-          algNames{s} = obj.logs{s+1,2};
+          algNames{s} = obj.logs{s+1,3};
           RL = strcat("$KF_", num2str(kf, "{%02.f}$"));
-          dat_a = obj.logs{s+1,5};
+          dat_a = obj.logs{s+1,6};
           Txyz = dat_a((((kf-1)*3)+1):(((kf-1)*3)+3),:);
           %fprintf("from row %d to %d, all cols\n", ...
           %  (((kf-1)*3)+1),(((kf-1)*3)+3)); % keep for debugging
