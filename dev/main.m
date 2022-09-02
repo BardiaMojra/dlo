@@ -2,7 +2,7 @@
 %% init sys
 close all; clear; clc;
 cfg  = cfg_class(TID    = 'D00001_piDMD_exact_vs_orth', ...
-                 brief  = ['Methods under BCCB require additional inputs.'], ...
+                 brief  = [''], ...
                  bnum   = 1, ...
                  end_frame  = 1000);
 dlgr  = dlgr_class(); dlgr.load_cfg(cfg);
@@ -19,15 +19,15 @@ hvk   = HAVOK_class(); hvk.load_cfg(cfg);
 % "BCCB", "BCCBtls", "BCCBskewsymmetric", "BCCBunitary", "hankel", "toeplitz", ...
 % "symmetric", "skewsymmetric"]
 
-gt_mld      = model_class(name = 'ground truth', rec = pi.dat); % gt
-piExct_mdl  = pi.est(pi.X, pi.Y, 'piDMD exact', 'exact'); % piDMD baseline
-C_mdl  = pi.est(pi.X, pi.Y, 'piDMD orth', 'orthogonal'); 
+gt_mld      = model_class(name = "ground truth", mthd = "gt", rec = pi.dat); % gt
+piExct_mdl  = pi.est(pi.X, pi.Y, "piDMD exact", "exact"); % piDMD baseline
+C_mdl  = pi.est(pi.X, pi.Y, "piDMD orth", "orthogonal"); 
 
 % HAVOK methods @todo investiage basis functions 
 % add errs 
 % plot A kernel
 
-%hvk_mdl  = hvk.est(hvk.x, hvk.r, 'HAVOK');
+%hvk_mdl  = hvk.est(hvk.x, hvk.r, "HAVOK");
 
 %% results
 % piDMD models
@@ -47,7 +47,7 @@ dlgr.add_mdl(C_mdl);
 %% post processing 
 dlgr.get_errs(); 
 dlgr.get_tab(); % get res table
-%dlgr.logs.sav_tab(); % sav log table - result tab
+dlgr.sav_tab(); % sav log table - result tab
 dlgr.plt_recons_grid();
 %dlgr.plt_models_grid();
 

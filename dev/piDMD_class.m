@@ -1,11 +1,11 @@
 classdef piDMD_class < matlab.System 
   properties
     %% class
-    cName       = 'piDMD' % Physics-informed dynamic mode decompositions
-    desc        = ['Computes a dynamic mode decomposition when the solution ' ...
-      'matrix is constrained to lie in a matrix manifold. The options ' ...
-      'availablefor the "method" so far are listed are "mthds" property.']
-    credit      = ''
+    cName       = "piDMD" % Physics-informed dynamic mode decompositions
+    desc        = ["Computes a dynamic mode decomposition when the solution " ...
+      "matrix is constrained to lie in a matrix manifold. The options " ...
+      "availablefor the 'method' so far are listed are 'mthd' property."]
+    credit      = ""
     %% cfg (argin)
     toutDir
     %% dat (argin)
@@ -63,8 +63,12 @@ classdef piDMD_class < matlab.System
       for j = 2:obj.nSamps
         rec(:,j) = A(rec(:,j-1));
       end
-      m = model_class(name = name, A_mdl = A, vals = vals, rec = rec, ...
-        toutDir=obj.toutDir); % create model obj
+      m = model_class(name    = name, ...
+                      mthd    = "piDMD", ...
+                      A_mdl   = A, ...
+                      vals    = vals, ...
+                      rec     = rec, ...
+                      toutDir = obj.toutDir); % create model obj
     end
   
   end 
@@ -88,10 +92,10 @@ classdef piDMD_class < matlab.System
     end
 
     function trajPlot(~,j) % Nice plot of trajectories
-      yticks([-pi/4,0,pi/4]); yticklabels([{'$-\pi/4$'},{'0'},{'$\pi/4$'}])
-      set(gca,'TickLabelInterpreter','Latex','FontSize',20);grid on
+      yticks([-pi/4,0,pi/4]); yticklabels([{"$-\pi/4$"},{"0"},{"$\pi/4$"}])
+      set(gca,"TickLabelInterpreter","Latex","FontSize",20);grid on
       ylim([-1,1])
-      ylabel(j,'Interpreter','latex','FontSize',20)
+      ylabel(j,"Interpreter","latex","FontSize",20)
     end
   end
 end
