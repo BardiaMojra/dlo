@@ -49,7 +49,7 @@ classdef dlgr_class < matlab.System
     fig_leg_U    = "inches"
     fig_leg_pos  = [9 9 .8 .8]
     fig_leg_FS   = 8
-    fig_LW       = 1.5
+    fig_LW       = .75
     fig_ylim     = "auto" %= [-2 2] 
     fig_Cr       = ["#A2142F", "#77AC30", "#0072BD", "#c451db", ...
                     "#EDB120", "#4DBEEE", "#D95319", "#77AC30"] % unique per alg
@@ -136,6 +136,7 @@ classdef dlgr_class < matlab.System
         if size(gt) >= size(mrec)
           pSize = size(gt) - size(mrec);
           mrec = padarray(mrec, pSize, 0, 'post');
+          obj.logs{a,6} = mrec  ;
         else
           error("[dlgr.get_errs]->> log size is greater than gt!\n")
         end
