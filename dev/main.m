@@ -1,10 +1,10 @@
 %% XEst main
 %% init sys
 close all; clear; clc;
-cfg  = cfg_class(TID    = 'D00001_piDMD_exact_vs_orth', ...
+cfg  = cfg_class(TID    = 'D00002_piDMD_exact_vs_HAVOK', ...
                  brief  = [''], ...
                  bnum   = 1, ...
-                 end_frame  = 1000);
+                 end_frame  = 10000);
 dlgr  = dlgr_class(); dlgr.load_cfg(cfg);
 %rpt   = report_class(); rpt.load_cfg(cfg);
 %% init app modules
@@ -26,9 +26,7 @@ C_mdl  = pi.est(pi.X, pi.Y, "piDMD orth", "orthogonal");
 % HAVOK methods @todo investiage basis functions 
 % add errs 
 % plot A kernel
-
-%hvk_mdl  = hvk.est(hvk.x, hvk.r, "HAVOK");
-
+hvk_mdl  = hvk.est(hvk.x, hvk.r, "HAVOK");
 %% results
 % piDMD models
 dlgr.add_mdl(gt_mld);
@@ -39,9 +37,8 @@ dlgr.add_mdl(piExct_mdl); % baseline
 %dlgr.add_mdl(B_mdl);
 dlgr.add_mdl(C_mdl);
 
-
 % HAVOK models
-%dlgr.add_mdl(hvk_mdl);
+dlgr.add_mdl(hvk_mdl);
 %dlgr.add_mdl(piCirSkSymt_mdl);
 
 %% post processing 

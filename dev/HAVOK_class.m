@@ -15,8 +15,10 @@ classdef HAVOK_class < matlab.System
     stackmax = 100 % the number of shift-stacked rows
     lambda = 0 % threshold for sparse regression (use 0.02 to kill terms)
     rmax = 15 % maximum singular vectors to include
+    rec_len = 4000 % moving window len % 25% of dat
     polyorder = 1
     sin_bs_en = 0 
+    use_opt_r = false % use optimal num of roots
     %% vars
     nss % 30 x state vars (dont include dx)
     xdat
@@ -33,6 +35,7 @@ classdef HAVOK_class < matlab.System
     sys % recon ODE 
     y % reconstruction 
     t % (nSamps-1)*dt
+    toutDir
   end
   methods % constructor
     function obj = HAVOK_class(varargin) 
@@ -55,6 +58,7 @@ classdef HAVOK_class < matlab.System
 
     function m = est(obj, x, r, label)
       if ~isinteger(r); r = obj.r; else; obj.r = r; end
+
       %%  BUILD HAVOK REGRESSION MODEL ON TIME DELAY COORDINATES
       % This implementation uses the SINDY code, but least-squares works too
       % Build library of nonlinear time series
@@ -80,10 +84,15 @@ classdef HAVOK_class < matlab.System
       obj.B = obj.A(:,r);
       obj.A = obj.A(:,1:r-1);
       %
-      L = 1:obj.nSamps;
+      L = 1:obj.nSamps-(obj.stackmax+5);
       obj.sys = ss(obj.A,obj.B,eye(r-1),0*obj.B);
       [obj.y, obj.t] = lsim(obj.sys,obj.x(L,r),obj.dt*(L-1),obj.x(1,1:r-1));
-      m = model_class(label,obj.A,[],obj.y,obj.B); % create model obj
+      m = model_class(name    = label, ...
+                      mthd    = "HAVOK", ...
+                      A_mdl   = obj.A, ...
+                      vals    = [], ...
+                      rec     = obj.y', ...
+                      toutDir = obj.toutDir); % create model obj
     end
   
   end 
@@ -96,33 +105,35 @@ classdef HAVOK_class < matlab.System
     function load_dat(obj, dat)
       assert(isequal(mod(size(dat,2),2),0), ...
         "-->>> odd num of state vars: %d", size(dat,2));
-      xdat    = dat(:,obj.x_cols); % state vars (x) -- [nSamps * nVars]  
+      obj.xdat    = dat(:,obj.x_cols); % state vars (x) -- [nSamps * nVars]  
       %% EIGEN-TIME DELAY COORDINATES
       clear V, clear dV, clear histcounts2
-      H = zeros(obj.stackmax,size(xdat,1)-obj.stackmax);
+      H = zeros(obj.stackmax,size(obj.xdat,1)-obj.stackmax);
       for k = 1:obj.stackmax
-        H(k,:) = xdat(k:end-obj.stackmax-1+k,1);
+        H(k,:) = obj.xdat(k:end-obj.stackmax-1+k,1);
       end
       [U,S,V] = svd(H,'econ');
       sigs = diag(S);
       beta = size(H,1)/size(H,2);
       thresh = optimal_SVHT_coef(beta,0) * median(sigs);
-      r = length(sigs(sigs>thresh));
-      r = min(obj.rmax,r);
+      if obj.use_opt_r
+        obj.r = length(sigs(sigs>thresh));
+        obj.r = min(obj.rmax,obj.r);
+      else
+        obj.r = obj.nss+1;
+      end
       %% COMPUTE DERIVATIVES
       % compute derivative using fourth order central difference
       % use TVRegDiff if more error 
-      dV = zeros(length(V)-5,r);
+      dV = zeros(length(V)-5,obj.r);
       for i=3:length(V)-3
-        for k=1:r
+        for k=1:obj.r
           dV(i-2,k) = (1/(12*obj.dt))*(-V(i+2,k)+8*V(i+1,k)-8*V(i-1,k)+V(i-2,k));
         end
       end  
       % concatenate
-      obj.xdat = xdat;
-      obj.x = V(3:end-3,1:r);
+      obj.x = V(3:end-3,1:obj.r);
       obj.dx = dV;
-      obj.r = r; % optimal number of roots 
     end % load_dat()
   end
 end

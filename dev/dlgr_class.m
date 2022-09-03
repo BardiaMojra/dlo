@@ -116,29 +116,31 @@ classdef dlgr_class < matlab.System
       obj.logs{len+1,13} = mdl.MSE;
     end
 
-    function res = get_res(obj, cfg, dlog)
-      obj.res{1}   = dlog.log.benchtype;
-      obj.res{2}   = obj.get_res_tab(dlog.log, cfg.dat); % returns a table object
-      if obj.res_tab_prt_en
-        disp(strcat(obj.mod_name, " module:")); disp(obj.rpt_note);
-        disp(obj.res{1}); disp(obj.res{1});
-      end 
-      if obj.res_tab_sav_en
-        fname = strcat(obj.toutDir,"res_", ...
-                       ...%obj.ttag, "_", ...
-                       obj.mod_name,"_tab.csv");
-        writetable(obj.res{2}, fname);
-      end 
-      res = obj.res;
-    end % get_res()      
+     
 
     function get_errs(obj)
       gt = obj.logs{2,6};
+      gt = gt(1:obj.nVars/2,:);
       nAlg = size(obj.logs,1);
       for a = 2:nAlg
-        assert(isequal(a-1, obj.logs{a,1}), "[dlgr.get_errs]->> log num mismatch!\n");
-        mrec    = obj.logs{a,6};
-        errs    = mrec - gt;
+        assert(isequal(a-1, obj.logs{a,1}), ...
+          "[dlgr.get_errs]->> log num mismatch!\n");
+        mrec  = obj.logs{a,6};
+        mrec  = mrec(1:obj.nVars/2,:);
+        if ~isequal(size(gt),size(mrec)) % check size
+          fprintf("[dlgr.get_errs]->> log dim DO NOT match gt!\n");
+          fprintf("[dlgr.get_errs]->> gt size: %s \n", mat2str(size(gt)));
+          fprintf("[dlgr.get_errs]->> %s size: %s \n", obj.logs{a,3}, mat2str(size(mrec)));
+        end
+  
+        if size(gt) >= size(mrec)
+          pSize = size(gt) - size(mrec);
+          mrec = padarray(mrec, pSize, 0, 'post');
+        else
+          error("[dlgr.get_errs]->> log size is greater than gt!\n")
+        end
+
+        errs    = gt - mrec;
         L1      = sum(abs(errs),"all"); % get st L1
         L2      = sum((errs.^2),"all"); 
         MAE     = L1/size(errs,2);
