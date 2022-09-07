@@ -56,6 +56,9 @@ classdef dlgr_class < matlab.System
     fig_MK       = ["o", "+", "*", ".", ...
                     "x", "s", "d", "^", ...
                     "v", ">", "<", "h"]
+    fig_PT       = ["bo:", "gx:", "r+:", "c*:", ...
+                    "ms:", "yd:", "kv:", "b^", ...
+                    "g<:"]
   end
   methods  % constructor
     function obj = dlgr_class(varargin)
@@ -183,9 +186,8 @@ classdef dlgr_class < matlab.System
       %tab % disp
     end
 
-
     function plt_recons_grid(obj)
-      nSet = size(obj.logs,1)-1;
+      nSol = size(obj.logs,1)-1;
       TX="$T_{x}$"; TY="$T_{y}$"; TZ="$T_{z}$";
       IN="Interpreter";LT="latex";MK="Marker";
       FS="fontsize";Cr="Color";LW ="LineWidth";
@@ -194,9 +196,9 @@ classdef dlgr_class < matlab.System
       fig.Units    = obj.fig_U;
       fig.Position = obj.fig_pos;
       hold on
-      algNames = cell(nSet,0);
+      algNames = cell(nSol,0);
       for kf = 1:10 % 10 KFs, 10 rows
-        for s = 1:nSet % nAlgs colors
+        for s = 1:nSol % nAlgs colors
           % log table {"num", "name", "A-model", "vals", "rec"} 
           algNames{s} = obj.logs{s+1,3};
           RL = strcat("$KF_", num2str(kf, "{%02.f}$"));
@@ -229,7 +231,42 @@ classdef dlgr_class < matlab.System
       if ~obj.plt_shw_en
         close(fig);
       end
-      
     end % plt_KFs_grid(obj)
+  
+    function plt_models_grid(obj)
+      nSol = size(obj.logs,1)-1;
+      IN="Interpreter";LT="latex";DN='DisplayName';
+      FS="fontsize";LW ="LineWidth";
+      fig = figure(); hold on
+      title("Models $(A_{method})$ in Phase Domain",IN,LT);
+      fig.Units    = obj.fig_U;
+      fig.Position = obj.fig_pos;
+      algNames = cell(nSol,0);
+      xlabel("$real$",IN,LT,FS,obj.fig_FS);
+      ylabel("$imag.$",IN,LT,FS,obj.fig_FS);
+          
+      for s = 1:nSol
+        algNames{s} = obj.logs{s+1,3}; 
+        %vals  = obj.logs{s+1,5};
+        %A_vec = obj.logs{s+1,7};
+        A_mat = obj.logs{s+1,8};
+        real_A = real(A_mat);
+        imag_A = imag(A_mat);
+        plot(real_A,imag_A,obj.fig_PT(s),LW,obj.fig_LW,DN,algNames{s});
+      end
+      lg          = legend('show','location','best'); 
+      lg.Units    = obj.fig_leg_U;
+      lg.Position = obj.fig_leg_pos;
+      lg.FontSize = obj.fig_leg_FS;
+      grid on;
+      if obj.plt_sav_en
+        figname = strcat(obj.toutDir,"plt_mdl_phase");
+        saveas(fig, figname); % sav as fig file
+        saveas(fig, strcat(figname,".png")); % sav as png file
+      end
+      if ~obj.plt_shw_en
+        close(fig);
+      end
+    end
   end % methods (Access = public) 
 end
