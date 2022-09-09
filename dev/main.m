@@ -20,7 +20,7 @@ piExct_mdl  = pi.est(pi.X, pi.Y, "piDMD exact", "exact"); % piDMD baseline
 
 % piDMD methods B000
 %C_mdl  = pi.est(pi.X, pi.Y, "piDMD ExactSVDS", "exactSVDS"); % 01
-C_mdl  = pi.est(pi.X, pi.Y, "piDMD Orth", "orthogonal"); % 02
+%C_mdl  = pi.est(pi.X, pi.Y, "piDMD Orth", "orthogonal"); % 02
 %C_mdl  = pi.est(pi.X, pi.Y, "piDMD UpTri", "uppertriangular"); % 03
 %C_mdl  = pi.est(pi.X, pi.Y, "piDMD LoTri", "lowertriangular"); % 04
 %D_mdl  = pi.est(pi.X, pi.Y, "piDMD Diag", "diagonal"); % 05
@@ -32,7 +32,7 @@ C_mdl  = pi.est(pi.X, pi.Y, "piDMD Orth", "orthogonal"); % 02
 %I_mdl  = pi.est(pi.X, pi.Y, "piDMD CircUnitary", "circulantunitary"); % 11
 %J_mdl  = pi.est(pi.X, pi.Y, "piDMD CircSym", "circulantsymmetric"); % 12
 %K_mdl  = pi.est(pi.X, pi.Y, "piDMD CircSkwSym", "circulantskewsymmetric"); % 13 
-%C_mdl  = pi.est(pi.X, pi.Y, "piDMD BCCB", "BCCB"); % 14
+C_mdl  = pi.est(pi.X, pi.Y, "piDMD BCCB", "BCCB"); % 14
 %C_mdl  = pi.est(pi.X, pi.Y, "piDMD BCCBtls", "BCCBtls"); 
 %C_mdl  = pi.est(pi.X, pi.Y, "piDMD BCCBSkwSym", "BCCBskewsymmetric"); 
 %C_mdl  = pi.est(pi.X, pi.Y, "piDMD BCCBUnitary", "BCCBunitary"); 
@@ -52,8 +52,8 @@ dlgr.add_mdl(piExct_mdl); % baseline
 %
 %dlgr.add_mdl(A_mdl);
 %dlgr.add_mdl(B_mdl);
-dlgr.add_mdl(C_mdl);
 %dlgr.add_mdl(C_mdl);
+dlgr.add_mdl(C_mdl);
 %dlgr.add_mdl(D_mdl);
 %dlgr.add_mdl(E_mdl);
 %dlgr.add_mdl(F_mdl);
