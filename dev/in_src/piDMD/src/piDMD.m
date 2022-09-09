@@ -209,38 +209,38 @@ elseif startsWith(method,'circulant')
 
 elseif strcmp(method,'BCCB') || strcmp(method,'BCCBtls') || strcmp(method,'BCCBskewsymmetric') || strcmp(method,'BCCBunitary')
     
-    if isempty(varargin); error('Need to specify size of blocks.'); end
-    s = varargin{1}; p = prod(s);
-    % Equivalent to applying the block-DFT matrix F 
-    % defined by F = kron(dftmtx(M),dftmtx(N)) to the 
-    % matrix X
-    aF =  @(x) reshape(     fft2(reshape(x ,[s,size(x,2)])) ,[p,size(x,2)])/sqrt(p);
-    aFt = @(x) conj(aF(conj(x)));
-    fX = aF(conj(X)); fY = aF(conj(Y));
-    d = zeros(p,1);
-    
-    if strcmp(method,'BCCB') 
-    for j = 1:p; d(j) = conj(fX(j,:)*fY(j,:)')/norm(fX(j,:)').^2; end
-    elseif strcmp(method,'BCCBtls')
-    for j = 1:p; d(j) = tls(fX(j,:)',fY(j,:)')'; end
-    elseif strcmp(method,'BCCBskewsymmetric')
-    for j = 1:p; d(j) = 1i*imag(fY(j,:)/fX(j,:)); end
-    elseif strcmp(method,'BCCBsymmetric')
-    for j = 1:p; d(j) = real(fY(j,:)/fX(j,:)); end
-    elseif strcmp(method,'BCCBunitary')
-    for j = 1:p; d(j) = exp(1i*angle(fY(j,:)/fX(j,:))); end
-    end
+  if isempty(varargin); error('Need to specify size of blocks.'); end
+  s = varargin{1}; p = prod(s);
+  % Equivalent to applying the block-DFT matrix F 
+  % defined by F = kron(dftmtx(M),dftmtx(N)) to the 
+  % matrix X
+  aF =  @(x) reshape( fft2(reshape(x ,[s,size(x,2)])),[p,size(x,2)])/sqrt(p);
+  aFt = @(x) conj(aF(conj(x)));
+  fX = aF(conj(X)); fY = aF(conj(Y));
+  d = zeros(p,1);
+  
+  if strcmp(method,'BCCB') 
+  for j = 1:p; d(j) = conj(fX(j,:)*fY(j,:)')/norm(fX(j,:)').^2; end
+  elseif strcmp(method,'BCCBtls')
+  for j = 1:p; d(j) = tls(fX(j,:)',fY(j,:)')'; end
+  elseif strcmp(method,'BCCBskewsymmetric')
+  for j = 1:p; d(j) = 1i*imag(fY(j,:)/fX(j,:)); end
+  elseif strcmp(method,'BCCBsymmetric')
+  for j = 1:p; d(j) = real(fY(j,:)/fX(j,:)); end
+  elseif strcmp(method,'BCCBunitary')
+  for j = 1:p; d(j) = exp(1i*angle(fY(j,:)/fX(j,:))); end
+  end
 
-    % Returns a function handle that applies A
-     if nargin>4
-        r = varargin{2};
-        res = diag(abs(fX*fY'))./vecnorm(fX')';
-        [~,idx] = mink(res,nx-r);
-        d(idx) = 0;
-    end
-    A = @(x) aF((conj(d).*aFt(x)));
-    varargout{1} = d;
-    % Eigenvalues are given by d
+  % Returns a function handle that applies A
+   if nargin>4
+      r = varargin{2};
+      res = diag(abs(fX*fY'))./vecnorm(fX')';
+      [~,idx] = mink(res,nx-r);
+      d(idx) = 0;
+  end
+  A = @(x) aF((conj(d).*aFt(x)));
+  varargout{1} = d;
+  % Eigenvalues are given by d
 
 elseif strcmp(method,'BC') || strcmp(method,'BCtri') || strcmp(method,'BCtls')
     

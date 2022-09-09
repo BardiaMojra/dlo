@@ -1,7 +1,7 @@
 %% DLO main
 %% init sys 
 close all; clear; clc;
-cfg  = cfg_class(TID    = ['D000', '00', '_piDMD_', ''], ...
+cfg  = cfg_class(TID    = ['D000', '00', '_piDMD_', 'BCCB'], ...
                  brief  = [''], ...
                  bnum   = 1, ...
                  end_frame  = 1000);
@@ -14,32 +14,37 @@ hvk   = HAVOK_class(); hvk.load_cfg(cfg);
 
 %% run
 gt_mld      = model_class(name = "ground truth", mthd = "gt", rec = pi.dat); % gt
-piExct_mdl  = pi.est(pi.X, pi.Y, "piDMD exact", "exact"); % piDMD baseline
+piExct_mdl  = pi.est(pi.X, pi.Y, "exact"); % piDMD baseline
 %A_mdl  = pi.est(pi.X, pi.Y, "piDMD orth", "orthogonal"); 
 %B_mdl  = pi.est(pi.X, pi.Y, "piDMD orth", "orthogonal"); 
 
 % piDMD methods B000
-%C_mdl  = pi.est(pi.X, pi.Y, "piDMD ExactSVDS", "exactSVDS"); % 01
-%C_mdl  = pi.est(pi.X, pi.Y, "piDMD Orth", "orthogonal"); % 02
-%C_mdl  = pi.est(pi.X, pi.Y, "piDMD UpTri", "uppertriangular"); % 03
-%C_mdl  = pi.est(pi.X, pi.Y, "piDMD LoTri", "lowertriangular"); % 04
-%D_mdl  = pi.est(pi.X, pi.Y, "piDMD Diag", "diagonal"); % 05
-%E_mdl  = pi.est(pi.X, pi.Y, "piDMD DiagPInv", "diagonalpinv"); % 06
-%F_mdl  = pi.est(pi.X, pi.Y, "piDMD DiagTLS", "diagonaltls"); % 07
-%C_mdl  = pi.est(pi.X, pi.Y, "piDMD SymTriDiag", "symtridiagonal"); % 08
-%G_mdl  = pi.est(pi.X, pi.Y, "piDMD Circ", "circulant"); % 09
-%H_mdl  = pi.est(pi.X, pi.Y, "piDMD CircTLS", "circulantTLS"); % 10
-%I_mdl  = pi.est(pi.X, pi.Y, "piDMD CircUnitary", "circulantunitary"); % 11
-%J_mdl  = pi.est(pi.X, pi.Y, "piDMD CircSym", "circulantsymmetric"); % 12
-%K_mdl  = pi.est(pi.X, pi.Y, "piDMD CircSkwSym", "circulantskewsymmetric"); % 13 
-C_mdl  = pi.est(pi.X, pi.Y, "piDMD BCCB", "BCCB"); % 14
-%C_mdl  = pi.est(pi.X, pi.Y, "piDMD BCCBtls", "BCCBtls"); 
-%C_mdl  = pi.est(pi.X, pi.Y, "piDMD BCCBSkwSym", "BCCBskewsymmetric"); 
-%C_mdl  = pi.est(pi.X, pi.Y, "piDMD BCCBUnitary", "BCCBunitary"); 
-%C_mdl  = pi.est(pi.X, pi.Y, "piDMD Hankel", "hankel"); 
-%C_mdl  = pi.est(pi.X, pi.Y, "piDMD Toeplitz", "toeplitz"); 
-%C_mdl  = pi.est(pi.X, pi.Y, "piDMD Sym", "symmetric"); 
-%C_mdl  = pi.est(pi.X, pi.Y, "piDMD SkwSym", "skewsymmetric"); 
+%C_mdl  = pi.est(pi.X, pi.Y, "exactSVDS"); % 01
+%C_mdl  = pi.est(pi.X, pi.Y, "orthogonal"); % 02
+%C_mdl  = pi.est(pi.X, pi.Y, "uppertriangular"); % 03
+%C_mdl  = pi.est(pi.X, pi.Y, "lowertriangular"); % 04
+%D_mdl  = pi.est(pi.X, pi.Y, "diagonal"); % 05
+%E_mdl  = pi.est(pi.X, pi.Y, "diagonalpinv"); % 06
+%F_mdl  = pi.est(pi.X, pi.Y, "diagonaltls"); % 07
+%C_mdl  = pi.est(pi.X, pi.Y, "symtridiagonal"); % 08
+%G_mdl  = pi.est(pi.X, pi.Y, "circulant"); % 09
+%H_mdl  = pi.est(pi.X, pi.Y, "circulantTLS"); % 10
+%I_mdl  = pi.est(pi.X, pi.Y, "circulantunitary"); % 11
+%J_mdl  = pi.est(pi.X, pi.Y, "circulantsymmetric"); % 12
+%K_mdl  = pi.est(pi.X, pi.Y, "circulantskewsymmetric"); % 13 
+C_mdl  = pi.est(pi.X, pi.Y, "BCCB", []); % 14
+%C_mdl  = pi.est(pi.X, pi.Y, "TLS"); % 15
+%C_mdl  = pi.est(pi.X, pi.Y, "BC"); % 16
+%C_mdl  = pi.est(pi.X, pi.Y, "BCtri"); % 17
+%C_mdl  = pi.est(pi.X, pi.Y, "BCtls"); % 18
+%C_mdl  = pi.est(pi.X, pi.Y, ""); % 19
+%C_mdl  = pi.est(pi.X, pi.Y, "BCCBtls"); 
+%C_mdl  = pi.est(pi.X, pi.Y, "BCCBskewsymmetric"); 
+%C_mdl  = pi.est(pi.X, pi.Y, "BCCBunitary"); 
+%C_mdl  = pi.est(pi.X, pi.Y, "hankel"); 
+%C_mdl  = pi.est(pi.X, pi.Y, "toeplitz"); 
+%C_mdl  = pi.est(pi.X, pi.Y, "symmetric"); 
+%C_mdl  = pi.est(pi.X, pi.Y, "skewsymmetric"); 
 
 % HAVOK methods @todo investiage basis functions 
 %hvk_mdl  = hvk.est(hvk.x, hvk.r, "HAVOK");

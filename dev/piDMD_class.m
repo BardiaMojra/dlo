@@ -56,20 +56,14 @@ classdef piDMD_class < matlab.System
       obj.load_dat(cfg.dat.dat);
     end
 
-    function m = est(obj, X, Y, name, piDMD_label)
-      if strcmp(piDMD_label, "diagonal")
-        [A,vals] = piDMD(X, Y, piDMD_label, 1); % est
-      elseif strcmp(piDMD_label, "BCCB")
-        [A,vals] = piDMD(X, Y, piDMD_label, 4); % est
-      else
-        [A,vals] = piDMD(X, Y, piDMD_label); % est
-      end
+    function m = est(obj, X, Y, piDMD_label, varargin)
+      [A,vals] = piDMD(X, Y, piDMD_label, varargin{:}); % est
       rec = zeros(obj.nVars, obj.nSamps); % reconstruct dat
       rec(:,1) = obj.dat(:,1); 
       for j = 2:obj.nSamps
         rec(:,j) = A(rec(:,j-1));
       end
-      m = model_class(name    = name, ...
+      m = model_class(name    = strcat("piDMD ", piDMD_label), ...
                       mthd    = "piDMD", ...
                       A_mdl   = A, ...
                       vals    = vals, ...
