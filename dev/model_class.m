@@ -44,15 +44,14 @@ classdef model_class < matlab.System
     function get_eigenFunc_Rep(obj)
       if strcmp(obj.mthd, "piDMD")
         obj.A_vec = obj.A_mdl(obj.vals);
-        obj.A_mat = obj.A_vec*obj.A_vec';
+        %obj.A_mat = obj.A_vec*obj.A_vec';
       elseif strcmp(obj.mthd, "HAVOK")
-
+        obj.A_vec = obj.A_mdl(obj.vals);
       else
         fprintf("[model.getEigenFunc_Rep]->> undefined or no mthd...\n");
       end
     end
       
-
     function sav(obj) 
       if ~isempty(obj.toutDir) % --->> save logs to file
         tag = strrep(obj.name," ","_");

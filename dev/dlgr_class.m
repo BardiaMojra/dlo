@@ -236,7 +236,7 @@ classdef dlgr_class < matlab.System
     function plt_models_grid(obj)
       nSol = size(obj.logs,1)-1;
       IN="Interpreter";LT="latex";DN='DisplayName';
-      FS="fontsize";LW ="LineWidth";
+      FS="fontsize";LW ="LineWidth";Cr="Color";LS="LineStyle";
       fig = figure(); hold on
       title("Models $(A_{method})$ in Phase Domain",IN,LT);
       fig.Units    = obj.fig_U;
@@ -248,12 +248,14 @@ classdef dlgr_class < matlab.System
       for s = 1:nSol
         algNames{s} = obj.logs{s+1,3}; 
         %vals  = obj.logs{s+1,5};
-        %A_vec = obj.logs{s+1,7};
-        A_mat = obj.logs{s+1,8};
-        real_A = real(A_mat);
-        imag_A = imag(A_mat);
+        A_vec = obj.logs{s+1,7};
+        %A_mat = obj.logs{s+1,8};
+        real_A = real(A_vec);
+        imag_A = imag(A_vec);
         plot(real_A,imag_A,obj.fig_PT(s),LW,obj.fig_LW,DN,algNames{s});
       end
+      viscircles([0 0],1,Cr,"k",LS,'--',LW,obj.fig_LW);% "unit circle"
+      %plot([:],0,"k-",LW,obj.fig_LW,DN,"unit circle");
       lg          = legend('show','location','best'); 
       lg.Units    = obj.fig_leg_U;
       lg.Position = obj.fig_leg_pos;

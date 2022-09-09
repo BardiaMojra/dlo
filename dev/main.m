@@ -1,7 +1,7 @@
 %% DLO main
 %% init sys 
 close all; clear; clc;
-cfg  = cfg_class(TID    = ['B000', '00', '_piDMD_', 'Errs'], ...
+cfg  = cfg_class(TID    = ['D000', '00', '_piDMD_', ''], ...
                  brief  = [''], ...
                  bnum   = 1, ...
                  end_frame  = 1000);
@@ -20,7 +20,7 @@ piExct_mdl  = pi.est(pi.X, pi.Y, "piDMD exact", "exact"); % piDMD baseline
 
 % piDMD methods B000
 %C_mdl  = pi.est(pi.X, pi.Y, "piDMD ExactSVDS", "exactSVDS"); % 01
-%C_mdl  = pi.est(pi.X, pi.Y, "piDMD Orth", "orthogonal"); % 02
+C_mdl  = pi.est(pi.X, pi.Y, "piDMD Orth", "orthogonal"); % 02
 %C_mdl  = pi.est(pi.X, pi.Y, "piDMD UpTri", "uppertriangular"); % 03
 %C_mdl  = pi.est(pi.X, pi.Y, "piDMD LoTri", "lowertriangular"); % 04
 %D_mdl  = pi.est(pi.X, pi.Y, "piDMD Diag", "diagonal"); % 05
@@ -52,7 +52,7 @@ dlgr.add_mdl(piExct_mdl); % baseline
 %
 %dlgr.add_mdl(A_mdl);
 %dlgr.add_mdl(B_mdl);
-%dlgr.add_mdl(C_mdl);
+dlgr.add_mdl(C_mdl);
 %dlgr.add_mdl(C_mdl);
 %dlgr.add_mdl(D_mdl);
 %dlgr.add_mdl(E_mdl);
