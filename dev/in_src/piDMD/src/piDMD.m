@@ -212,7 +212,7 @@ elseif strcmp(method,'BCCB') || strcmp(method,'BCCBtls') || strcmp(method,'BCCBs
   if isempty(varargin); error('Need to specify size of blocks.'); end
   s = varargin{1}; p = prod(s);
   % Equivalent to applying the block-DFT matrix F 
-  % defined by F = kron(dftmtx(M),dftmtx(N)) to the 
+  % defined by F =m(dftmtx(M),dftmtx(N)) to the 
   % matrix X
   aF =  @(x) reshape( fft2(reshape(x ,[s,size(x,2)])),[p,size(x,2)])/sqrt(p);
   aFt = @(x) conj(aF(conj(x)));
@@ -244,34 +244,34 @@ elseif strcmp(method,'BCCB') || strcmp(method,'BCCBtls') || strcmp(method,'BCCBs
 
 elseif strcmp(method,'BC') || strcmp(method,'BCtri') || strcmp(method,'BCtls')
     
-    s = varargin{1}; p = prod(s);
-        M = s(2); N = s(1);
-    if isempty(s); error('Need to specify size of blocks.'); end
-    % Equivalent to applying the block-DFT matrix F 
-    % defined by F = kron(dftmtx(M),eye(N)) to the 
-    % matrix X
-aF  =  @(x) reshape(fft(reshape(x,[s,size(x,2)]),[],2) ,[p,size(x,2)])/sqrt(M);
-aFt =  @(x) conj(aF(conj(x)));
-
-fX = aF(X); fY = aF(Y);
-    d = cell(M,1);
-
-for j = 1:M
+  s = varargin{1}; p = prod(s);
+      M = s(2); N = s(1);
+  if isempty(s); error('Need to specify size of blocks.'); end
+  % Equivalent to applying the block-DFT matrix F 
+  % defined by F = kron(dftmtx(M),eye(N)) to the 
+  % matrix X
+  aF  =  @(x) reshape(fft(reshape(x,[s,size(x,2)]),[],2) ,[p,size(x,2)])/sqrt(M);
+  aFt =  @(x) conj(aF(conj(x)));
+  
+  fX = aF(X); fY = aF(Y);
+  d = cell(M,1);
+  
+  for j = 1:M
     ls = (j-1)*N + (1:N);
     if strcmp(method,'BC')
-        d{j} = fY(ls,:)/fX(ls,:);
+      d{j} = fY(ls,:)/fX(ls,:);
     elseif strcmp(method,'BCtri')
-        d{j} = piDMD(fX(ls,:),fY(ls,:),'diagonal',2);
+      d{j} = piDMD(fX(ls,:),fY(ls,:),'diagonal',2);
     elseif strcmp(method,'BCtls')
-        d{j} = tls(fX(ls,:)',fY(ls,:)')';
+      d{j} = tls(fX(ls,:)',fY(ls,:)')';
     end
-end 
-
-    BD = blkdiag(d{:});
-    A = @(v) aFt(BD*aF(v));        
-   
-elseif strcmp(method,'symtridiagonal')
-    
+  end 
+  
+  BD = blkdiag(d{:});
+  A = @(v) aFt(BD*aF(v));        
+     
+  elseif strcmp(method,'symtridiagonal')
+      
     T1e = vecnorm(X,2,2).^2; % Compute the entries of the first block
     T1 = spdiags(T1e,0,nx,nx); % Form the leading block
     T2e = dot(X(2:end,:),X(1:end-1,:),2); % Compute the entries of the second block
@@ -284,7 +284,6 @@ elseif strcmp(method,'symtridiagonal')
     c = real(T)\real(d); % Take real parts then solve linear system
     % Form the solution matrix
     A = spdiags(c(1:nx),0,nx,nx) + spdiags([0;c(nx+1:end)],1,nx,nx) + spdiags([c(nx+1:end); 0],-1,nx,nx);
-else
+  else
     error('The selected method doesn''t exist.');
-
-end
+  end
