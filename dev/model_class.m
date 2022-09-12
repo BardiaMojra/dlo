@@ -27,12 +27,14 @@ classdef model_class < matlab.System
     Ux
     Sx
     Vx
-     m.Yproj = m.Ux'*Y; m.Xproj 
-[m.Uyx, ~, m.Vyx]
-        [m.R,m.Q] = rq(X); % Q*Q' = I
-        m.Ut = triu(Y*m.Q');
-        m.A = m.Ut/m.R;
-
+    Yproj
+    Xproj 
+    Uyx
+    Vyx
+    R
+    Q
+    Ut
+    
 
 
     %% private vars
