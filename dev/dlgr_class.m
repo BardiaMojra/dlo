@@ -107,8 +107,8 @@ classdef dlgr_class < matlab.System
       obj.logs{len+1, 1} = len;
       obj.logs{len+1, 2} = mdl.mthd; % e.g. piDMD, HAVOK 
       obj.logs{len+1, 3} = mdl.name;
-      obj.logs{len+1, 4} = mdl.A_mdl;
-      obj.logs{len+1, 5} = mdl.vals;
+      obj.logs{len+1, 4} = mdl;
+      obj.logs{len+1, 5} = mdl.eVals;
       obj.logs{len+1, 6} = mdl.rec;
       obj.logs{len+1, 7} = mdl.A_vec;
       obj.logs{len+1, 8} = mdl.A_mat;

@@ -57,10 +57,8 @@ classdef piDMD_class < matlab.System
     end
 
     function m = get_model(obj, X, Y, mthd, varargin)
-      
-      m = model_class(name = strcat("piDMD ", mthd));
+      m = model_class(name = strcat("piDMD ", mthd), mthd = mthd);
       [nx, nt] = size(X); 
-      
       if strcmp(m.mthd,'exact') || strcmp(m.mthd,'exactSVDS')
         if nargin>4
           m.r = varargin{1};
@@ -75,7 +73,7 @@ classdef piDMD_class < matlab.System
         end
         m.Atilde = (m.Ux'*Y)*m.Vx*pinv(m.Sx);
         m.A = @(v) m.Ux*(m.Atilde*(m.Ux'*v));
-        m.eigen_Atilde = eig(m.Atilde);
+        m.eig_Atilde = eig(m.Atilde);
         [m.eVecs, m.eVals] = eig(m.Atilde);
         m.eVals = diag(m.eVals); 
         m.eVecs = Y*m.Vx*pinv(m.Sx)*m.eVecs./m.eVals.';
@@ -87,7 +85,7 @@ classdef piDMD_class < matlab.System
         end
         [m.Ux,~,~] = svd(X,0); m.Ux = m.Ux(:,1:m.r);
         m.Yproj = m.Ux'*Y; m.Xproj = m.Ux'*X; % Project X and Y onto principal components
-        [m.Uyx, ~, m.Vyx] = svd(Yproj*Xproj',0);
+        [m.Uyx, ~, m.Vyx] = svd(m.Yproj*m.Xproj',0);
         m.Aproj = m.Uyx*m.Vyx';    
         m.A = @(x) m.Ux*(m.Aproj*(m.Ux'*x));
         [m.eVecs, m.eVals] = eig(m.Aproj);
@@ -96,7 +94,7 @@ classdef piDMD_class < matlab.System
         m.Ut = triu(Y*m.Q');
         m.A = m.Ut/m.R;
       elseif strcmp(m.mthd,'lowertriangular')  
-        m.A = rot90(piDMD(flipud(X),flipud(Y),'uppertriangular'),2);
+        m.A = rot90(obj.get_model(flipud(X),flipud(Y),'uppertriangular'),2);
 % The codes allows for matrices of variable banded width. The fourth input,
 % a 2xn matrix called d, specifies the upper and lower bounds of the
 % indices of the non-zero elements. The first column corresponds to the width of
@@ -106,174 +104,157 @@ classdef piDMD_class < matlab.System
 % d as a scalar then the algorithm converts the input to obtain a banded 
 % diagonal matrix of width d. 
       elseif startsWith(m.mthd,'diagonal') 
-        if nargin>3
-          d = varargin{1}; % arrange d into an nx-by-2 matrix
-          if numel(d) == 1
-            d = d*ones(nx,2);
-          elseif numel(d) == nx
-            d = repmat(d,[1,2]);
-          elseif any(size(d)~=[nx,2])
+        if nargin>4
+          m.d = varargin{1}; % arrange d into an nx-by-2 matrix
+          if numel(m.d) == 1
+            m.d = m.d*ones(nx,2);
+          elseif numel(m.d) == nx
+            m.d = repmat(m.d,[1,2]);
+          elseif any(size(m.d)~=[nx,2])
             error('Diagonal number is not in an allowable format.')
           end
         else 
-          d = ones(nx,2); % default is for a diagonal matrix
+          m.d = ones(nx,2); % default is for a diagonal matrix
         end
         % Allocate cells to build sparse matrix
         Icell = cell(1,nx); Jcell = cell(1,nx); Rcell = cell(1,nx);
         for j = 1:nx
-          l1 = max(j-(d(j,1)-1),1); l2 = min(j+(d(j,2)-1),nx);
+          l1 = max(j-(m.d(j,1)-1),1); l2 = min(j+(m.d(j,2)-1),nx);
           C = X(l1:l2,:); b = Y(j,:); % preparing to solve min||Cx-b|| along each row
-          if strcmp(mthd,'diagonal')
+          if strcmp(m.mthd,'diagonal')
             sol = b/C;
-          elseif strcmp(mthd,'diagonalpinv')
+          elseif strcmp(m.mthd,'diagonalpinv')
             sol = b*pinv(C);
-          elseif strcmp(mthd,'diagonaltls')
-            sol = tls(C.',b.').';
+          elseif strcmp(m.mthd,'diagonaltls')
+            sol = obj.tls(C.',b.').';
           end
           Icell{j} = j*ones(1,1+l2-l1); Jcell{j} = l1:l2; Rcell{j} = sol;
         end
         Imat = cell2mat(Icell); Jmat = cell2mat(Jcell); Rmat = cell2mat(Rcell);
-        Asparse = sparse(Imat,Jmat,Rmat,nx,nx);
-        A = @(v) Asparse*v;
-        if nargout==2
-          eVals = eigs(Asparse,nx);
-          varargout{1} = eVals;
-        elseif nargout>2
-          [eVecs, eVals] = eigs(Asparse,nx);
-          varargout{1} = diag(eVals); varargout{2} = eVecs;
-        end
-      elseif strcmp(mthd,'symmetric') || strcmp(mthd,'skewsymmetric')
-        [Ux,S,V] = svd(X,0);
-        C = Ux'*Y*V;
+        m.Asparse = sparse(Imat,Jmat,Rmat,nx,nx);
+        m.A = @(v) m.Asparse*v;
+        [m.eVecs, m.eVals] = eigs(m.Asparse,nx);
+      elseif strcmp(m.mthd,'symmetric') || strcmp(m.mthd,'skewsymmetric')
+        [m.Ux,m.S,m.V] = svd(X,0);
+        C = m.Ux'*Y*m.V;
         C1 = C;
-        if nargin>3; r = varargin{1}; else; r = rank(X); end
-        Ux = Ux(:,1:r);
-        Yf = zeros(r);
-        if strcmp(mthd,'symmetric') 
-          for i = 1:r
-            Yf(i,i) = real(C1(i,i))/S(i,i);
-            for j = i+1:r
-              Yf(i,j) = (S(i,i)*conj(C1(j,i)) + S(j,j)*C1(i,j)) / (S(i,i)^2 + S(j,j)^2);
+        if nargin>4; m.r = varargin{1}; else; m.r = rank(X); end
+        m.Ux = m.Ux(:,1:m.r);
+        m.Yf = zeros(m.r);
+        if strcmp(m.mthd,'symmetric') 
+          for i = 1:m.r
+            m.Yf(i,i) = real(C1(i,i))/m.S(i,i);
+            for j = i+1:m.r
+              m.Yf(i,j) = (m.S(i,i)*conj(C1(j,i)) + m.S(j,j)*C1(i,j)) / (m.S(i,i)^2 + m.S(j,j)^2);
             end
           end
-          Yf = Yf + Yf' - diag(diag(real(Yf)));
-        elseif strcmp(mthd,'skewsymmetric')
-          for i = 1:r
-            Yf(i,i) = 1i*imag(C1(i,i))/S(i,i);
+          m.Yf = m.Yf + m.Yf' - diag(diag(real(m.Yf)));
+        elseif strcmp(m.mthd,'skewsymmetric')
+          for i = 1:m.r
+            m.Yf(i,i) = 1i*imag(C1(i,i))/m.S(i,i);
             for j = i+1:nx
-              Yf(i,j) = (-S(i,i)*conj(C1(j,i)) + S(j,j)*(C1(i,j))) / (S(i,i)^2 + S(j,j)^2);
+              m.Yf(i,j) = (-m.S(i,i)*conj(C1(j,i)) + m.S(j,j)*(C1(i,j))) / (m.S(i,i)^2 + m.S(j,j)^2);
             end
           end
-          Yf = Yf - Yf' - 1i*diag(diag(imag(Yf)));
+          m.Yf = m.Yf - m.Yf' - 1i*diag(diag(imag(Yf)));
         end
 
-        A = @(v) Ux*Yf*(Ux'*v);
+        m.A = @(v) m.Ux*m.Yf*(m.Ux'*v);
+        m.eig_YF = eig(m.Yf);
 
-        if nargout==2
-          varargout{1} = eig(Yf);
-        elseif nargout>2
-          [eVecs,eVals] = eig(Yf);
-          eVals = diag(eVals);
-          eVecs = Ux*eVecs;
-          varargout{1} = eVals; varargout{2} = eVecs;
-        end
-      elseif strcmp(mthd,'toeplitz') || strcmp(mthd,'hankel')
-        if  strcmp(mthd,'toeplitz'); J = eye(nx); 
-        elseif strcmp(mthd,'hankel'); J = fliplr(eye(nx)); end
+        [m.eVecs,m.eVals] = eig(m.Yf);
+        m.eVals = diag(m.eVals);
+        m.eVecs = m.Ux*m.eVecs;
+      elseif strcmp(m.mthd,'toeplitz') || strcmp(m.mthd,'hankel')
+        if  strcmp(m.mthd,'toeplitz'); J = eye(nx); 
+        elseif strcmp(m.mthd,'hankel'); J = fliplr(eye(nx)); end
         Am = fft([eye(nx) zeros(nx)].',[],1)'/sqrt(2*nx); % Define the left matrix
         B = fft([(J*X)' zeros(nt,nx)].',[],1)'/sqrt(2*nx); % Define the right matrix
         BtB = B'*B; 
         AAt = ifft(fft([eye(nx) zeros(nx); zeros(nx,2*nx)]).').'; % Fast computation of A*A'
         y = diag(Am'*conj(Y)*B)'; % Construct the RHS of the linear system
         L = (AAt.*BtB.')'; % Construct the matrix for the linear system
-        d = [y(1:end-1)/L(1:end-1,1:end-1) 0]; % Solve the linear system
-        newA = ifft(fft(diag(d)).').'; % Convert the eigenvalues into the circulant matrix
-        A = newA(1:nx,1:nx)*J; % Extract the Toeplitz matrix from the circulant matrix
-      elseif startsWith(mthd,'circulant')
-        fX = fft(X); fY = fft(conj(Y));
-        d = zeros(nx,1);
+        m.d = [y(1:end-1)/L(1:end-1,1:end-1) 0]; % Solve the linear system
+        newA = ifft(fft(diag(m.d)).').'; % Convert the eigenvalues into the circulant matrix
+        m.A = newA(1:nx,1:nx)*J; % Extract the Toeplitz matrix from the circulant matrix
+      elseif startsWith(m.mthd,'circulant')
+        m.fX = fft(X); m.fY = fft(conj(Y));
+        m.d = zeros(nx,1);
         if endsWith(mthd,'TLS') % Solve in the total least squares sense     
           for j = 1:nx
-            d(j) = tls(fX(j,:)',fY(j,:)');
+            m.d(j) = obj.tls(m.fX(j,:)',m.fY(j,:)');
           end
-        elseif ~endsWith(mthd,'TLS') % Solve the other cases
-          d = diag(fX*fY')./vecnorm(fX,2,2).^2;
-          if endsWith(mthd,'unitary'); d = exp(1i*angle(d));
-          elseif endsWith(mthd,'symmetric'); d = real(d);
-          elseif endsWith(mthd,'skewsymmetric'); d = 1i*imag(d);
+        elseif ~endsWith(m.mthd,'TLS') % Solve the other cases
+          m.d = diag(m.fX*m.fY')./vecnorm(m.fX,2,2).^2;
+          if endsWith(m.mthd,'unitary'); m.d = exp(1i*angle(m.d));
+          elseif endsWith(m.mthd,'symmetric'); m.d = real(m.d);
+          elseif endsWith(m.mthd,'skewsymmetric'); m.d = 1i*imag(m.d);
           end
         end
-        eVals = d; % These are the eigenvalues
-        eVecs = fft(eye(nx)); % These are the eigenvectors
-        if nargin>3
-          r = varargin{1}; % Rank constraint
-          res = diag(abs(fX*fY'))./vecnorm(fX')'; % Identify least important eigenvalues
-          [~,idx] = mink(res,nx-r); % Remove least important eigenvalues
-          d(idx) = 0; eVals(idx) = []; eVecs(:,idx) = [];
+        m.eVals = m.d; % These are the eigenvalues
+        m.eVecs = fft(eye(nx)); % These are the eigenvectors
+        if nargin>4
+          m.r = varargin{1}; % Rank constraint
+          res = diag(abs(m.fX*m.fY'))./vecnorm(m.fX')'; % Identify least important eigenvalues
+          [~,idx] = mink(res,nx-m.r); % Remove least important eigenvalues
+          m.d(idx) = 0; m.eVals(idx) = []; m.eVecs(:,idx) = [];
         end
-        if nargout>1; varargout{1} = eVals; end
-        if nargout>2; varargout{2} = eVecs; end
-        A = @(v) fft(d.*ifft(v)); % Reconstruct the operator in terms of FFTs
-
-      elseif strcmp(mthd,'BCCB') || strcmp(mthd,'BCCBtls') || strcmp(mthd,'BCCBskewsymmetric') || strcmp(mthd,'BCCBunitary')
-    
+        m.A = @(v) fft(m.d.*ifft(v)); % Reconstruct the operator in terms of FFTs
+      elseif strcmp(m.mthd,'BCCB') || strcmp(m.mthd,'BCCBtls') || ...
+        strcmp(m.mthd,'BCCBskewsymmetric') || strcmp(m.mthd,'BCCBunitary')
         if isempty(varargin); error('Need to specify size of blocks.'); end
-        s = varargin{1}; p = prod(s);
+        m.s = varargin{1}; m.p = prod(m.s);
         % Equivalent to applying the block-DFT matrix F 
         % defined by F = kron(dftmtx(M),dftmtx(N)) to the 
         % matrix X
-        aF =  @(x) reshape(     fft2(reshape(x ,[s,size(x,2)])) ,[p,size(x,2)])/sqrt(p);
+        aF =  @(x) reshape(fft2(reshape(x ,[m.s,size(x,2)])) ,[m.p,size(x,2)])/sqrt(m.p);
         aFt = @(x) conj(aF(conj(x)));
-        fX = aF(conj(X)); fY = aF(conj(Y));
-        d = zeros(p,1);
-            
-        if strcmp(mthd,'BCCB') 
-        for j = 1:p; d(j) = conj(fX(j,:)*fY(j,:)')/norm(fX(j,:)').^2; end
-        elseif strcmp(mthd,'BCCBtls')
-        for j = 1:p; d(j) = tls(fX(j,:)',fY(j,:)')'; end
-        elseif strcmp(mthd,'BCCBskewsymmetric')
-        for j = 1:p; d(j) = 1i*imag(fY(j,:)/fX(j,:)); end
-        elseif strcmp(mthd,'BCCBsymmetric')
-        for j = 1:p; d(j) = real(fY(j,:)/fX(j,:)); end
-        elseif strcmp(mthd,'BCCBunitary')
-        for j = 1:p; d(j) = exp(1i*angle(fY(j,:)/fX(j,:))); end
+        m.m.fX = aF(conj(X)); m.m.fY = aF(conj(Y));
+        m.d = zeros(m.p,1);
+        if strcmp(m.mthd,'BCCB') 
+          for j = 1:m.p; m.d(j) = conj(m.m.fX(j,:)*m.m.fY(j,:)')/norm(m.fX(j,:)').^2; end
+          elseif strcmp(mthd,'BCCBtls')
+          for j = 1:m.p; m.d(j) = tls(m.fX(j,:)',m.fY(j,:)')'; end
+          elseif strcmp(mthd,'BCCBskewsymmetric')
+          for j = 1:m.p; m.d(j) = 1i*imag(m.fY(j,:)/m.fX(j,:)); end
+          elseif strcmp(mthd,'BCCBsymmetric')
+          for j = 1:m.p; m.d(j) = real(m.fY(j,:)/m.fX(j,:)); end
+          elseif strcmp(mthd,'BCCBunitary')
+          for j = 1:m.p; m.d(j) = exp(1i*angle(m.fY(j,:)/m.fX(j,:))); end
         end
-
         % Returns a function handle that applies A
-        if nargin>4
-          r = varargin{2};
-          res = diag(abs(fX*fY'))./vecnorm(fX')';
+        if nargin>5
+          m.r = varargin{2};
+          res = diag(abs(m.fX*m.fY'))./vecnorm(m.fX')';
           [~,idx] = mink(res,nx-r);
-          d(idx) = 0;
+          m.d(idx) = 0;
         end
-        A = @(x) aF((conj(d).*aFt(x)));
-        varargout{1} = d;
-        % Eigenvalues are given by d
-
-      elseif strcmp(mthd,'BC') || strcmp(mthd,'BCtri') || strcmp(mthd,'BCtls')
-        s = varargin{1}; p = prod(s);
-        M = s(2); N = s(1);
-        if isempty(s); error('Need to specify size of blocks.'); end
+        m.A = @(x) aF((conj(m.d).*aFt(x)));
+        m.eVals = m.d; % Eigenvalues are given by d
+      elseif strcmp(m.mthd,'BC') || strcmp(m.mthd,'BCtri') || strcmp(m.mthd,'BCtls')
+        m.s = varargin{1}; m.p = prod(m.s);
+        m.M = m.s(2); m.N = m.s(1);
+        if isempty(m.s); error('Need to specify size of blocks.'); end
         % Equivalent to applying the block-DFT matrix F 
         % defined by F = kron(dftmtx(M),eye(N)) to the 
         % matrix X
-        aF  =  @(x) reshape(fft(reshape(x,[s,size(x,2)]),[],2) ,[p,size(x,2)])/sqrt(M);
+        aF  =  @(x) reshape(fft(reshape(x,[m.s,size(x,2)]),[],2) ,[m.p,size(x,2)])/sqrt(m.M);
         aFt =  @(x) conj(aF(conj(x)));
-        fX = aF(X); fY = aF(Y);
-        d = cell(M,1);
-        for j = 1:M
-          ls = (j-1)*N + (1:N);
-          if strcmp(mthd,'BC')
-            d{j} = fY(ls,:)/fX(ls,:);
-          elseif strcmp(mthd,'BCtri')
-            d{j} = piDMD(fX(ls,:),fY(ls,:),'diagonal',2);
-          elseif strcmp(mthd,'BCtls')
-            d{j} = tls(fX(ls,:)',fY(ls,:)')';
+        m.fX = aF(X); m.fY = aF(Y);
+        m.d = cell(m.M,1);
+        for j = 1:m.M
+          ls = (j-1)*m.N + (1:m.N);
+          if strcmp(m.mthd,'BC')
+            m.d{j} = m.fY(ls,:)/m.fX(ls,:);
+          elseif strcmp(m.mthd,'BCtri')
+            m.d{j} = obj.get_model(m.fX(ls,:),m.fY(ls,:),'diagonal',2);
+          elseif strcmp(m.mthd,'BCtls')
+            m.d{j} = obj.tls(m.fX(ls,:)',m.fY(ls,:)')';
           end
         end 
-        BD = blkdiag(d{:});
-        A = @(v) aFt(BD*aF(v));           
-      elseif strcmp(mthd,'symtridiagonal')
+        BD = blkdiag(m.d{:});
+        m.A = @(v) aFt(BD*aF(v));           
+      elseif strcmp(m.mthd,'symtridiagonal')
         T1e = vecnorm(X,2,2).^2; % Compute the entries of the first block
         T1 = spdiags(T1e,0,nx,nx); % Form the leading block
         T2e = dot(X(2:end,:),X(1:end-1,:),2); % Compute the entries of the second block
@@ -281,23 +262,23 @@ classdef piDMD_class < matlab.System
         T3e = [0; dot(X(3:end,:),X(1:end-2,:),2)]; % Compute the entries of the final block
         T3 = spdiags(T1e(1:end-1) + T1e(2:end),0,nx-1,nx-1) ...
              + spdiags(T3e,1,nx-1,nx-1) + spdiags(T3e,1,nx-1,nx-1)'; % Form the final block
-        T = [T1 T2; T2' T3]; % Form the block tridiagonal matrix
-        d = [dot(X,Y,2); dot(X(1:end-1,:),Y(2:end,:),2) + dot(X(2:end,:),Y(1:end-1,:),2)]; % Compute the RHS vector
-        c = real(T)\real(d); % Take real parts then solve linear system
-        % Form the solution matrix
-        A = spdiags(c(1:nx),0,nx,nx) + spdiags([0;c(nx+1:end)],1,nx,nx) + spdiags([c(nx+1:end); 0],-1,nx,nx);
+        m.T = [T1 T2; T2' T3]; % Form the block tridiagonal matrix
+        m.d = [dot(X,Y,2); dot(X(1:end-1,:),Y(2:end,:),2) + dot(X(2:end,:),Y(1:end-1,:),2)]; % Compute the RHS vector
+        c = real(m.T)\real(m.d); % Take real parts then solve linear system
+        m.A = spdiags(c(1:nx),0,nx,nx) + spdiags([0;c(nx+1:end)],1,nx,nx) + ...
+                spdiags([c(nx+1:end); 0],-1,nx,nx); % Form the solution matrix
       else
         error('The selected method doesn''t exist.');
       end 
+      obj.get_rec(m); % get data reconstruction
     end % get_model()
 
-    function rec = get_rec(obj, m)
-      rec = zeros(obj.nVars, obj.nSamps); % reconstruct dat
-      rec(:,1) = obj.dat(:,1);       
+    function get_rec(obj, m)
+      m.rec = zeros(obj.nVars, obj.nSamps); % reconstruct dat
+      m.rec(:,1) = obj.dat(:,1);       
       for j = 2:obj.nSamps
-        rec(:,j) = m.A(rec(:,j-1));
+        m.rec(:,j) = m.A(m.rec(:,j-1));
       end
-      m.rec = rec;
     end % get_rec()
   
   end 
@@ -328,7 +309,7 @@ classdef piDMD_class < matlab.System
       ylabel(j,"Interpreter","latex","FontSize",20)
     end
 
-    function [R,Q,varargout] = rq(A) % Performs RQ decomposition
+    function [R,Q,varargout] = rq(~,A,varargin) % Performs RQ decomposition
       n = size(A,1);
       if nargout<3
         [Q,R] = qr(flipud(A)',0);
@@ -339,25 +320,25 @@ classdef piDMD_class < matlab.System
       end
       R = rot90(R',2);
       Q = flipud(Q');
-      [n,m]=size(A);
+      [n,m] = size(A);
       if n>m
         R = [zeros(n,n-m), R];
         Q = [zeros(n-m,m); Q];
       end  
     end % rq()
       
-    function [Xhat] = tls(A,B)
+    function [Xhat] = tls(obj,A,B,varargin)
       n = size(A,2);
       if size(A,1)~=size(B,1); error('Matrices are not conformant.'); end
       R1 = [A B];
       [~,~,V] = svd(R1,0);
       r = size(A,2);
-      R = rq(V(:,r+1:end));Gamma = R(n+1:end,n-r+1:end);
+      R = obj.rq(V(:,r+1:end));Gamma = R(n+1:end,n-r+1:end);
       Z = R(1:n,n-r+1:end);
       Xhat = -Z/Gamma;
     end % tls
 
-    function c = redblue(m)
+    function c = redblue(~,m,varargin)
       %REDBLUE    Shades of red and blue color map
       %  REDBLUE(M), is an M-by-3 matrix that defines a colormap.
       %  The colors begin with bright blue, range through shades of

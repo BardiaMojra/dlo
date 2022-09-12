@@ -16,14 +16,22 @@ classdef model_class < matlab.System
     A       = [] % state transient function pointer (per piDMD)
     Aproj   = [] % A projection matrix
     Atilde  = [] % A est matrix 
-    eigen_Atilde = [] % = eig(Atilde)
     eVals   = []
     eVecs   = []
     rec
     A_vec   = [] % eigenFunc state stransition vec
     A_mat   = [] % eigenFunc sysmmetric matrix model     % method specific vars
-    
+    % inputs 
+    s % block size 
+    d % band width of diag 
+    p % num element for block 
+    r % rank
+
     % other piDMD vars
+    eig_Atilde = [] % = eig(Atilde)
+    U
+    S
+    V
     Ux
     Sx
     Vx
@@ -34,8 +42,13 @@ classdef model_class < matlab.System
     R
     Q
     Ut
-    
-
+    Asparse 
+    Yf
+    Xf
+    eig_YF
+    M
+    N
+    T % the block tridiagonal matrix
 
     %% private vars
     st_errs % state errors 

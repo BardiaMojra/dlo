@@ -14,41 +14,41 @@ hvk   = HAVOK_class(); hvk.load_cfg(cfg);
 
 %% run
 gt_mld      = model_class(name = "ground truth", mthd = "gt", rec = pi.dat); % gt
-piExct_mdl  = pi.est(pi.X, pi.Y, "exact"); % piDMD baseline
-%A_mdl  = pi.est(pi.X, pi.Y, "piDMD orth", "orthogonal"); 
-%B_mdl  = pi.est(pi.X, pi.Y, "piDMD orth", "orthogonal"); 
+piExct_mdl  = pi.get_model(pi.X, pi.Y, "exact"); % piDMD baseline
+%A_mdl  = pi.get_model(pi.X, pi.Y, "piDMD orth", "orthogonal"); 
+%B_mdl  = pi.get_model(pi.X, pi.Y, "piDMD orth", "orthogonal"); 
 
 
 
 %C_mdl  = pi.est(pi.X, pi.Y, "uppertriangular"); % 03
 
 % piDMD methods B000
-%C_mdl  = pi.est(pi.X, pi.Y, "exactSVDS"); % 01
-C_mdl  = pi.est(pi.X, pi.Y, "orthogonal"); % 02 r
-D_mdl  = pi.est(pi.X, pi.Y, "uppertriangular"); % 03
-%C_mdl  = pi.est(pi.X, pi.Y, "lowertriangular"); % 04
-%D_mdl  = pi.est(pi.X, pi.Y, "diagonal"); % 05
-%E_mdl  = pi.est(pi.X, pi.Y, "diagonalpinv"); % 06
-%F_mdl  = pi.est(pi.X, pi.Y, "diagonaltls"); % 07
-%C_mdl  = pi.est(pi.X, pi.Y, "symtridiagonal"); % 08
-%G_mdl  = pi.est(pi.X, pi.Y, "circulant"); % 09
-%H_mdl  = pi.est(pi.X, pi.Y, "circulantTLS"); % 10
-%I_mdl  = pi.est(pi.X, pi.Y, "circulantunitary"); % 11
-%J_mdl  = pi.est(pi.X, pi.Y, "circulantsymmetric"); % 12
-%K_mdl  = pi.est(pi.X, pi.Y, "circulantskewsymmetric"); % 13 
-%C_mdl  = pi.est(pi.X, pi.Y, "BCCB", [9 9]); % 14
-%C_mdl  = pi.est(pi.X, pi.Y, "TLS"); % 15
-%C_mdl  = pi.est(pi.X, pi.Y, "BC"); % 16
-%C_mdl  = pi.est(pi.X, pi.Y, "BCtri"); % 17
-%C_mdl  = pi.est(pi.X, pi.Y, "BCtls"); % 18
-%C_mdl  = pi.est(pi.X, pi.Y, ""); % 19
-%C_mdl  = pi.est(pi.X, pi.Y, "BCCBtls"); 
-%C_mdl  = pi.est(pi.X, pi.Y, "BCCBskewsymmetric"); 
-%C_mdl  = pi.est(pi.X, pi.Y, "BCCBunitary"); 
-%C_mdl  = pi.est(pi.X, pi.Y, "hankel"); 
-%C_mdl  = pi.est(pi.X, pi.Y, "toeplitz"); 
-%C_mdl  = pi.est(pi.X, pi.Y, "symmetric"); 
-%C_mdl  = pi.est(pi.X, pi.Y, "skewsymmetric"); 
+%C_mdl  = pi.get_model(pi.X, pi.Y, "exactSVDS"); % 01
+C_mdl  = pi.get_model(pi.X, pi.Y, "orthogonal"); % 02 r
+%D_mdl  = pi.get_model(pi.X, pi.Y, "uppertriangular"); % 03
+%C_mdl  = pi.get_model(pi.X, pi.Y, "lowertriangular"); % 04
+D_mdl  = pi.get_model(pi.X, pi.Y, "diagonal", 2); % 05
+%E_mdl  = pi.get_model(pi.X, pi.Y, "diagonalpinv"); % 06
+%F_mdl  = pi.get_model(pi.X, pi.Y, "diagonaltls"); % 07
+%C_mdl  = pi.get_model(pi.X, pi.Y, "symtridiagonal"); % 08
+%G_mdl  = pi.get_model(pi.X, pi.Y, "circulant"); % 09
+%H_mdl  = pi.get_model(pi.X, pi.Y, "circulantTLS"); % 10
+%I_mdl  = pi.get_model(pi.X, pi.Y, "circulantunitary"); % 11
+%J_mdl  = pi.get_model(pi.X, pi.Y, "circulantsymmetric"); % 12
+%K_mdl  = pi.get_model(pi.X, pi.Y, "circulantskewsymmetric"); % 13 
+%C_mdl  = pi.get_model(pi.X, pi.Y, "BCCB", [9 9]); % 14
+%C_mdl  = pi.get_model(pi.X, pi.Y, "TLS"); % 15
+%C_mdl  = pi.get_model(pi.X, pi.Y, "BC"); % 16
+%C_mdl  = pi.get_model(pi.X, pi.Y, "BCtri"); % 17
+%C_mdl  = pi.get_model(pi.X, pi.Y, "BCtls"); % 18
+%C_mdl  = pi.get_model(pi.X, pi.Y, ""); % 19
+%C_mdl  = pi.get_model(pi.X, pi.Y, "BCCBtls"); 
+%C_mdl  = pi.get_model(pi.X, pi.Y, "BCCBskewsymmetric"); 
+%C_mdl  = pi.get_model(pi.X, pi.Y, "BCCBunitary"); 
+%C_mdl  = pi.get_model(pi.X, pi.Y, "hankel"); 
+%C_mdl  = pi.get_model(pi.X, pi.Y, "toeplitz"); 
+%C_mdl  = pi.get_model(pi.X, pi.Y, "symmetric"); 
+%C_mdl  = pi.get_model(pi.X, pi.Y, "skewsymmetric"); 
 
 % HAVOK methods @todo investiage basis functions 
 %hvk_mdl  = hvk.est(hvk.x, hvk.r, "HAVOK");
@@ -80,7 +80,7 @@ dlgr.get_errs();
 dlgr.get_tab(); % get res table
 dlgr.sav_tab(); % sav log table - result tab
 dlgr.plt_recons_grid();
-dlgr.plt_models_grid();
+%dlgr.plt_models_grid();
 
 %% report
 %rpt.gen_plots(cfg.dat, dlog, piDMD);
