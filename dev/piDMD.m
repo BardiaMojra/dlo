@@ -15,70 +15,54 @@
 % - "symmetric", "skewsymmetric"
 %
 function [A, varargout] = piDMD(X,Y,method,varargin)
-
-[nx, nt] = size(X);
-
-if strcmp(method,'exact') || strcmp(method,'exactSVDS')
-        
+  [nx, nt] = size(X); 
+  if strcmp(method,'exact') || strcmp(method,'exactSVDS')
     if nargin>3
-        r = varargin{1};
+      r = varargin{1};
     else
-        r = min(nx,nt);
+      r = min(nx,nt);
     end
-
     if strcmp(method,'exact')
-        [Ux,Sx,Vx] = svd(X,0);
-        Ux = Ux(:,1:r); Sx = Sx(1:r,1:r); Vx = Vx(:,1:r);
+      [Ux,Sx,Vx] = svd(X,0);
+      Ux = Ux(:,1:r); Sx = Sx(1:r,1:r); Vx = Vx(:,1:r);
     elseif strcmp(method,'exactSVDS')
-        [Ux,Sx,Vx] = svds(X,r);
+     [Ux,Sx,Vx] = svds(X,r);
     end
-
     Atilde = (Ux'*Y)*Vx*pinv(Sx);
     A = @(v) Ux*(Atilde*(Ux'*v));
-
     if nargout==2
-    varargout{1} = eig(Atilde);
+      varargout{1} = eig(Atilde);
     elseif nargout>2
-    [eVecs,eVals] = eig(Atilde);
-    eVals = diag(eVals);
-    eVecs = Y*Vx*pinv(Sx)*eVecs./eVals.';
-    varargout{1} = eVals;
-    varargout{2} = eVecs;
+      [eVecs,eVals] = eig(Atilde);
+      eVals = diag(eVals); eVecs = Y*Vx*pinv(Sx)*eVecs./eVals.';
+      varargout{1} = eVals; varargout{2} = eVecs;
     end
-
-elseif strcmp(method,'orthogonal')
-    
+  elseif strcmp(method,'orthogonal')
     if nargin>3
-        r = varargin{1}; 
+      r = varargin{1}; 
     else 
-        r = min(nx,nt);
+      r = min(nx,nt);
     end
     [Ux,~,~] = svd(X,0); Ux = Ux(:,1:r);
     Yproj = Ux'*Y; Xproj = Ux'*X; % Project X and Y onto principal components
     [Uyx, ~, Vyx] = svd(Yproj*Xproj',0);
     Aproj = Uyx*Vyx';    
     A = @(x) Ux*(Aproj*(Ux'*x));
-    
     if nargout==2
-        eVals = eig(Aproj);
-        varargout{1} = eVals;
+      eVals = eig(Aproj);
+      varargout{1} = eVals;
     elseif nargout>2
-        [eVecs,eVals] = eig(Aproj);
-        varargout{1} = diag(eVals);
-        varargout{2} = Ux*eVecs;
-        if nargout > 3; varargout{3} = Aproj; end
+      [eVecs,eVals] = eig(Aproj);
+      varargout{1} = diag(eVals);
+      varargout{2} = Ux*eVecs;
+      if nargout > 3; varargout{3} = Aproj; end
     end
-    
-elseif strcmp(method,'uppertriangular')
-    
+  elseif strcmp(method,'uppertriangular')
     [R,Q] = rq(X); % Q*Q' = I
     Ut = triu(Y*Q');
     A = Ut/R;
-
-elseif strcmp(method,'lowertriangular')
-    
+  elseif strcmp(method,'lowertriangular')  
     A = rot90(piDMD(flipud(X),flipud(Y),'uppertriangular'),2);
-    
 % The codes allows for matrices of variable banded width. The fourth input,
 % a 2xn matrix called d, specifies the upper and lower bounds of the
 % indices of the non-zero elements. The first column corresponds to the width of
@@ -87,32 +71,32 @@ elseif strcmp(method,'lowertriangular')
 % a tridiagonal matrix would have d = [2 2]+zeros(nx,2). If you only specify
 % d as a scalar then the algorithm converts the input to obtain a banded 
 % diagonal matrix of width d. 
-elseif startsWith(method,'diagonal') 
+  elseif startsWith(method,'diagonal') 
     if nargin>3
-        d = varargin{1}; % arrange d into an nx-by-2 matrix
-        if numel(d) == 1
-            d = d*ones(nx,2);
-        elseif numel(d) == nx
-             d = repmat(d,[1,2]);
-        elseif any(size(d)~=[nx,2])
-            error('Diagonal number is not in an allowable format.')
-        end
+      d = varargin{1}; % arrange d into an nx-by-2 matrix
+      if numel(d) == 1
+        d = d*ones(nx,2);
+      elseif numel(d) == nx
+        d = repmat(d,[1,2]);
+      elseif any(size(d)~=[nx,2])
+        error('Diagonal number is not in an allowable format.')
+      end
     else 
-        d = ones(nx,2); % default is for a diagonal matrix
+      d = ones(nx,2); % default is for a diagonal matrix
     end
     % Allocate cells to build sparse matrix
     Icell = cell(1,nx); Jcell = cell(1,nx); Rcell = cell(1,nx);
     for j = 1:nx
-    l1 = max(j-(d(j,1)-1),1); l2 = min(j+(d(j,2)-1),nx);
-    C = X(l1:l2,:); b = Y(j,:); % preparing to solve min||Cx-b|| along each row
-    if strcmp(method,'diagonal')
-            sol = b/C;
-    elseif strcmp(method,'diagonalpinv')
-            sol = b*pinv(C);
-    elseif strcmp(method,'diagonaltls')
-            sol = tls(C.',b.').';
-    end
-    Icell{j} = j*ones(1,1+l2-l1); Jcell{j} = l1:l2; Rcell{j} = sol;
+      l1 = max(j-(d(j,1)-1),1); l2 = min(j+(d(j,2)-1),nx);
+      C = X(l1:l2,:); b = Y(j,:); % preparing to solve min||Cx-b|| along each row
+      if strcmp(method,'diagonal')
+        sol = b/C;
+      elseif strcmp(method,'diagonalpinv')
+        sol = b*pinv(C);
+      elseif strcmp(method,'diagonaltls')
+        sol = tls(C.',b.').';
+      end
+      Icell{j} = j*ones(1,1+l2-l1); Jcell{j} = l1:l2; Rcell{j} = sol;
     end
     Imat = cell2mat(Icell); Jmat = cell2mat(Jcell); Rmat = cell2mat(Rcell);
     Asparse = sparse(Imat,Jmat,Rmat,nx,nx);
@@ -126,14 +110,14 @@ elseif startsWith(method,'diagonal')
         varargout{1} = diag(eVals); varargout{2} = eVecs;
     end
 
-elseif strcmp(method,'symmetric') || strcmp(method,'skewsymmetric')
-    
-[Ux,S,V] = svd(X,0);
-C = Ux'*Y*V;
-C1 = C;
-if nargin>3; r = varargin{1}; else; r = rank(X); end
-Ux = Ux(:,1:r);
-Yf = zeros(r);
+  elseif strcmp(method,'symmetric') || strcmp(method,'skewsymmetric')
+        
+    [Ux,S,V] = svd(X,0);
+    C = Ux'*Y*V;
+    C1 = C;
+    if nargin>3; r = varargin{1}; else; r = rank(X); end
+    Ux = Ux(:,1:r);
+    Yf = zeros(r);
     if strcmp(method,'symmetric') 
     for i = 1:r
         Yf(i,i) = real(C1(i,i))/S(i,i);
@@ -165,7 +149,7 @@ Yf = zeros(r);
     end
 
     
-elseif strcmp(method,'toeplitz') || strcmp(method,'hankel')
+  elseif strcmp(method,'toeplitz') || strcmp(method,'hankel')
    if  strcmp(method,'toeplitz'); J = eye(nx); 
    elseif strcmp(method,'hankel'); J = fliplr(eye(nx)); end
     Am = fft([eye(nx) zeros(nx)].',[],1)'/sqrt(2*nx); % Define the left matrix
@@ -178,11 +162,11 @@ elseif strcmp(method,'toeplitz') || strcmp(method,'hankel')
     newA = ifft(fft(diag(d)).').'; % Convert the eigenvalues into the circulant matrix
     A = newA(1:nx,1:nx)*J; % Extract the Toeplitz matrix from the circulant matrix
  
-elseif startsWith(method,'circulant')
+  elseif startsWith(method,'circulant')
 
- fX = fft(X); fY = fft(conj(Y));
-
- d = zeros(nx,1);
+     fX = fft(X); fY = fft(conj(Y));
+    
+     d = zeros(nx,1);
     if endsWith(method,'TLS') % Solve in the total least squares sense     
         for j = 1:nx
         d(j) = tls(fX(j,:)',fY(j,:)');
@@ -194,21 +178,21 @@ elseif startsWith(method,'circulant')
         elseif endsWith(method,'skewsymmetric'); d = 1i*imag(d);
         end
     end
-  eVals = d; % These are the eigenvalues
-  eVecs = fft(eye(nx)); % These are the eigenvectors
- if nargin>3
-    r = varargin{1}; % Rank constraint
-    res = diag(abs(fX*fY'))./vecnorm(fX')'; % Identify least important eigenvalues
-    [~,idx] = mink(res,nx-r); % Remove least important eigenvalues
-    d(idx) = 0; eVals(idx) = []; eVecs(:,idx) = [];
- end
+    eVals = d; % These are the eigenvalues
+    eVecs = fft(eye(nx)); % These are the eigenvectors
+    if nargin>3
+      r = varargin{1}; % Rank constraint
+      res = diag(abs(fX*fY'))./vecnorm(fX')'; % Identify least important eigenvalues
+      [~,idx] = mink(res,nx-r); % Remove least important eigenvalues
+      d(idx) = 0; eVals(idx) = []; eVecs(:,idx) = [];
+    end
+  
+    if nargout>1; varargout{1} = eVals; end
+    if nargout>2; varargout{2} = eVecs; end
+    
+     A = @(v) fft(d.*ifft(v)); % Reconstruct the operator in terms of FFTs
 
- if nargout>1; varargout{1} = eVals; end
- if nargout>2; varargout{2} = eVecs; end
-
- A = @(v) fft(d.*ifft(v)); % Reconstruct the operator in terms of FFTs
-
-elseif strcmp(method,'BCCB') || strcmp(method,'BCCBtls') || strcmp(method,'BCCBskewsymmetric') || strcmp(method,'BCCBunitary')
+  elseif strcmp(method,'BCCB') || strcmp(method,'BCCBtls') || strcmp(method,'BCCBskewsymmetric') || strcmp(method,'BCCBunitary')
     
     if isempty(varargin); error('Need to specify size of blocks.'); end
     s = varargin{1}; p = prod(s);
@@ -233,7 +217,7 @@ elseif strcmp(method,'BCCB') || strcmp(method,'BCCBtls') || strcmp(method,'BCCBs
     end
 
     % Returns a function handle that applies A
-     if nargin>4
+    if nargin>4
         r = varargin{2};
         res = diag(abs(fX*fY'))./vecnorm(fX')';
         [~,idx] = mink(res,nx-r);
@@ -243,7 +227,7 @@ elseif strcmp(method,'BCCB') || strcmp(method,'BCCBtls') || strcmp(method,'BCCBs
     varargout{1} = d;
     % Eigenvalues are given by d
 
-elseif strcmp(method,'BC') || strcmp(method,'BCtri') || strcmp(method,'BCtls')
+  elseif strcmp(method,'BC') || strcmp(method,'BCtri') || strcmp(method,'BCtls')
     
     s = varargin{1}; p = prod(s);
         M = s(2); N = s(1);
@@ -251,27 +235,27 @@ elseif strcmp(method,'BC') || strcmp(method,'BCtri') || strcmp(method,'BCtls')
     % Equivalent to applying the block-DFT matrix F 
     % defined by F = kron(dftmtx(M),eye(N)) to the 
     % matrix X
-aF  =  @(x) reshape(fft(reshape(x,[s,size(x,2)]),[],2) ,[p,size(x,2)])/sqrt(M);
-aFt =  @(x) conj(aF(conj(x)));
+    aF  =  @(x) reshape(fft(reshape(x,[s,size(x,2)]),[],2) ,[p,size(x,2)])/sqrt(M);
+    aFt =  @(x) conj(aF(conj(x)));
+    
+    fX = aF(X); fY = aF(Y);
+        d = cell(M,1);
 
-fX = aF(X); fY = aF(Y);
-    d = cell(M,1);
-
-for j = 1:M
-    ls = (j-1)*N + (1:N);
-    if strcmp(method,'BC')
-        d{j} = fY(ls,:)/fX(ls,:);
-    elseif strcmp(method,'BCtri')
-        d{j} = piDMD(fX(ls,:),fY(ls,:),'diagonal',2);
-    elseif strcmp(method,'BCtls')
-        d{j} = tls(fX(ls,:)',fY(ls,:)')';
-    end
-end 
+    for j = 1:M
+        ls = (j-1)*N + (1:N);
+        if strcmp(method,'BC')
+            d{j} = fY(ls,:)/fX(ls,:);
+        elseif strcmp(method,'BCtri')
+            d{j} = piDMD(fX(ls,:),fY(ls,:),'diagonal',2);
+        elseif strcmp(method,'BCtls')
+            d{j} = tls(fX(ls,:)',fY(ls,:)')';
+        end
+    end 
 
     BD = blkdiag(d{:});
     A = @(v) aFt(BD*aF(v));        
    
-elseif strcmp(method,'symtridiagonal')
+  elseif strcmp(method,'symtridiagonal')
     
     T1e = vecnorm(X,2,2).^2; % Compute the entries of the first block
     T1 = spdiags(T1e,0,nx,nx); % Form the leading block
@@ -285,7 +269,9 @@ elseif strcmp(method,'symtridiagonal')
     c = real(T)\real(d); % Take real parts then solve linear system
     % Form the solution matrix
     A = spdiags(c(1:nx),0,nx,nx) + spdiags([0;c(nx+1:end)],1,nx,nx) + spdiags([c(nx+1:end); 0],-1,nx,nx);
-else
+  else
     error('The selected method doesn''t exist.');
 
-end
+  end
+
+end % func

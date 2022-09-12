@@ -1,6 +1,6 @@
 classdef model_class < matlab.System
   properties
-     %% class
+    %% class
     cName       = "model"
     note        = ["model class is used as a general class for system " ...
       "operations, i.e. plots and general data/output logging."]
@@ -14,7 +14,9 @@ classdef model_class < matlab.System
     name % mdl name 
     mthd  = [] % piDMD, HAVOK
     A_mdl = [] % state transient function (per piDMD)
-    vals  = []
+    Aproj = [] % A projection matrix
+    eVals  = []
+    eVecs  = []
     rec
     A_vec = [] % eigenFunc state stransition vec
     A_mat = [] % eigenFunc sysmmetric matrix model     % method specific vars
@@ -43,10 +45,10 @@ classdef model_class < matlab.System
   
     function get_eigenFunc_Rep(obj)
       if strcmp(obj.mthd, "piDMD")
-        obj.A_vec = obj.A_mdl(obj.vals);
+        obj.A_vec = obj.A_mdl(obj.eVals);
         %obj.A_mat = obj.A_vec*obj.A_vec';
       elseif strcmp(obj.mthd, "HAVOK")
-        obj.A_vec = obj.A_mdl(obj.vals);
+        obj.A_vec = obj.A_mdl(obj.eVals);
       else
         fprintf("[model.getEigenFunc_Rep]->> undefined or no mthd...\n");
       end
@@ -60,9 +62,19 @@ classdef model_class < matlab.System
           fname = strcat(obj.toutDir,"log_",tag,"_A_mdl"); % sav A_mod
           writematrix(obj.A_mat, fname);
         end
-        if ~isempty(obj.vals)
-          fname = strcat(obj.toutDir,"log_",tag,"_vals.csv"); % sav vals
-          writematrix(obj.vals, fname);
+        if ~isempty(obj.Aproj)
+          fig = surf(obj.Aproj);
+          fname = strcat(obj.toutDir,"log_",tag,"_Aproj.png"); % sav Aproj
+          saveas(fig, fname); % sav as png file
+          close(fig);
+        end
+        if ~isempty(obj.eVals)
+          fname = strcat(obj.toutDir,"log_",tag,"_eVals.csv"); % sav eVals
+          writematrix(obj.eVals, fname);
+        end
+        if ~isempty(obj.eVecs)
+          fname = strcat(obj.toutDir,"log_",tag,"_eVecs.csv"); % sav eVecs
+          writematrix(obj.eVecs, fname);
         end
         fname = strcat(obj.toutDir,"log_",tag,"_rec.csv"); % sav rec
         writematrix(obj.rec, fname);  

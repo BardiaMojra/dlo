@@ -1,10 +1,10 @@
 %% DLO main
 %% init sys 
 close all; clear; clc;
-cfg  = cfg_class(TID    = ['D000', '00', '_piDMD_', 'BCCB'], ...
-                 brief  = [''], ...
+cfg  = cfg_class(TID    = ['D000', '00', '_piDMD_', 'orth_'], ...
+                 brief  = ["Added orientation states "], ...
                  bnum   = 1, ...
-                 end_frame  = 1001);
+                 end_frame  = 2000);
 dlgr  = dlgr_class(); dlgr.load_cfg(cfg);
 %rpt   = report_class(); rpt.load_cfg(cfg);
 %% init app modules
@@ -20,12 +20,12 @@ piExct_mdl  = pi.est(pi.X, pi.Y, "exact"); % piDMD baseline
 
 
 
-C_mdl  = pi.est(pi.X, pi.Y, "uppertriangular"); % 03
+%C_mdl  = pi.est(pi.X, pi.Y, "uppertriangular"); % 03
 
 % piDMD methods B000
 %C_mdl  = pi.est(pi.X, pi.Y, "exactSVDS"); % 01
-%C_mdl  = pi.est(pi.X, pi.Y, "orthogonal"); % 02
-%C_mdl  = pi.est(pi.X, pi.Y, "uppertriangular"); % 03
+C_mdl  = pi.est(pi.X, pi.Y, "orthogonal"); % 02 r
+D_mdl  = pi.est(pi.X, pi.Y, "uppertriangular"); % 03
 %C_mdl  = pi.est(pi.X, pi.Y, "lowertriangular"); % 04
 %D_mdl  = pi.est(pi.X, pi.Y, "diagonal"); % 05
 %E_mdl  = pi.est(pi.X, pi.Y, "diagonalpinv"); % 06
@@ -36,7 +36,7 @@ C_mdl  = pi.est(pi.X, pi.Y, "uppertriangular"); % 03
 %I_mdl  = pi.est(pi.X, pi.Y, "circulantunitary"); % 11
 %J_mdl  = pi.est(pi.X, pi.Y, "circulantsymmetric"); % 12
 %K_mdl  = pi.est(pi.X, pi.Y, "circulantskewsymmetric"); % 13 
-%C_mdl  = pi.est(pi.X, pi.Y, "BCCB", 100); % 14
+%C_mdl  = pi.est(pi.X, pi.Y, "BCCB", [9 9]); % 14
 %C_mdl  = pi.est(pi.X, pi.Y, "TLS"); % 15
 %C_mdl  = pi.est(pi.X, pi.Y, "BC"); % 16
 %C_mdl  = pi.est(pi.X, pi.Y, "BCtri"); % 17
@@ -63,7 +63,7 @@ dlgr.add_mdl(piExct_mdl); % baseline
 %dlgr.add_mdl(B_mdl);
 %dlgr.add_mdl(C_mdl);
 dlgr.add_mdl(C_mdl);
-%dlgr.add_mdl(D_mdl);
+dlgr.add_mdl(D_mdl);
 %dlgr.add_mdl(E_mdl);
 %dlgr.add_mdl(F_mdl);
 %dlgr.add_mdl(G_mdl);

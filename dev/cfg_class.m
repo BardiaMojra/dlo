@@ -42,10 +42,16 @@ classdef cfg_class < matlab.System
       obj.toutDir = strcat(obj.outDir,'/',obj.ttag,'/');
 
       if not(isfolder(obj.toutDir)) % create toutDir
-        disp("[config]->> test_outDir does NOT exist: ");
+        disp("[config]->> test_toutDir does NOT exist: ");
         disp(obj.toutDir);
         mkdir(obj.toutDir);
-        disp("[config]->> directory has been created!");
+        disp("[config]->> directory was created!");
+      else 
+        disp("[config]->> test_toutDir exists and will be removed: ");
+        disp(obj.toutDir);
+        rmdir(obj.toutDir, 's');
+        mkdir(obj.toutDir);
+        disp("[config]->> directory was created!");
       end 
       
       obj.load_dat(); % 
@@ -60,19 +66,19 @@ classdef cfg_class < matlab.System
     end
     function sav_cfg(obj)
       if ~isempty(obj.brief) || obj.sav_cfg_en
-        fname = strcat(obj.toutDir,'cfg.txt'); 
-        file = fopen(fname,'wt');
-        fprintf(file, ['TID:      ', obj.TID, '\n']);
-        fprintf(file, ['brief:    ', obj.brief, '\n']);
-        fprintf(file, ['projDir:  ', obj.projDir, '\n']);
-        fprintf(file, ['outDir:   ', obj.outDir, '\n']);
-        fprintf(file, ['datDir:   ', obj.datDir, '\n']);
-        fprintf(file, ['ttag:     ', obj.ttag, '\n']);
-        fprintf(file, ['toutDir:  ', obj.toutDir, '\n']);
-        fprintf(file, ['btype:    ', obj.btype, '\n']);
-        fprintf(file, ['bnum:     ', num2str(obj.bnum), '\n']);
-        fprintf(file, ['st_frame: ', num2str(obj.st_frame), '\n']);
-        fprintf(file, ['end_frame:', num2str(obj.end_frame), '\n']);
+        fname = strcat(obj.toutDir,"cfg.txt"); 
+        file = fopen(fname,"wt");
+        fprintf(file, strcat("TID:      ", obj.TID, "\n"));
+        fprintf(file, strcat("brief:    ", obj.brief, "\n"));
+        fprintf(file, strcat("projDir:  ", obj.projDir, "\n"));
+        fprintf(file, strcat("outDir:   ", obj.outDir, "\n"));
+        fprintf(file, strcat("datDir:   ", obj.datDir, "\n"));
+        fprintf(file, strcat("ttag:     ", obj.ttag, "\n"));
+        fprintf(file, strcat("toutDir:  ", obj.toutDir, "\n"));
+        fprintf(file, strcat("btype:    ", obj.btype, "\n"));
+        fprintf(file, strcat("bnum:     ", num2str(obj.bnum), "\n"));
+        fprintf(file, strcat("st_frame: ", num2str(obj.st_frame), "\n"));
+        fprintf(file, strcat("end_frame:", num2str(obj.end_frame),"\n"));
         fclose(file);
       end
     end
