@@ -4,7 +4,7 @@ close all; clear; clc;
 cfg  = cfg_class(TID    = ['D000', '00', '_piDMD_', 'BCCB'], ...
                  brief  = [''], ...
                  bnum   = 1, ...
-                 end_frame  = 1000);
+                 end_frame  = 1001);
 dlgr  = dlgr_class(); dlgr.load_cfg(cfg);
 %rpt   = report_class(); rpt.load_cfg(cfg);
 %% init app modules
@@ -17,6 +17,10 @@ gt_mld      = model_class(name = "ground truth", mthd = "gt", rec = pi.dat); % g
 piExct_mdl  = pi.est(pi.X, pi.Y, "exact"); % piDMD baseline
 %A_mdl  = pi.est(pi.X, pi.Y, "piDMD orth", "orthogonal"); 
 %B_mdl  = pi.est(pi.X, pi.Y, "piDMD orth", "orthogonal"); 
+
+
+
+C_mdl  = pi.est(pi.X, pi.Y, "uppertriangular"); % 03
 
 % piDMD methods B000
 %C_mdl  = pi.est(pi.X, pi.Y, "exactSVDS"); % 01
@@ -32,7 +36,7 @@ piExct_mdl  = pi.est(pi.X, pi.Y, "exact"); % piDMD baseline
 %I_mdl  = pi.est(pi.X, pi.Y, "circulantunitary"); % 11
 %J_mdl  = pi.est(pi.X, pi.Y, "circulantsymmetric"); % 12
 %K_mdl  = pi.est(pi.X, pi.Y, "circulantskewsymmetric"); % 13 
-C_mdl  = pi.est(pi.X, pi.Y, "BCCB", ones(cfg.dat.nVars,6)); % 14
+%C_mdl  = pi.est(pi.X, pi.Y, "BCCB", 100); % 14
 %C_mdl  = pi.est(pi.X, pi.Y, "TLS"); % 15
 %C_mdl  = pi.est(pi.X, pi.Y, "BC"); % 16
 %C_mdl  = pi.est(pi.X, pi.Y, "BCtri"); % 17
