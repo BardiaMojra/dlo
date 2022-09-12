@@ -56,56 +56,47 @@ classdef piDMD_class < matlab.System
       obj.load_dat(cfg.dat.dat);
     end
 
-    function m = get_model(obj, X, Y, method, varargin)
+    function m = get_model(obj, X, Y, mthd, varargin)
+      
+      m = model_class(name = strcat("piDMD ", mthd));
       [nx, nt] = size(X); 
       
-      if strcmp(method,'exact') || strcmp(method,'exactSVDS')
+      if strcmp(m.mthd,'exact') || strcmp(m.mthd,'exactSVDS')
         if nargin>4
-          r = varargin{1};
+          m.r = varargin{1};
         else
-          r = min(nx,nt);
+          m.r = min(nx,nt);
         end
-        if strcmp(method,'exact')
-          [Ux,Sx,Vx] = svd(X,0);
-          Ux = Ux(:,1:r); Sx = Sx(1:r,1:r); Vx = Vx(:,1:r);
-        elseif strcmp(method,'exactSVDS')
-          [Ux,Sx,Vx] = svds(X,r);
+        if strcmp(mthd,'exact')
+          [m.Ux,m.Sx,m.Vx] = svd(X,0);
+          m.Ux = m.Ux(:,1:m.r); m.Sx = m.Sx(1:m.r,1:m.r); m.Vx = m.Vx(:,1:m.r);
+        elseif strcmp(mthd,'exactSVDS')
+          [m.Ux,m.Sx,m.Vx] = svds(X,m.r);
         end
-        Atilde = (Ux'*Y)*Vx*pinv(Sx);
-        A = @(v) Ux*(Atilde*(Ux'*v));
-        if nargout==2
-          varargout{1} = eig(Atilde);
-        elseif nargout>2
-          [eVecs,eVals] = eig(Atilde);
-          eVals = diag(eVals); eVecs = Y*Vx*pinv(Sx)*eVecs./eVals.';
-          varargout{1} = eVals; varargout{2} = eVecs;
-        end
-      elseif strcmp(method,'orthogonal')
-        if nargin>3
-          r = varargin{1}; 
+        m.Atilde = (m.Ux'*Y)*m.Vx*pinv(m.Sx);
+        m.A = @(v) m.Ux*(m.Atilde*(m.Ux'*v));
+        m.eigen_Atilde = eig(m.Atilde);
+        [m.eVecs, m.eVals] = eig(m.Atilde);
+        m.eVals = diag(m.eVals); 
+        m.eVecs = Y*m.Vx*pinv(m.Sx)*m.eVecs./m.eVals.';
+      elseif strcmp(m.mthd,'orthogonal')
+        if nargin>4
+          m.r = varargin{1}; 
         else 
-          r = min(nx,nt);
+          m.r = min(nx,nt);
         end
-        [Ux,~,~] = svd(X,0); Ux = Ux(:,1:r);
-        Yproj = Ux'*Y; Xproj = Ux'*X; % Project X and Y onto principal components
-        [Uyx, ~, Vyx] = svd(Yproj*Xproj',0);
-        Aproj = Uyx*Vyx';    
-        A = @(x) Ux*(Aproj*(Ux'*x));
-        if nargout==2
-          eVals = eig(Aproj);
-          varargout{1} = eVals;
-        elseif nargout>2
-          [eVecs,eVals] = eig(Aproj);
-          varargout{1} = diag(eVals);
-          varargout{2} = Ux*eVecs;
-          if nargout > 3; varargout{3} = Aproj; end
-        end
-      elseif strcmp(method,'uppertriangular')
-        [R,Q] = rq(X); % Q*Q' = I
-        Ut = triu(Y*Q');
-        A = Ut/R;
-      elseif strcmp(method,'lowertriangular')  
-        A = rot90(piDMD(flipud(X),flipud(Y),'uppertriangular'),2);
+        [m.Ux,~,~] = svd(X,0); m.Ux = m.Ux(:,1:m.r);
+        m.Yproj = m.Ux'*Y; m.Xproj = m.Ux'*X; % Project X and Y onto principal components
+        [m.Uyx, ~, m.Vyx] = svd(Yproj*Xproj',0);
+        m.Aproj = m.Uyx*m.Vyx';    
+        m.A = @(x) m.Ux*(m.Aproj*(m.Ux'*x));
+        [m.eVecs, m.eVals] = eig(m.Aproj);
+      elseif strcmp(m.mthd,'uppertriangular')
+        [m.R,m.Q] = obj.rq(X); % Q*Q' = I
+        m.Ut = triu(Y*m.Q');
+        m.A = m.Ut/m.R;
+      elseif strcmp(m.mthd,'lowertriangular')  
+        m.A = rot90(piDMD(flipud(X),flipud(Y),'uppertriangular'),2);
 % The codes allows for matrices of variable banded width. The fourth input,
 % a 2xn matrix called d, specifies the upper and lower bounds of the
 % indices of the non-zero elements. The first column corresponds to the width of
@@ -114,7 +105,7 @@ classdef piDMD_class < matlab.System
 % a tridiagonal matrix would have d = [2 2]+zeros(nx,2). If you only specify
 % d as a scalar then the algorithm converts the input to obtain a banded 
 % diagonal matrix of width d. 
-      elseif startsWith(method,'diagonal') 
+      elseif startsWith(m.mthd,'diagonal') 
         if nargin>3
           d = varargin{1}; % arrange d into an nx-by-2 matrix
           if numel(d) == 1
@@ -132,11 +123,11 @@ classdef piDMD_class < matlab.System
         for j = 1:nx
           l1 = max(j-(d(j,1)-1),1); l2 = min(j+(d(j,2)-1),nx);
           C = X(l1:l2,:); b = Y(j,:); % preparing to solve min||Cx-b|| along each row
-          if strcmp(method,'diagonal')
+          if strcmp(mthd,'diagonal')
             sol = b/C;
-          elseif strcmp(method,'diagonalpinv')
+          elseif strcmp(mthd,'diagonalpinv')
             sol = b*pinv(C);
-          elseif strcmp(method,'diagonaltls')
+          elseif strcmp(mthd,'diagonaltls')
             sol = tls(C.',b.').';
           end
           Icell{j} = j*ones(1,1+l2-l1); Jcell{j} = l1:l2; Rcell{j} = sol;
@@ -151,14 +142,14 @@ classdef piDMD_class < matlab.System
           [eVecs, eVals] = eigs(Asparse,nx);
           varargout{1} = diag(eVals); varargout{2} = eVecs;
         end
-      elseif strcmp(method,'symmetric') || strcmp(method,'skewsymmetric')
+      elseif strcmp(mthd,'symmetric') || strcmp(mthd,'skewsymmetric')
         [Ux,S,V] = svd(X,0);
         C = Ux'*Y*V;
         C1 = C;
         if nargin>3; r = varargin{1}; else; r = rank(X); end
         Ux = Ux(:,1:r);
         Yf = zeros(r);
-        if strcmp(method,'symmetric') 
+        if strcmp(mthd,'symmetric') 
           for i = 1:r
             Yf(i,i) = real(C1(i,i))/S(i,i);
             for j = i+1:r
@@ -166,7 +157,7 @@ classdef piDMD_class < matlab.System
             end
           end
           Yf = Yf + Yf' - diag(diag(real(Yf)));
-        elseif strcmp(method,'skewsymmetric')
+        elseif strcmp(mthd,'skewsymmetric')
           for i = 1:r
             Yf(i,i) = 1i*imag(C1(i,i))/S(i,i);
             for j = i+1:nx
@@ -186,9 +177,9 @@ classdef piDMD_class < matlab.System
           eVecs = Ux*eVecs;
           varargout{1} = eVals; varargout{2} = eVecs;
         end
-      elseif strcmp(method,'toeplitz') || strcmp(method,'hankel')
-        if  strcmp(method,'toeplitz'); J = eye(nx); 
-        elseif strcmp(method,'hankel'); J = fliplr(eye(nx)); end
+      elseif strcmp(mthd,'toeplitz') || strcmp(mthd,'hankel')
+        if  strcmp(mthd,'toeplitz'); J = eye(nx); 
+        elseif strcmp(mthd,'hankel'); J = fliplr(eye(nx)); end
         Am = fft([eye(nx) zeros(nx)].',[],1)'/sqrt(2*nx); % Define the left matrix
         B = fft([(J*X)' zeros(nt,nx)].',[],1)'/sqrt(2*nx); % Define the right matrix
         BtB = B'*B; 
@@ -198,18 +189,18 @@ classdef piDMD_class < matlab.System
         d = [y(1:end-1)/L(1:end-1,1:end-1) 0]; % Solve the linear system
         newA = ifft(fft(diag(d)).').'; % Convert the eigenvalues into the circulant matrix
         A = newA(1:nx,1:nx)*J; % Extract the Toeplitz matrix from the circulant matrix
-      elseif startsWith(method,'circulant')
+      elseif startsWith(mthd,'circulant')
         fX = fft(X); fY = fft(conj(Y));
         d = zeros(nx,1);
-        if endsWith(method,'TLS') % Solve in the total least squares sense     
+        if endsWith(mthd,'TLS') % Solve in the total least squares sense     
           for j = 1:nx
             d(j) = tls(fX(j,:)',fY(j,:)');
           end
-        elseif ~endsWith(method,'TLS') % Solve the other cases
+        elseif ~endsWith(mthd,'TLS') % Solve the other cases
           d = diag(fX*fY')./vecnorm(fX,2,2).^2;
-          if endsWith(method,'unitary'); d = exp(1i*angle(d));
-          elseif endsWith(method,'symmetric'); d = real(d);
-          elseif endsWith(method,'skewsymmetric'); d = 1i*imag(d);
+          if endsWith(mthd,'unitary'); d = exp(1i*angle(d));
+          elseif endsWith(mthd,'symmetric'); d = real(d);
+          elseif endsWith(mthd,'skewsymmetric'); d = 1i*imag(d);
           end
         end
         eVals = d; % These are the eigenvalues
@@ -224,7 +215,7 @@ classdef piDMD_class < matlab.System
         if nargout>2; varargout{2} = eVecs; end
         A = @(v) fft(d.*ifft(v)); % Reconstruct the operator in terms of FFTs
 
-      elseif strcmp(method,'BCCB') || strcmp(method,'BCCBtls') || strcmp(method,'BCCBskewsymmetric') || strcmp(method,'BCCBunitary')
+      elseif strcmp(mthd,'BCCB') || strcmp(mthd,'BCCBtls') || strcmp(mthd,'BCCBskewsymmetric') || strcmp(mthd,'BCCBunitary')
     
         if isempty(varargin); error('Need to specify size of blocks.'); end
         s = varargin{1}; p = prod(s);
@@ -236,15 +227,15 @@ classdef piDMD_class < matlab.System
         fX = aF(conj(X)); fY = aF(conj(Y));
         d = zeros(p,1);
             
-        if strcmp(method,'BCCB') 
+        if strcmp(mthd,'BCCB') 
         for j = 1:p; d(j) = conj(fX(j,:)*fY(j,:)')/norm(fX(j,:)').^2; end
-        elseif strcmp(method,'BCCBtls')
+        elseif strcmp(mthd,'BCCBtls')
         for j = 1:p; d(j) = tls(fX(j,:)',fY(j,:)')'; end
-        elseif strcmp(method,'BCCBskewsymmetric')
+        elseif strcmp(mthd,'BCCBskewsymmetric')
         for j = 1:p; d(j) = 1i*imag(fY(j,:)/fX(j,:)); end
-        elseif strcmp(method,'BCCBsymmetric')
+        elseif strcmp(mthd,'BCCBsymmetric')
         for j = 1:p; d(j) = real(fY(j,:)/fX(j,:)); end
-        elseif strcmp(method,'BCCBunitary')
+        elseif strcmp(mthd,'BCCBunitary')
         for j = 1:p; d(j) = exp(1i*angle(fY(j,:)/fX(j,:))); end
         end
 
@@ -259,7 +250,7 @@ classdef piDMD_class < matlab.System
         varargout{1} = d;
         % Eigenvalues are given by d
 
-      elseif strcmp(method,'BC') || strcmp(method,'BCtri') || strcmp(method,'BCtls')
+      elseif strcmp(mthd,'BC') || strcmp(mthd,'BCtri') || strcmp(mthd,'BCtls')
         s = varargin{1}; p = prod(s);
         M = s(2); N = s(1);
         if isempty(s); error('Need to specify size of blocks.'); end
@@ -272,17 +263,17 @@ classdef piDMD_class < matlab.System
         d = cell(M,1);
         for j = 1:M
           ls = (j-1)*N + (1:N);
-          if strcmp(method,'BC')
+          if strcmp(mthd,'BC')
             d{j} = fY(ls,:)/fX(ls,:);
-          elseif strcmp(method,'BCtri')
+          elseif strcmp(mthd,'BCtri')
             d{j} = piDMD(fX(ls,:),fY(ls,:),'diagonal',2);
-          elseif strcmp(method,'BCtls')
+          elseif strcmp(mthd,'BCtls')
             d{j} = tls(fX(ls,:)',fY(ls,:)')';
           end
         end 
         BD = blkdiag(d{:});
         A = @(v) aFt(BD*aF(v));           
-      elseif strcmp(method,'symtridiagonal')
+      elseif strcmp(mthd,'symtridiagonal')
         T1e = vecnorm(X,2,2).^2; % Compute the entries of the first block
         T1 = spdiags(T1e,0,nx,nx); % Form the leading block
         T2e = dot(X(2:end,:),X(1:end-1,:),2); % Compute the entries of the second block
@@ -300,21 +291,14 @@ classdef piDMD_class < matlab.System
       end 
     end % get_model()
 
-
-
-
-      if strcmp(method,'exact') || strcmp(method,'exactSVDS')
-      [A,eVals,eVecs] = piDMD(X, Y, method, varargin{:}); % est
+    function rec = get_rec(obj, m)
       rec = zeros(obj.nVars, obj.nSamps); % reconstruct dat
-      rec(:,1) = obj.dat(:,1); 
-      
-      
+      rec(:,1) = obj.dat(:,1);       
       for j = 2:obj.nSamps
-        rec(:,j) = A(rec(:,j-1));
+        rec(:,j) = m.A(rec(:,j-1));
       end
-
-      
-    end
+      m.rec = rec;
+    end % get_rec()
   
   end 
   methods  (Access = private)
@@ -325,6 +309,7 @@ classdef piDMD_class < matlab.System
       obj.xd_cols   = obj.nss+1:obj.nVars; 
       obj.tspan     = obj.dt*obj.nSamps;
     end
+    
     function load_dat(obj, dat)
       assert(isequal(mod(size(dat,2),2),0), ...
         "-->>> odd num of state vars: %d", size(dat,2));
@@ -342,7 +327,70 @@ classdef piDMD_class < matlab.System
       ylim([-1,1])
       ylabel(j,"Interpreter","latex","FontSize",20)
     end
-  end
+
+    function [R,Q,varargout] = rq(A) % Performs RQ decomposition
+      n = size(A,1);
+      if nargout<3
+        [Q,R] = qr(flipud(A)',0);
+      else
+        [Q,R,P1] = qr(flipud(A)',0);
+        P(n+1-P1) = n:-1:1; % arrange permutation in right way
+        varargout{1} = P;
+      end
+      R = rot90(R',2);
+      Q = flipud(Q');
+      [n,m]=size(A);
+      if n>m
+        R = [zeros(n,n-m), R];
+        Q = [zeros(n-m,m); Q];
+      end  
+    end % rq()
+      
+    function [Xhat] = tls(A,B)
+      n = size(A,2);
+      if size(A,1)~=size(B,1); error('Matrices are not conformant.'); end
+      R1 = [A B];
+      [~,~,V] = svd(R1,0);
+      r = size(A,2);
+      R = rq(V(:,r+1:end));Gamma = R(n+1:end,n-r+1:end);
+      Z = R(1:n,n-r+1:end);
+      Xhat = -Z/Gamma;
+    end % tls
+
+    function c = redblue(m)
+      %REDBLUE    Shades of red and blue color map
+      %  REDBLUE(M), is an M-by-3 matrix that defines a colormap.
+      %  The colors begin with bright blue, range through shades of
+      %  blue to white, and then through shades of red to bright red.
+      %  REDBLUE, by itself, is the same length as the current figure's
+      %  colormap. If no figure exists, MATLAB creates one.
+      %  For example, to reset the colormap of the current figure:
+      %            colormap(redblue)
+      %  See also HSV, GRAY, HOT, BONE, COPPER, PINK, FLAG, 
+      %  COLORMAP, RGBPLOT.
+      %  Adam Auton, 9th October 2009
+      if nargin < 1, m = size(get(gcf,'colormap'),1); end
+      if (mod(m,2) == 0)
+        % From [0 0 1] to [1 1 1], then [1 1 1] to [1 0 0];
+        m1 = m*0.5;
+        r = (0:m1-1)'/max(m1-1,1);
+        g = r;
+        r = [r; ones(m1,1)];
+        g = [g; flipud(g)];
+        b = flipud(r);
+      else
+        % From [0 0 1] to [1 1 1] to [1 0 0];
+        m1 = floor(m*0.5);
+        r = (0:m1-1)'/max(m1,1);
+        g = r;
+        r = [r; ones(m1+1,1)];
+        g = [g; 1; flipud(g)];
+        b = flipud(r);
+      end
+      c = [r g b]; 
+    end % redblue()
+
+  end % private methods
 end
  
 

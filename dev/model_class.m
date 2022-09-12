@@ -12,14 +12,29 @@ classdef model_class < matlab.System
     toutDir 
     %% vars (argin)
     name % mdl name 
-    mthd  = [] % piDMD, HAVOK
-    A_mdl = [] % state transient function (per piDMD)
-    Aproj = [] % A projection matrix
-    eVals  = []
-    eVecs  = []
+    mthd    = [] % piDMD, HAVOK
+    A       = [] % state transient function pointer (per piDMD)
+    Aproj   = [] % A projection matrix
+    Atilde  = [] % A est matrix 
+    eigen_Atilde = [] % = eig(Atilde)
+    eVals   = []
+    eVecs   = []
     rec
-    A_vec = [] % eigenFunc state stransition vec
-    A_mat = [] % eigenFunc sysmmetric matrix model     % method specific vars
+    A_vec   = [] % eigenFunc state stransition vec
+    A_mat   = [] % eigenFunc sysmmetric matrix model     % method specific vars
+    
+    % other piDMD vars
+    Ux
+    Sx
+    Vx
+     m.Yproj = m.Ux'*Y; m.Xproj 
+[m.Uyx, ~, m.Vyx]
+        [m.R,m.Q] = rq(X); % Q*Q' = I
+        m.Ut = triu(Y*m.Q');
+        m.A = m.Ut/m.R;
+
+
+
     %% private vars
     st_errs % state errors 
     L1
@@ -35,20 +50,20 @@ classdef model_class < matlab.System
   methods  % constructor
     function obj = model_class(varargin) % init obj w name-value args
       setProperties(obj,nargin,varargin{:}) % set toutDir via varargin
-      obj.init();
+      %obj.init();
     end
     
     function init(obj)
-      obj.get_eigenFunc_Rep();
-      obj.sav(); 
+      %obj.get_eigenFunc_Rep();
+      %obj.sav(); 
     end
   
     function get_eigenFunc_Rep(obj)
       if strcmp(obj.mthd, "piDMD")
-        obj.A_vec = obj.A_mdl(obj.eVals);
+        obj.A_vec = obj.A(obj.eVals);
         %obj.A_mat = obj.A_vec*obj.A_vec';
       elseif strcmp(obj.mthd, "HAVOK")
-        obj.A_vec = obj.A_mdl(obj.eVals);
+        obj.A_vec = obj.A(obj.eVals);
       else
         fprintf("[model.getEigenFunc_Rep]->> undefined or no mthd...\n");
       end
@@ -58,7 +73,7 @@ classdef model_class < matlab.System
       if ~isempty(obj.toutDir) % --->> save logs to file
         tag = strrep(obj.name," ","_");
         tag = strrep(tag,"-","_");  
-        if (obj.sav_mdl_en==true && ~isempty(obj.A_mdl))
+        if (obj.sav_mdl_en==true && ~isempty(obj.A))
           fname = strcat(obj.toutDir,"log_",tag,"_A_mdl"); % sav A_mod
           writematrix(obj.A_mat, fname);
         end
