@@ -4,7 +4,7 @@ close all; clear; clc;
 cfg  = cfg_class(TID    = ['D000', '00', '_piDMD_', 'orth_'], ...
                  brief  = ["Added orientation states "], ...
                  bnum   = 1, ...
-                 end_frame  = 2000);
+                 end_frame  = 10000);
 dlgr  = dlgr_class(); dlgr.load_cfg(cfg);
 %rpt   = report_class(); rpt.load_cfg(cfg);
 %% init app modules
@@ -14,7 +14,7 @@ hvk   = HAVOK_class(); hvk.load_cfg(cfg);
 
 %% run
 gt_mld      = model_class(name = "ground truth", mthd = "gt", rec = pi.dat); % gt
-piExct_mdl  = pi.get_model(pi.X, pi.Y, "exact"); % piDMD baseline
+piExct_mdl  = pi.get_model(pi.X, pi.Y, "exact", ''); % piDMD baseline
 %A_mdl  = pi.get_model(pi.X, pi.Y, "piDMD orth", "orthogonal"); 
 %B_mdl  = pi.get_model(pi.X, pi.Y, "piDMD orth", "orthogonal"); 
 
@@ -24,11 +24,12 @@ piExct_mdl  = pi.get_model(pi.X, pi.Y, "exact"); % piDMD baseline
 
 % piDMD methods B000
 %C_mdl  = pi.get_model(pi.X, pi.Y, "exactSVDS"); % 01
-C_mdl  = pi.get_model(pi.X, pi.Y, "orthogonal"); % 02 r
+C_mdl  = pi.get_model(pi.X, pi.Y, "orthogonal", ""); % 02 r
 %D_mdl  = pi.get_model(pi.X, pi.Y, "uppertriangular"); % 03
 %C_mdl  = pi.get_model(pi.X, pi.Y, "lowertriangular"); % 04
-D_mdl  = pi.get_model(pi.X, pi.Y, "diagonal", 2); % 05
-%E_mdl  = pi.get_model(pi.X, pi.Y, "diagonalpinv"); % 06
+D_mdl  = pi.get_model(pi.X, pi.Y, "diagonal", " - d=2", 2); % 05
+E_mdl  = pi.get_model(pi.X, pi.Y, "diagonal", " - d=1", 1); % 05
+F_mdl  = pi.get_model(pi.X, pi.Y, "diagonal", " - d=6", 2); % 06
 %F_mdl  = pi.get_model(pi.X, pi.Y, "diagonaltls"); % 07
 %C_mdl  = pi.get_model(pi.X, pi.Y, "symtridiagonal"); % 08
 %G_mdl  = pi.get_model(pi.X, pi.Y, "circulant"); % 09
@@ -64,8 +65,8 @@ dlgr.add_mdl(piExct_mdl); % baseline
 %dlgr.add_mdl(C_mdl);
 dlgr.add_mdl(C_mdl);
 dlgr.add_mdl(D_mdl);
-%dlgr.add_mdl(E_mdl);
-%dlgr.add_mdl(F_mdl);
+dlgr.add_mdl(E_mdl);
+dlgr.add_mdl(F_mdl);
 %dlgr.add_mdl(G_mdl);
 %dlgr.add_mdl(H_mdl);
 %dlgr.add_mdl(I_mdl);

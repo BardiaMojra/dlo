@@ -13,19 +13,20 @@ classdef model_class < matlab.System
     %% vars (argin)
     name % mdl name 
     mthd    = [] % piDMD, HAVOK
+    label   = [] % show model cfg and is used in plots
     A       = [] % state transient function pointer (per piDMD)
     Aproj   = [] % A projection matrix
     Atilde  = [] % A est matrix 
     eVals   = []
     eVecs   = []
-    rec
+    rec     = []
     A_vec   = [] % eigenFunc state stransition vec
     A_mat   = [] % eigenFunc sysmmetric matrix model     % method specific vars
     % inputs 
-    s % block size 
-    d % band width of diag 
-    p % num element for block 
     r % rank
+    d % band width of diag 
+    s % block size [2 3]
+    p % num elements in the block 
 
     % other piDMD vars
     eig_Atilde = [] % = eig(Atilde)

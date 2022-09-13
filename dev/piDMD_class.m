@@ -56,11 +56,13 @@ classdef piDMD_class < matlab.System
       obj.load_dat(cfg.dat.dat);
     end
 
-    function m = get_model(obj, X, Y, mthd, varargin)
-      m = model_class(name = strcat("piDMD ", mthd), mthd = mthd);
+    function m = get_model(obj, X, Y, mthd, label, varargin)
+      m = model_class(name = strcat("piDMD ", mthd, label), ...
+                      mthd = mthd, ...
+                      label = label);
       [nx, nt] = size(X); 
       if strcmp(m.mthd,'exact') || strcmp(m.mthd,'exactSVDS')
-        if nargin>4
+        if nargin>5
           m.r = varargin{1};
         else
           m.r = min(nx,nt);
@@ -78,7 +80,7 @@ classdef piDMD_class < matlab.System
         m.eVals = diag(m.eVals); 
         m.eVecs = Y*m.Vx*pinv(m.Sx)*m.eVecs./m.eVals.';
       elseif strcmp(m.mthd,'orthogonal')
-        if nargin>4
+        if nargin>5
           m.r = varargin{1}; 
         else 
           m.r = min(nx,nt);
@@ -104,7 +106,7 @@ classdef piDMD_class < matlab.System
 % d as a scalar then the algorithm converts the input to obtain a banded 
 % diagonal matrix of width d. 
       elseif startsWith(m.mthd,'diagonal') 
-        if nargin>4
+        if nargin>5
           m.d = varargin{1}; % arrange d into an nx-by-2 matrix
           if numel(m.d) == 1
             m.d = m.d*ones(nx,2);
@@ -138,7 +140,7 @@ classdef piDMD_class < matlab.System
         [m.Ux,m.S,m.V] = svd(X,0);
         C = m.Ux'*Y*m.V;
         C1 = C;
-        if nargin>4; m.r = varargin{1}; else; m.r = rank(X); end
+        if nargin>5; m.r = varargin{1}; else; m.r = rank(X); end
         m.Ux = m.Ux(:,1:m.r);
         m.Yf = zeros(m.r);
         if strcmp(m.mthd,'symmetric') 
@@ -193,7 +195,7 @@ classdef piDMD_class < matlab.System
         end
         m.eVals = m.d; % These are the eigenvalues
         m.eVecs = fft(eye(nx)); % These are the eigenvectors
-        if nargin>4
+        if nargin>5
           m.r = varargin{1}; % Rank constraint
           res = diag(abs(m.fX*m.fY'))./vecnorm(m.fX')'; % Identify least important eigenvalues
           [~,idx] = mink(res,nx-m.r); % Remove least important eigenvalues
@@ -223,7 +225,7 @@ classdef piDMD_class < matlab.System
           for j = 1:m.p; m.d(j) = exp(1i*angle(m.fY(j,:)/m.fX(j,:))); end
         end
         % Returns a function handle that applies A
-        if nargin>5
+        if nargin>6
           m.r = varargin{2};
           res = diag(abs(m.fX*m.fY'))./vecnorm(m.fX')';
           [~,idx] = mink(res,nx-r);
