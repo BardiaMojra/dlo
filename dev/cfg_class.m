@@ -39,6 +39,8 @@ classdef cfg_class < matlab.System
         obj.ttag  = strcat(obj.TID );% ...
                            %,'_', obj.btype,'_', num2str(obj.bnum,'%02.f'));
       end      
+      obj.ttag = strrep(obj.ttag,' ','_');
+      %obj.ttag = strrep(obj.ttag,'-','_');
       obj.toutDir = strcat(obj.outDir,'/',obj.ttag,'/');
 
       if not(isfolder(obj.toutDir)) % create toutDir

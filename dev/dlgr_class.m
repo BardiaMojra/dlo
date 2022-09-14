@@ -26,17 +26,17 @@ classdef dlgr_class < matlab.System
     logs % log table
     tab  % res tab
     lcols = ["num", ... 
-             "mthd", ... 
+             "method", ... 
              "name", ... 
-             "A_mdl", ... 
-             "vals", ... 
-             "rec", ...
-             "A_vec", ... 
-             "A_mat", ... 
+             "model", ... 
+             "eVals", ...
+             "rec", ... 
+             "A_eV", ... 
+             "A_eM", ... 
              "st_errs", ... 
              "L1", ... 
              "L2", ... 
-             "MAE", ... 
+             "MAE", ...
              "MSE"]
     %% plot 
     font_style   = "Times"
@@ -68,14 +68,16 @@ classdef dlgr_class < matlab.System
   methods (Access = public) 
  
     function init(obj)
+      %"num","mthd","name","model","eVals" ,"rec",
+      %"A_eV","A_eM","st_errs","L1" ,"L2" ,"MAE" ,"MSE"
       obj.logs{1, 1}    = obj.lcols{ 1}; %"num"
       obj.logs{1, 2}    = obj.lcols{ 2}; %"mthd" 
       obj.logs{1, 3}    = obj.lcols{ 3}; %"name"
-      obj.logs{1, 4}    = obj.lcols{ 4}; %"A_mdl" 
-      obj.logs{1, 5}    = obj.lcols{ 5}; %"vals" 
+      obj.logs{1, 4}    = obj.lcols{ 4}; %"model" 
+      obj.logs{1, 5}    = obj.lcols{ 5}; %"eVals" 
       obj.logs{1, 6}    = obj.lcols{ 6}; %"rec"
-      obj.logs{1, 7}    = obj.lcols{ 7}; %"A_vet"
-      obj.logs{1, 8}    = obj.lcols{ 8}; %"A_mat"
+      obj.logs{1, 7}    = obj.lcols{ 7}; %"A_eV"
+      obj.logs{1, 8}    = obj.lcols{ 8}; %"A_eM"
       obj.logs{1, 9}    = obj.lcols{ 9}; %"st_errs"
       obj.logs{1,10}    = obj.lcols{10}; %"L1" 
       obj.logs{1,11}    = obj.lcols{11}; %"L2" 
@@ -99,10 +101,7 @@ classdef dlgr_class < matlab.System
       obj.init();
     end
 
-    function add_mdl(obj, mdl) 
-      % log table 
-      % {"num", "mthd", "name", "A_mdl", "vals", "rec",
-      %  "A_vec", "A_mat", "st_errs", "L1", "L2", "MAE", "MSE"}
+    function add_mdl(obj, mdl) % to log table 
       len = size(obj.logs,1);
       obj.logs{len+1, 1} = len;
       obj.logs{len+1, 2} = mdl.mthd; % e.g. piDMD, HAVOK 
@@ -119,8 +118,6 @@ classdef dlgr_class < matlab.System
       obj.logs{len+1,13} = mdl.MSE;
     end
 
-     
-
     function get_errs(obj)
       gt = obj.logs{2,6};
       gt = gt(1:obj.nVars/2,:);
@@ -135,7 +132,6 @@ classdef dlgr_class < matlab.System
           fprintf("[dlgr.get_errs]->> gt size: %s \n", mat2str(size(gt)));
           fprintf("[dlgr.get_errs]->> %s size: %s \n", obj.logs{a,3}, mat2str(size(mrec)));
         end
-  
         if size(gt) >= size(mrec)
           pSize = size(gt) - size(mrec);
           mrec = padarray(mrec, pSize, 0, 'post');
@@ -143,7 +139,6 @@ classdef dlgr_class < matlab.System
         else
           error("[dlgr.get_errs]->> log size is greater than gt!\n")
         end
-
         errs    = gt - mrec;
         L1      = sum(abs(errs),"all"); % get st L1
         L2      = sum((errs.^2),"all"); 
@@ -188,10 +183,10 @@ classdef dlgr_class < matlab.System
     end
 
     function plt_recons_grid(obj)
-      nSol = size(obj.logs,1)-1;
       TX="$T_{x}$"; TY="$T_{y}$"; TZ="$T_{z}$";
       IN="Interpreter";LT="latex";MK="Marker";
       FS="fontsize";Cr="Color";LW ="LineWidth";
+      nSol = size(obj.logs,1)-1;
       fig = figure(); % 10*3 subplots 10 KFs * 3 Txyz 
       sgtitle("Key Feature Pose Reconstruction",IN,LT);
       fig.Units    = obj.fig_U;
@@ -234,58 +229,106 @@ classdef dlgr_class < matlab.System
       end
     end % plt_KFs_grid(obj)
   
-    function plt_A_surf(obj)
-
-
-
-
-
-
-
-
-
-
+    function plt_A_roots(obj) % roots in one plt
+      TX="$T_{x}$"; TY="$T_{y}$"; TZ="$T_{z}$";DN='DisplayName';
+      IN="Interpreter";LT="latex";MK="Marker";LS="LineStyle";
+      FS="fontsize";Cr="Color";LW ="LineWidth";
       nSol = size(obj.logs,1)-1;
-      IN="Interpreter";LT="latex";DN='DisplayName';
-      FS="fontsize";LW ="LineWidth";Cr="Color";LS="LineStyle";
       fig = figure(); hold on
-      title("Models $(A_{method})$ in Phase Domain",IN,LT);
+      title("Model Roots",IN,LT);
       fig.Units    = obj.fig_U;
       fig.Position = obj.fig_pos;
       algNames = cell(nSol,0);
       xlabel("$real$",IN,LT,FS,obj.fig_FS);
       ylabel("$imag.$",IN,LT,FS,obj.fig_FS);
-          
-      for s = 1:nSol
+      for s = 2:nSol % skip gt
         algNames{s} = obj.logs{s+1,3}; 
-        %vals  = obj.logs{s+1,5};
-        A_vec = obj.logs{s+1,7};
-        %A_mat = obj.logs{s+1,8};
-        real_A = real(A_vec);
-        imag_A = imag(A_vec);
+        mdl = obj.logs{s+1,4};
+        A_eV = mdl.A_eV;
+        real_A = real(A_eV);
+        imag_A = imag(A_eV);
         plot(real_A,imag_A,obj.fig_PT(s),LW,obj.fig_LW,DN,algNames{s});
       end
       viscircles([0 0],1,Cr,"k",LS,'--',LW,obj.fig_LW);% "unit circle"
-      %plot([:],0,"k-",LW,obj.fig_LW,DN,"unit circle");
       lg          = legend('show','location','best'); 
       lg.Units    = obj.fig_leg_U;
       lg.Position = obj.fig_leg_pos;
       lg.FontSize = obj.fig_leg_FS;
       grid on;
       if obj.plt_sav_en
-        figname = strcat(obj.toutDir,"plt_mdl_phase");
-        saveas(fig, figname); % sav as fig file
-        saveas(fig, strcat(figname,".png")); % sav as png file
+        fname = strcat(obj.toutDir,"plt_all_A_eVec_roots");
+        saveas(fig, fname); % sav as fig file
+        saveas(fig, strcat(fname,".png")); % sav as png file
       end
       if ~obj.plt_shw_en
         close(fig);
       end
+    end % plt_A_roots()
 
+    function plt_A_roots_sep(obj)
+      IN="Interpreter";LT="latex";DN='DisplayName';
+      FS="fontsize";LW ="LineWidth";Cr="Color";LS="LineStyle";
+      nSol = size(obj.logs,1)-1;
+      for s = 2:nSol % skip gt
+        name = obj.logs{s+1,3}; 
+        titname = "$A_{est}$ Roots (Phase)";
+        %vals  = obj.logs{s+1,5};
+        A_eV = obj.logs{s+1,7};
+        %A_mat = obj.logs{s+1,8};
+        real_A = real(A_eV);
+        imag_A = imag(A_eV);
+        fig = figure(); hold on
+        title(name,titname,IN,LT);
+        set(fig,"Units", obj.fig_U);
+        set(fig,"Position", obj.fig_pos);
+        plot(real_A,imag_A,obj.fig_PT(s),LW,obj.fig_LW,DN,name);
+        xlabel("$real$",IN,LT,FS,obj.fig_FS);
+        ylabel("$imag.$",IN,LT,FS,obj.fig_FS);
+        viscircles([0 0],1,Cr,"k",LS,'--',LW,obj.fig_LW);% "unit circle"
+        lg          = legend('show','location','best'); 
+        lg.Units    = obj.fig_leg_U;
+        lg.Position = obj.fig_leg_pos;
+        lg.FontSize = obj.fig_leg_FS;
+        grid on; hold off
+        if obj.plt_sav_en
+          name = strrep(name,' ','_');
+          fname = strcat(obj.toutDir,"plt_",name,"_A_eVec_roots");
+          saveas(fig, fname); % sav as fig file
+          saveas(fig, strcat(fname,".png")); % sav as png file
+        end
+        if ~obj.plt_shw_en
+          close(fig);
+        end
+      end % for
+    end % plt_A_roots_sep()
 
+    function plt_A_surfs_sep(obj)
+      nSol = size(obj.logs,1)-1;
+      IN="Interpreter";LT="latex";DN='DisplayName';
+      FS="fontsize";LW ="LineWidth";Cr="Color";LS="LineStyle";
+      for s = 1:nSol % skip gt
+        %"num","mthd","name","model","eVals" ,"rec",
+        %"A_eV","A_eM","st_errs","L1" ,"L2" ,"MAE" ,"MSE"
+        name  = obj.logs{s+1,3};     
+        mdl   = obj.logs{s+1,4};
+        A_eM  = mdl.A_eM;  
+        titname = "$A_{est}$ Performance Surface"; 
+        surf(A_eM);
+        title(name,titname,IN,LT);
+        fig = gcf;
+        set(fig,"Units", obj.fig_U);
+        set(fig,"Position", obj.fig_pos);
+        if obj.plt_sav_en
+          name = strrep(name,' ','_');
+          fname = strcat(obj.toutDir,"plt_",name,"_A_eM_surf");
+          saveas(fig, fname); % sav as fig file
+          saveas(fig, strcat(fname,".png")); % sav as png file
+        end
+        if ~obj.plt_shw_en
+          close(fig);
+        end
+      end
+    end % plt_A_surfs_sep()
 
-
-
-      
-    end
   end % methods (Access = public) 
 end

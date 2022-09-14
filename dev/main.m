@@ -81,8 +81,10 @@ dlgr.add_mdl(F_mdl);
 dlgr.get_errs(); 
 dlgr.get_tab(); % get res table
 dlgr.plt_recons_grid();
-dlgr.plt_A_surf();
-dlgr.plt_A_hmap();
+dlgr.plt_A_roots(); % overlay in one fig
+dlgr.plt_A_roots_sep(); % separate figs 
+dlgr.plt_A_surfs_sep(); % separate figs 
+abiouydlgr.plt_A_hmaps_sep(); % separate figs 
 
 %% report
 %rpt.gen_plots(cfg.dat, dlog, piDMD);
