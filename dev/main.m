@@ -1,10 +1,11 @@
 %% DLO main
 %% init sys 
 close all; clear; clc;
-cfg  = cfg_class(TID    = ['D000', '00', '_piDMD_', 'orth_'], ...
+cfg  = cfg_class(TID    = ['D000', '01', '_piDMD_', 'adj_dims_dat02'], ...
                  brief  = ["Added orientation states "], ...
+                 ...
                  bnum   = 1, ...
-                 end_frame  = 10000);
+                 end_frame  = 1000);
 dlgr  = dlgr_class(); dlgr.load_cfg(cfg);
 %rpt   = report_class(); rpt.load_cfg(cfg);
 %% init app modules
@@ -23,13 +24,13 @@ piExct_mdl  = pi.get_model(pi.X, pi.Y, "exact", ''); % piDMD baseline
 %C_mdl  = pi.est(pi.X, pi.Y, "uppertriangular"); % 03
 
 % piDMD methods B000
-%C_mdl  = pi.get_model(pi.X, pi.Y, "exactSVDS"); % 01
+B_mdl  = pi.get_model(pi.X, pi.Y, "exactSVDS", ""); % 01
 C_mdl  = pi.get_model(pi.X, pi.Y, "orthogonal", ""); % 02 r
 %D_mdl  = pi.get_model(pi.X, pi.Y, "uppertriangular"); % 03
 %C_mdl  = pi.get_model(pi.X, pi.Y, "lowertriangular"); % 04
 D_mdl  = pi.get_model(pi.X, pi.Y, "diagonal", " - d=2", 2); % 05
 E_mdl  = pi.get_model(pi.X, pi.Y, "diagonal", " - d=1", 1); % 05
-F_mdl  = pi.get_model(pi.X, pi.Y, "diagonal", " - d=6", 2); % 06
+F_mdl  = pi.get_model(pi.X, pi.Y, "diagonal", " - d=6", 6); % 06
 %F_mdl  = pi.get_model(pi.X, pi.Y, "diagonaltls"); % 07
 %C_mdl  = pi.get_model(pi.X, pi.Y, "symtridiagonal"); % 08
 %G_mdl  = pi.get_model(pi.X, pi.Y, "circulant"); % 09
@@ -61,7 +62,7 @@ dlgr.add_mdl(piExct_mdl); % baseline
 
 %
 %dlgr.add_mdl(A_mdl);
-%dlgr.add_mdl(B_mdl);
+dlgr.add_mdl(B_mdl);
 %dlgr.add_mdl(C_mdl);
 dlgr.add_mdl(C_mdl);
 dlgr.add_mdl(D_mdl);
@@ -79,9 +80,9 @@ dlgr.add_mdl(F_mdl);
 %% post processing 
 dlgr.get_errs(); 
 dlgr.get_tab(); % get res table
-dlgr.sav_tab(); % sav log table - result tab
 dlgr.plt_recons_grid();
-%dlgr.plt_models_grid();
+dlgr.plt_A_surf();
+dlgr.plt_A_hmap();
 
 %% report
 %rpt.gen_plots(cfg.dat, dlog, piDMD);

@@ -5,6 +5,7 @@ classdef model_class < matlab.System
     note        = ["model class is used as a general class for system " ...
       "operations, i.e. plots and general data/output logging."]
     sav_mdl_en     = true
+    shw_mdl_en     = true
     %sliding_ref_en  % cfg argin
     %% cfg (argin)
     TID     
@@ -13,6 +14,7 @@ classdef model_class < matlab.System
     %% vars (argin)
     name % mdl name 
     mthd    = [] % piDMD, HAVOK
+    cons    = [] % e.g. orth
     label   = [] % show model cfg and is used in plots
     A       = [] % state transient function pointer (per piDMD)
     Aproj   = [] % A projection matrix
@@ -20,8 +22,8 @@ classdef model_class < matlab.System
     eVals   = []
     eVecs   = []
     rec     = []
-    A_vec   = [] % eigenFunc state stransition vec
-    A_mat   = [] % eigenFunc sysmmetric matrix model     % method specific vars
+    A_eV   = [] % eigenFunc vec
+    A_eM   = [] % eigenFunc matrix
     % inputs 
     r % rank
     d % band width of diag 
@@ -70,18 +72,31 @@ classdef model_class < matlab.System
     end
     
     function init(obj)
-      %obj.get_eigenFunc_Rep();
-      %obj.sav(); 
+
     end
   
-    function get_eigenFunc_Rep(obj)
-      if strcmp(obj.mthd, "piDMD")
-        obj.A_vec = obj.A(obj.eVals);
+    function get_eigModel(obj)
+      if contains("piDMD",obj.mthd,"IgnoreCase",true)
+        if ~isempty(obj.Aproj)
+          obj.A_eM = obj.Aproj;
+          fprintf("[model.get_eigModel]-->> %0.10s - %0.10s: Aproj  is used as A_eM!\n",obj.mthd,obj.cons);
+        end
+        if ~isempty(obj.Atilde)
+          obj.A_eM = obj.Atilde;
+          fprintf("[model.get_eigModel]-->> %0.10s - %0.10s: Atilde is used as A_eM!\n",obj.mthd,obj.cons);
+        end
+        if ~isempty(obj.Asparse)
+          obj.A_eM = obj.Asparse;
+          fprintf("[model.get_eigModel]-->> %0.10s - %0.10s: Asparse is used as A_eM!\n",obj.mthd,obj.cons);
+        end
+        
+        %figure; surf(obj.A_eM);
+        obj.A_eV = obj.A(obj.eVals);
         %obj.A_mat = obj.A_vec*obj.A_vec';
-      elseif strcmp(obj.mthd, "HAVOK")
-        obj.A_vec = obj.A(obj.eVals);
+      elseif contains("HAVOK",obj.mthd,"IgnoreCase",true)
+        obj.A_eV = obj.A(obj.eVals);
       else
-        fprintf("[model.getEigenFunc_Rep]->> undefined or no mthd...\n");
+        fprintf("[model.get_eigModel]->> undefined or no mthd: %s \n", obj.mthd);
       end
     end
       
@@ -89,16 +104,6 @@ classdef model_class < matlab.System
       if ~isempty(obj.toutDir) % --->> save logs to file
         tag = strrep(obj.name," ","_");
         tag = strrep(tag,"-","_");  
-        if (obj.sav_mdl_en==true && ~isempty(obj.A))
-          fname = strcat(obj.toutDir,"log_",tag,"_A_mdl"); % sav A_mod
-          writematrix(obj.A_mat, fname);
-        end
-        if ~isempty(obj.Aproj)
-          fig = surf(obj.Aproj);
-          fname = strcat(obj.toutDir,"log_",tag,"_Aproj.png"); % sav Aproj
-          saveas(fig, fname); % sav as png file
-          close(fig);
-        end
         if ~isempty(obj.eVals)
           fname = strcat(obj.toutDir,"log_",tag,"_eVals.csv"); % sav eVals
           writematrix(obj.eVals, fname);
@@ -109,13 +114,13 @@ classdef model_class < matlab.System
         end
         fname = strcat(obj.toutDir,"log_",tag,"_rec.csv"); % sav rec
         writematrix(obj.rec, fname);  
-        if ~isempty(obj.A_vec)
-          fname = strcat(obj.toutDir,"log_",tag,"_A_vec.csv"); % sav A_vec
-          writematrix(obj.A_vec, fname);
+        if ~isempty(obj.A_eV)
+          fname = strcat(obj.toutDir,"log_",tag,"_A_eV.csv"); % sav A_vec
+          writematrix(obj.A_eV, fname);
         end
-        if ~isempty(obj.A_mat)
-          fname = strcat(obj.toutDir,"log_",tag,"_A_mat.csv"); % sav A_mat
-          writematrix(obj.A_mat, fname);
+        if ~isempty(obj.A_eM)
+          fname = strcat(obj.toutDir,"log_",tag,"_A_eM.csv"); % sav A_mat
+          writematrix(obj.A_eM, fname);
         end
       end
     end

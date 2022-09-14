@@ -110,8 +110,8 @@ classdef dlgr_class < matlab.System
       obj.logs{len+1, 4} = mdl;
       obj.logs{len+1, 5} = mdl.eVals;
       obj.logs{len+1, 6} = mdl.rec;
-      obj.logs{len+1, 7} = mdl.A_vec;
-      obj.logs{len+1, 8} = mdl.A_mat;
+      obj.logs{len+1, 7} = mdl.A_eV;
+      obj.logs{len+1, 8} = mdl.A_eM;
       obj.logs{len+1, 9} = mdl.st_errs;
       obj.logs{len+1,10} = mdl.L1;
       obj.logs{len+1,11} = mdl.L2;
@@ -176,6 +176,7 @@ classdef dlgr_class < matlab.System
                       [obj.logs{2:end,13}]', ... % {13} "MSE"
                       VariableNames=labels);
       obj.tab % show tab
+      obj.sav_tab();
     end
     
     function sav_tab(obj)
@@ -233,7 +234,17 @@ classdef dlgr_class < matlab.System
       end
     end % plt_KFs_grid(obj)
   
-    function plt_models_grid(obj)
+    function plt_A_surf(obj)
+
+
+
+
+
+
+
+
+
+
       nSol = size(obj.logs,1)-1;
       IN="Interpreter";LT="latex";DN='DisplayName';
       FS="fontsize";LW ="LineWidth";Cr="Color";LS="LineStyle";
@@ -269,6 +280,12 @@ classdef dlgr_class < matlab.System
       if ~obj.plt_shw_en
         close(fig);
       end
+
+
+
+
+
+      
     end
   end % methods (Access = public) 
 end
