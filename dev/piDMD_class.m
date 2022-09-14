@@ -27,13 +27,14 @@ classdef piDMD_class < matlab.System
     X % state in ss 
     Y % state est 
     %% piDMD methods (const)
-    constrains   = ["exact", "exactSVDS", ...
-               "orthogonal", ...
-               "uppertriangular", "lowertriangular" , ... % 
-               "diagonal", "diagonalpinv", "diagonaltls", "symtridiagonal", ... 
-               "circulant", "circulantTLS", "circulantunitary", "circulantsymmetric","circulantskewsymmetric", ...
-               "BCCB", "BCCBtls", "BCCBskewsymmetric", "BCCBunitary", "hankel", "toeplitz", ...
-               "symmetric", "skewsymmetric"]
+    constrains   = [ ...
+      "exact", "exactSVDS", ...
+      "orthogonal", ...
+      "uppertriangular", "lowertriangular" , ... % 
+      "diagonal", "diagonalpinv", "diagonaltls", "symtridiagonal", ... 
+      "circulant", "circulantTLS", "circulantunitary", "circulantsymmetric","circulantskewsymmetric", ...
+      "BCCB", "BCCBtls", "BCCBskewsymmetric", "BCCBunitary", "hankel", "toeplitz", ...
+      "symmetric", "skewsymmetric"]
   end
   methods % constructor
     
@@ -57,8 +58,7 @@ classdef piDMD_class < matlab.System
     end
 
     function m = get_model(obj, X, Y, cons, label, varargin)
-      m = model_class(name = strcat("piDMD ", cons, label), ...
-                      cons = cons, ...
+      m = model_class(cons = cons, ...
                       mthd = "piDMD", ...
                       label = label);
       [nx, nt] = size(X); 
@@ -76,7 +76,6 @@ classdef piDMD_class < matlab.System
         end
         m.Atilde = (m.Ux'*Y)*m.Vx*pinv(m.Sx);
         m.A = @(v) m.Ux*(m.Atilde*(m.Ux'*v));
-        m.eig_Atilde = eig(m.Atilde);
         [m.eVecs, m.eVals] = eig(m.Atilde);
         m.eVals = diag(m.eVals); 
         m.eVecs = Y*m.Vx*pinv(m.Sx)*m.eVecs./m.eVals.';
@@ -97,7 +96,7 @@ classdef piDMD_class < matlab.System
         m.Ut = triu(Y*m.Q');
         m.A = m.Ut/m.R;
       elseif strcmp(m.cons,'lowertriangular')  
-        m.A = rot90(obj.get_model(flipud(X),flipud(Y),'uppertriangular'),2);
+        m.A = rot90(obj.get_model(flipud(X),flipud(Y),'uppertriangular').A,2);
 % The codes allows for matrices of variable banded width. The fourth input,
 % a 2xn matrix called d, specifies the upper and lower bounds of the
 % indices of the non-zero elements. The first column corresponds to the width of
@@ -143,29 +142,28 @@ classdef piDMD_class < matlab.System
         C1 = C;
         if nargin>5; m.r = varargin{1}; else; m.r = rank(X); end
         m.Ux = m.Ux(:,1:m.r);
-        m.Yf = zeros(m.r);
+        Yf = zeros(m.r);
         if strcmp(m.cons,'symmetric') 
           for i = 1:m.r
-            m.Yf(i,i) = real(C1(i,i))/m.S(i,i);
+            Yf(i,i) = real(C1(i,i))/m.S(i,i);
             for j = i+1:m.r
-              m.Yf(i,j) = (m.S(i,i)*conj(C1(j,i)) + m.S(j,j)*C1(i,j)) / (m.S(i,i)^2 + m.S(j,j)^2);
+              Yf(i,j) = (m.S(i,i)*conj(C1(j,i)) + m.S(j,j)*C1(i,j)) / (m.S(i,i)^2 + m.S(j,j)^2);
             end
           end
-          m.Yf = m.Yf + m.Yf' - diag(diag(real(m.Yf)));
+          Yf = Yf + Yf' - diag(diag(real(Yf)));
         elseif strcmp(m.cons,'skewsymmetric')
           for i = 1:m.r
-            m.Yf(i,i) = 1i*imag(C1(i,i))/m.S(i,i);
+            Yf(i,i) = 1i*imag(C1(i,i))/m.S(i,i);
             for j = i+1:nx
-              m.Yf(i,j) = (-m.S(i,i)*conj(C1(j,i)) + m.S(j,j)*(C1(i,j))) / (m.S(i,i)^2 + m.S(j,j)^2);
+              Yf(i,j) = (-m.S(i,i)*conj(C1(j,i)) + m.S(j,j)*(C1(i,j))) / (m.S(i,i)^2 + m.S(j,j)^2);
             end
           end
-          m.Yf = m.Yf - m.Yf' - 1i*diag(diag(imag(Yf)));
+          Yf = Yf - Yf' - 1i*diag(diag(imag(Yf)));
         end
 
-        m.A = @(v) m.Ux*m.Yf*(m.Ux'*v);
-        m.eig_YF = eig(m.Yf);
-
-        [m.eVecs,m.eVals] = eig(m.Yf);
+        m.A = @(v) m.Ux*Yf*(m.Ux'*v);
+        m.YF = Yf;
+        [m.eVecs,m.eVals] = eig();
         m.eVals = diag(m.eVals);
         m.eVecs = m.Ux*m.eVecs;
       elseif strcmp(m.cons,'toeplitz') || strcmp(m.cons,'hankel')
@@ -181,14 +179,14 @@ classdef piDMD_class < matlab.System
         newA = ifft(fft(diag(m.d)).').'; % Convert the eigenvalues into the circulant matrix
         m.A = newA(1:nx,1:nx)*J; % Extract the Toeplitz matrix from the circulant matrix
       elseif startsWith(m.cons,'circulant')
-        m.fX = fft(X); m.fY = fft(conj(Y));
+        fX = fft(X); fY = fft(conj(Y));
         m.d = zeros(nx,1);
         if endsWith(cons,'TLS') % Solve in the total least squares sense     
           for j = 1:nx
-            m.d(j) = obj.tls(m.fX(j,:)',m.fY(j,:)');
+            m.d(j) = obj.tls(fX(j,:)',fY(j,:)');
           end
         elseif ~endsWith(m.cons,'TLS') % Solve the other cases
-          m.d = diag(m.fX*m.fY')./vecnorm(m.fX,2,2).^2;
+          m.d = diag(fX*fY')./vecnorm(fX,2,2).^2;
           if endsWith(m.cons,'unitary'); m.d = exp(1i*angle(m.d));
           elseif endsWith(m.cons,'symmetric'); m.d = real(m.d);
           elseif endsWith(m.cons,'skewsymmetric'); m.d = 1i*imag(m.d);
@@ -198,7 +196,7 @@ classdef piDMD_class < matlab.System
         m.eVecs = fft(eye(nx)); % These are the eigenvectors
         if nargin>5
           m.r = varargin{1}; % Rank constraint
-          res = diag(abs(m.fX*m.fY'))./vecnorm(m.fX')'; % Identify least important eigenvalues
+          res = diag(abs(fX*fY'))./vecnorm(fX')'; % Identify least important eigenvalues
           [~,idx] = mink(res,nx-m.r); % Remove least important eigenvalues
           m.d(idx) = 0; m.eVals(idx) = []; m.eVecs(:,idx) = [];
         end
@@ -208,27 +206,27 @@ classdef piDMD_class < matlab.System
         if isempty(varargin); error('Need to specify size of blocks.'); end
         m.s = varargin{1}; m.p = prod(m.s);
         % Equivalent to applying the block-DFT matrix F 
-        % defined by F = kron(dftmtx(M),dftmtx(N)) to the 
-        % matrix X
-        aF =  @(x) reshape(fft2(reshape(x ,[m.s,size(x,2)])) ,[m.p,size(x,2)])/sqrt(m.p);
+        % defined by F = kron(dftmtx(M),dftmtx(N)) to the matrix X 
+        aF =  @(x) reshape(fft2(reshape(x,[m.s,size(x,2)])),[m.p,size(x,2)])/sqrt(m.p);
+        %aF =  @(x) x*kron(dftmtx(s(1)),dftmtx(s(2)));
         aFt = @(x) conj(aF(conj(x)));
-        m.m.fX = aF(conj(X)); m.m.fY = aF(conj(Y));
+        fX = aF(conj(X)); fY = aF(conj(Y));
         m.d = zeros(m.p,1);
         if strcmp(m.cons,'BCCB') 
-          for j = 1:m.p; m.d(j) = conj(m.m.fX(j,:)*m.m.fY(j,:)')/norm(m.fX(j,:)').^2; end
+          for j = 1:m.p; m.d(j) = conj(fX(j,:)*fY(j,:)')/norm(fX(j,:)').^2; end
           elseif strcmp(cons,'BCCBtls')
-          for j = 1:m.p; m.d(j) = tls(m.fX(j,:)',m.fY(j,:)')'; end
+          for j = 1:m.p; m.d(j) = tls(fX(j,:)',fY(j,:)')'; end
           elseif strcmp(cons,'BCCBskewsymmetric')
-          for j = 1:m.p; m.d(j) = 1i*imag(m.fY(j,:)/m.fX(j,:)); end
+          for j = 1:m.p; m.d(j) = 1i*imag(fY(j,:)/fX(j,:)); end
           elseif strcmp(cons,'BCCBsymmetric')
-          for j = 1:m.p; m.d(j) = real(m.fY(j,:)/m.fX(j,:)); end
+          for j = 1:m.p; m.d(j) = real(fY(j,:)/fX(j,:)); end
           elseif strcmp(cons,'BCCBunitary')
-          for j = 1:m.p; m.d(j) = exp(1i*angle(m.fY(j,:)/m.fX(j,:))); end
+          for j = 1:m.p; m.d(j) = exp(1i*angle(fY(j,:)/fX(j,:))); end
         end
         % Returns a function handle that applies A
         if nargin>6
           m.r = varargin{2};
-          res = diag(abs(m.fX*m.fY'))./vecnorm(m.fX')';
+          res = diag(abs(fX*fY'))./vecnorm(fX')';
           [~,idx] = mink(res,nx-r);
           m.d(idx) = 0;
         end
@@ -243,16 +241,16 @@ classdef piDMD_class < matlab.System
         % matrix X
         aF  =  @(x) reshape(fft(reshape(x,[m.s,size(x,2)]),[],2) ,[m.p,size(x,2)])/sqrt(m.M);
         aFt =  @(x) conj(aF(conj(x)));
-        m.fX = aF(X); m.fY = aF(Y);
+        fX = aF(X); fY = aF(Y);
         m.d = cell(m.M,1);
         for j = 1:m.M
           ls = (j-1)*m.N + (1:m.N);
           if strcmp(m.cons,'BC')
-            m.d{j} = m.fY(ls,:)/m.fX(ls,:);
+            m.d{j} = fY(ls,:)/fX(ls,:);
           elseif strcmp(m.cons,'BCtri')
-            m.d{j} = obj.get_model(m.fX(ls,:),m.fY(ls,:),'diagonal',2);
+            m.d{j} = obj.get_model(fX(ls,:),fY(ls,:),'diagonal',2);
           elseif strcmp(m.cons,'BCtls')
-            m.d{j} = obj.tls(m.fX(ls,:)',m.fY(ls,:)')';
+            m.d{j} = obj.tls(fX(ls,:)',fY(ls,:)')';
           end
         end 
         BD = blkdiag(m.d{:});

@@ -107,9 +107,9 @@ classdef dlgr_class < matlab.System
       obj.logs{len+1, 2} = mdl.mthd; % e.g. piDMD, HAVOK 
       obj.logs{len+1, 3} = mdl.name;
       obj.logs{len+1, 4} = mdl;
-      obj.logs{len+1, 5} = mdl.eVals;
+      %obj.logs{len+1, 5} = mdl.eVals;
       obj.logs{len+1, 6} = mdl.rec;
-      obj.logs{len+1, 7} = mdl.A_eV;
+      %obj.logs{len+1, 7} = mdl.A_eV;
       obj.logs{len+1, 8} = mdl.A_eM;
       obj.logs{len+1, 9} = mdl.st_errs;
       obj.logs{len+1,10} = mdl.L1;
@@ -139,7 +139,7 @@ classdef dlgr_class < matlab.System
         else
           error("[dlgr.get_errs]->> log size is greater than gt!\n")
         end
-        errs    = gt - mrec;
+        errs    = real(gt - mrec);
         L1      = sum(abs(errs),"all"); % get st L1
         L2      = sum((errs.^2),"all"); 
         MAE     = L1/size(errs,2);
@@ -196,7 +196,7 @@ classdef dlgr_class < matlab.System
       for kf = 1:10 % 10 KFs, 10 rows
         for s = 1:nSol % nAlgs colors
           % log table {"num", "name", "A-model", "vals", "rec"} 
-          algNames{s} = obj.logs{s+1,3};
+          algNames{s} = obj.logs{s+1,4}.name; 
           RL = strcat("$KF_", num2str(kf, "{%02.f}$"));
           dat_a = obj.logs{s+1,6};
           Txyz = dat_a((((kf-1)*3)+1):(((kf-1)*3)+3),:);
@@ -242,11 +242,11 @@ classdef dlgr_class < matlab.System
       xlabel("$real$",IN,LT,FS,obj.fig_FS);
       ylabel("$imag.$",IN,LT,FS,obj.fig_FS);
       for s = 2:nSol % skip gt
-        algNames{s} = obj.logs{s+1,3}; 
+        algNames{s} = obj.logs{s+1,4}.name; 
         mdl = obj.logs{s+1,4};
-        A_eV = mdl.A_eV;
-        real_A = real(A_eV);
-        imag_A = imag(A_eV);
+        eVals = mdl.eVals;
+        real_A = real(eVals);
+        imag_A = imag(eVals);
         plot(real_A,imag_A,obj.fig_PT(s),LW,obj.fig_LW,DN,algNames{s});
       end
       viscircles([0 0],1,Cr,"k",LS,'--',LW,obj.fig_LW);% "unit circle"
@@ -254,9 +254,9 @@ classdef dlgr_class < matlab.System
       lg.Units    = obj.fig_leg_U;
       lg.Position = obj.fig_leg_pos;
       lg.FontSize = obj.fig_leg_FS;
-      grid on;
+      grid on; hold off
       if obj.plt_sav_en
-        fname = strcat(obj.toutDir,"plt_all_A_eVec_roots");
+        fname = strcat(obj.toutDir,"plt_all_eVal_roots");
         saveas(fig, fname); % sav as fig file
         saveas(fig, strcat(fname,".png")); % sav as png file
       end
@@ -270,18 +270,16 @@ classdef dlgr_class < matlab.System
       FS="fontsize";LW ="LineWidth";Cr="Color";LS="LineStyle";
       nSol = size(obj.logs,1)-1;
       for s = 2:nSol % skip gt
-        name = obj.logs{s+1,3}; 
+        mdl   = obj.logs{s+1,4};
         titname = "$A_{est}$ Roots (Phase)";
-        %vals  = obj.logs{s+1,5};
-        A_eV = obj.logs{s+1,7};
-        %A_mat = obj.logs{s+1,8};
-        real_A = real(A_eV);
-        imag_A = imag(A_eV);
+        eVals = mdl.eVals;
+        real_A = real(eVals);
+        imag_A = imag(eVals);
         fig = figure(); hold on
-        title(name,titname,IN,LT);
+        title(mdl.name,titname,IN,LT);
         set(fig,"Units", obj.fig_U);
         set(fig,"Position", obj.fig_pos);
-        plot(real_A,imag_A,obj.fig_PT(s),LW,obj.fig_LW,DN,name);
+        plot(real_A,imag_A,obj.fig_PT(3),LW,obj.fig_LW,DN,mdl.name);
         xlabel("$real$",IN,LT,FS,obj.fig_FS);
         ylabel("$imag.$",IN,LT,FS,obj.fig_FS);
         viscircles([0 0],1,Cr,"k",LS,'--',LW,obj.fig_LW);% "unit circle"
@@ -289,10 +287,11 @@ classdef dlgr_class < matlab.System
         lg.Units    = obj.fig_leg_U;
         lg.Position = obj.fig_leg_pos;
         lg.FontSize = obj.fig_leg_FS;
-        grid on; hold off
+        grid on; 
         if obj.plt_sav_en
-          name = strrep(name,' ','_');
-          fname = strcat(obj.toutDir,"plt_",name,"_A_eVec_roots");
+          name = strrep(mdl.name,' ','_');
+          name = strrep(name,':','_');
+          fname = strcat(obj.toutDir,"plt_",name,"_eVec_roots");
           saveas(fig, fname); % sav as fig file
           saveas(fig, strcat(fname,".png")); % sav as png file
         end
@@ -300,27 +299,55 @@ classdef dlgr_class < matlab.System
           close(fig);
         end
       end % for
+      hold off
     end % plt_A_roots_sep()
+    
+    function plt_A_bmaps_sep(obj)
+      nSol = size(obj.logs,1)-1;
+      IN="Interpreter";LT="latex";
+      for s = 2:nSol % skip gt
+        %"num","mthd","name","model","eVals" ,"rec",
+        %"A_eV","A_eM","st_errs","L1" ,"L2" ,"MAE" ,"MSE"
+        mdl   = obj.logs{s+1,4};
+        A_eM  = mdl.A_eM;  
+        titname = "$A_{eMat}$ Performance Surface"; 
+        fig = figure(); hold on
+        set(fig,"Units", obj.fig_U);
+        set(fig,"Position", obj.fig_pos);
+        surf(A_eM); 
+        title(mdl.name,titname,IN,LT);
+        fig.Name = mdl.name;
+        if obj.plt_sav_en
+          name = strrep(mdl.name,' ','_');
+          name = strrep(name,':','-');
+          fname = strcat(obj.toutDir,"plt_",name,"_eM_bmap");
+          saveas(fig, fname); % sav as fig file
+          saveas(fig, strcat(fname,".png")); % sav as png file
+        end
+        if ~obj.plt_shw_en
+          close(fig);
+        end
+      end
+      hold off
+    end % plt_A_bmaps_sep()
 
     function plt_A_surfs_sep(obj)
       nSol = size(obj.logs,1)-1;
-      IN="Interpreter";LT="latex";DN='DisplayName';
-      FS="fontsize";LW ="LineWidth";Cr="Color";LS="LineStyle";
-      for s = 1:nSol % skip gt
-        %"num","mthd","name","model","eVals" ,"rec",
-        %"A_eV","A_eM","st_errs","L1" ,"L2" ,"MAE" ,"MSE"
-        name  = obj.logs{s+1,3};     
+      IN="Interpreter";LT="latex";
+      for s = 2:nSol % skip gt  
         mdl   = obj.logs{s+1,4};
         A_eM  = mdl.A_eM;  
         titname = "$A_{est}$ Performance Surface"; 
-        surf(A_eM);
-        title(name,titname,IN,LT);
-        fig = gcf;
-        set(fig,"Units", obj.fig_U);
-        set(fig,"Position", obj.fig_pos);
+        %fig = figure(); 
+        %set(fig,"Units", obj.fig_U);
+        %set(fig,"Position", obj.fig_pos);
+        fig = surf(A_eM);hold on
+        title(mdl.name,titname,IN,LT);
+        hold off
         if obj.plt_sav_en
-          name = strrep(name,' ','_');
-          fname = strcat(obj.toutDir,"plt_",name,"_A_eM_surf");
+          name = strrep(mdl.name,' ','_');
+          name = strrep(name,':','-');
+          fname = strcat(obj.toutDir,"plt_",name,"_eM_surf");
           saveas(fig, fname); % sav as fig file
           saveas(fig, strcat(fname,".png")); % sav as png file
         end

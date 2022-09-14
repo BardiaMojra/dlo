@@ -19,19 +19,18 @@ classdef model_class < matlab.System
     A       = [] % state transient function pointer (per piDMD)
     Aproj   = [] % A projection matrix
     Atilde  = [] % A est matrix 
+    Asparse      % = sparse(Imat,Jmat,Rmat,nx,nx) - diag
+    YF       % = eig(m.Yf);
+    A_eM    = [] % eigenFunc matrix
     eVals   = []
     eVecs   = []
     rec     = []
-    A_eV   = [] % eigenFunc vec
-    A_eM   = [] % eigenFunc matrix
     % inputs 
     r % rank
     d % band width of diag 
     s % block size [2 3]
     p % num elements in the block 
-
     % other piDMD vars
-    eig_Atilde = [] % = eig(Atilde)
     U
     S
     V
@@ -45,10 +44,6 @@ classdef model_class < matlab.System
     R
     Q
     Ut
-    Asparse 
-    Yf
-    Xf
-    eig_YF
     M
     N
     T % the block tridiagonal matrix
@@ -68,30 +63,45 @@ classdef model_class < matlab.System
   methods  % constructor
     function obj = model_class(varargin) % init obj w name-value args
       setProperties(obj,nargin,varargin{:}) % set toutDir via varargin
-      %obj.init();
+      obj.init();
     end
     
     function init(obj)
-
+      obj.name = strcat(obj.mthd," ",obj.cons," ",obj.label);
     end
   
     function get_eigModel(obj)
-      if contains("piDMD",obj.mthd,"IgnoreCase",true)
-        if ~isempty(obj.Aproj)
-          obj.A_eM = obj.Aproj;
-          fprintf("[model.get_eigModel]-->> %0.10s - %0.10s: Aproj  is used as A_eM!\n",obj.mthd,obj.cons);
-        end
-        if ~isempty(obj.Atilde)
+      if strcmp("piDMD",obj.mthd)
+        if strcmp(obj.cons,'exact') || strcmp(obj.cons,'exactSVDS')
           obj.A_eM = obj.Atilde;
-          fprintf("[model.get_eigModel]-->> %0.10s - %0.10s: Atilde is used as A_eM!\n",obj.mthd,obj.cons);
-        end
-        if ~isempty(obj.Asparse)
+          fprintf("[model.get_eigModel]-->> %s: Atilde taken as A_eM!\n",obj.name);         
+        elseif strcmp(obj.cons,'orthogonal')
+          obj.A_eM = obj.Aproj;
+          fprintf("[model.get_eigModel]-->> %s: Aproj taken as A_eM!\n",obj.name);
+        elseif strcmp(obj.cons,'uppertriangular') || strcmp(obj.cons,'lowertriangular') 
+          obj.A_eM = obj.A;
+          fprintf("[model.get_eigModel]-->> %s: A taken as A_eM!\n",obj.name);
+        elseif startsWith(obj.cons,'diagonal') 
           obj.A_eM = obj.Asparse;
-          fprintf("[model.get_eigModel]-->> %0.10s - %0.10s: Asparse is used as A_eM!\n",obj.mthd,obj.cons);
+          fprintf("[model.get_eigModel]-->> %s: Asparse taken as A_eM!\n",obj.name);
+        elseif strcmp(obj.cons,'symmetric') || strcmp(obj.cons,'skewsymmetric')
+          obj.A_eM = obj.YF;
+          fprintf("[model.get_eigModel]-->> %s: YF taken as A_eM!\n",obj.name);
+
+        elseif strcmp(obj.cons,'toeplitz') || strcmp(obj.cons,'hankel')
+          obj.A_eM = obj.A; 
+          fprintf("[model.get_eigModel]-->> %s: A taken as A_eM!\n",obj.name);
+        elseif startsWith(obj.cons,'circulant')
+          obj.A_eM = real(obj.eVals)*real(obj.eVals'); % TLS, circ
+          fprintf("[model.get_eigModel]-->> %s: re{eVals}*re{eVals}' taken as A_eM!\n",obj.name);
+        %elseif strcmp(obj.cons,'BCCB') 
+        %elseif strcmp(obj.cons,'BC') || strcmp(obj.cons,'BCtri') || strcmp(obj.cons,'BCtls')
+        %elseif strcmp(obj.cons,'symtridiagonal')        
+        else
+          fprintf("[model.get_eigModel]-->> %s: takes no model!\n",obj.name);
+          error("[model.get_eigModel]-->> %s: takes no model!\n",obj.name);
         end
-        
         %figure; surf(obj.A_eM);
-        obj.A_eV = obj.A(obj.eVals);
         %obj.A_mat = obj.A_vec*obj.A_vec';
       elseif contains("HAVOK",obj.mthd,"IgnoreCase",true)
         obj.A_eV = obj.A(obj.eVals);
