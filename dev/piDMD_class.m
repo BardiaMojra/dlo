@@ -163,7 +163,7 @@ classdef piDMD_class < matlab.System
 
         m.A = @(v) m.Ux*Yf*(m.Ux'*v);
         m.YF = Yf;
-        [m.eVecs,m.eVals] = eig();
+        [m.eVecs,m.eVals] = eig(Yf);
         m.eVals = diag(m.eVals);
         m.eVecs = m.Ux*m.eVecs;
       elseif strcmp(m.cons,'toeplitz') || strcmp(m.cons,'hankel')

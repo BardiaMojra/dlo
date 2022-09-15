@@ -30,7 +30,7 @@ classdef model_class < matlab.System
     d % band width of diag 
     s % block size [2 3]
     p % num elements in the block 
-    % other piDMD vars
+    % piDMD vars
     U
     S
     V
@@ -41,21 +41,20 @@ classdef model_class < matlab.System
     Xproj 
     Uyx
     Vyx
-    R
-    Q
+    R % uTri
+    Q % lTri
     Ut
     M
     N
     T % the block tridiagonal matrix
 
-    %% private vars
+    % errs
     st_errs % state errors 
     L1
     L2
     MAE
     MSE
 
-    % piDMD
 
     % HAVOK
     B_frcin % HAVOK
@@ -67,7 +66,7 @@ classdef model_class < matlab.System
     end
     
     function init(obj)
-      obj.name = strcat(obj.mthd," ",obj.cons," ",obj.label);
+      obj.name = strcat(obj.mthd," ",obj.cons," ",obj.label," ");
     end
   
     function get_eigModel(obj)

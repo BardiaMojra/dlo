@@ -51,13 +51,13 @@ classdef dlgr_class < matlab.System
     fig_leg_FS   = 8
     fig_LW       = .75
     fig_ylim     = "auto" %= [-2 2] 
-    fig_Cr       = ["#A2142F", "#77AC30", "#0072BD", "#c451db", ...
+    fig_Cr       = [	"#000000", "#A2142F", "#77AC30", "#0072BD", "#c451db", ...
                     "#EDB120", "#4DBEEE", "#D95319", "#77AC30"] % unique per alg
     fig_MK       = ["o", "+", "*", ".", ...
                     "x", "s", "d", "^", ...
                     "v", ">", "<", "h"]
     fig_PT       = ["bo:", "gx:", "r+:", "c*:", ...
-                    "ms:", "yd:", "kv:", "b^", ...
+                    "ms:", "kd:", "b^", ...
                     "g<:"]
   end
   methods  % constructor
@@ -247,7 +247,7 @@ classdef dlgr_class < matlab.System
         eVals = mdl.eVals;
         real_A = real(eVals);
         imag_A = imag(eVals);
-        plot(real_A,imag_A,obj.fig_PT(s),LW,obj.fig_LW,DN,algNames{s});
+        plot(real_A,imag_A,obj.fig_PT(s),Cr,obj.fig_Cr(s),LW,obj.fig_LW,DN,algNames{s});
       end
       viscircles([0 0],1,Cr,"k",LS,'--',LW,obj.fig_LW);% "unit circle"
       lg          = legend('show','location','best'); 
@@ -279,7 +279,7 @@ classdef dlgr_class < matlab.System
         title(mdl.name,titname,IN,LT);
         set(fig,"Units", obj.fig_U);
         set(fig,"Position", obj.fig_pos);
-        plot(real_A,imag_A,obj.fig_PT(3),LW,obj.fig_LW,DN,mdl.name);
+        plot(real_A,imag_A,obj.fig_PT(s),Cr,obj.fig_Cr(s),LW,obj.fig_LW,DN,mdl.name);
         xlabel("$real$",IN,LT,FS,obj.fig_FS);
         ylabel("$imag.$",IN,LT,FS,obj.fig_FS);
         viscircles([0 0],1,Cr,"k",LS,'--',LW,obj.fig_LW);% "unit circle"
@@ -314,6 +314,8 @@ classdef dlgr_class < matlab.System
         fig = figure(); hold on
         set(fig,"Units", obj.fig_U);
         set(fig,"Position", obj.fig_pos);
+        
+        
         surf(A_eM); 
         title(mdl.name,titname,IN,LT);
         fig.Name = mdl.name;
