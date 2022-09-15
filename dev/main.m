@@ -2,16 +2,16 @@
 %% init sys 
 warning('off','all')
 close all; clear; clc;
-cfg  = cfg_class(TID    = ['T001', '07', '_piDMD_', 'circs_fullt'], ...
+cfg  = cfg_class(TID    = ['T001', '10', '_piDMD_', 'circs_200'], ...
                  brief  = ["testing circ const at diff bands over diff lengths."], ...
-                 bnum   = 1); %, ...
-                 %end_frame  = 10000);
+                 bnum   = 1, ...
+                 end_frame  = 200);
 dlgr  = dlgr_class(); dlgr.load_cfg(cfg);
 %rpt   = report_class(); rpt.load_cfg(cfg);
 %% init app modules
 pi    = piDMD_class(); pi.load_cfg(cfg); 
 % import SINDy
-hvk   = HAVOK_class(); hvk.load_cfg(cfg);
+%hvk   = HAVOK_class(); hvk.load_cfg(cfg);
 %knc   = KRONIC_class(); knc.load_cfg(cfg);
 
 %% run

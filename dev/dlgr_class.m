@@ -47,7 +47,7 @@ classdef dlgr_class < matlab.System
     fig_FS       = 10
     fig_pos      = [0 0 10 10]
     fig_leg_U    = "inches"
-    fig_leg_pos  = [9 9 .8 .8]
+    fig_leg_pos  = [9 9 .8 .8] % [left bottom width height]
     fig_leg_FS   = 8
     fig_LW       = .75
     fig_ylim     = "auto" %= [-2 2] 
