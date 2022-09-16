@@ -31,18 +31,19 @@ classdef cfg_class < matlab.System
   methods (Access = private)
   
     function init(obj)
-      assert(~isempty(obj.btype), '[config]->> cfg.btype is empty: %s', ...
-        obj.btype)
-      if isnan(obj.bnum) % get test tag and toutDir
+      if strcmp(obj.btype, "_no_btype_")              % get test tag and toutDir
+        fprintf("[config]->> cfg.btype is empty: %s",obj.btype);
+        error("_no_btype_");
+      elseif isnan(obj.bnum) 
         obj.ttag  = strcat(obj.TID,'_',obj.btype);
       else
-        obj.ttag  = strcat(obj.TID );% ...
-                           %,'_', obj.btype,'_', num2str(obj.bnum,'%02.f'));
+        obj.ttag  = strcat(obj.TID,'_',obj.btype,'_',num2str(obj.bnum,'%03.f'));
       end      
       obj.ttag = strrep(obj.ttag,' ','_');
+      %obj.ttag = strrep(obj.ttag,'-','_');
       obj.toutDir = strcat(obj.outDir,'/',obj.ttag,'/');
 
-      if not(isfolder(obj.toutDir)) % create toutDir
+      if not(isfolder(obj.toutDir))                          % create toutDir
         disp("[config]->> test_toutDir does NOT exist: ");
         disp(obj.toutDir);
         mkdir(obj.toutDir);
@@ -52,19 +53,28 @@ classdef cfg_class < matlab.System
         disp(obj.toutDir);
         rmdir(obj.toutDir, 's');
         mkdir(obj.toutDir);
-        disp("[config]->> directory was created!");
+        disp("[config]->> directory is created!");
       end 
       
-      obj.load_dat(); % 
+      obj.load_dat(); % load data
       obj.sav_cfg(); % sav cfg to file
     end
 
+
     function load_dat(obj)
-      obj.dat = dat_class(btype = obj.btype, datDir = obj.datDir); % load data
-      obj.dat.load_cfg(obj);
+      if strcmp(obj.btype, "dlo_shape_control") % ------------------------ dlo
+        obj.dat = dlo_dat(); obj.dat.load_cfg(obj); 
+      elseif strcmp(obj.btype, "dp")
+        obj.dat = dp_dat(); obj.dat.load_cfg(obj); % ------------------------- dp
+      elseif strcmp(obj.btype, "vtol")
+      
+
+      end
+      
       obj.st_frame = obj.dat.st_frame;
       obj.end_frame = obj.dat.end_frame;
     end
+
     function sav_cfg(obj)
       if ~isempty(obj.brief) || obj.sav_cfg_en
         fname = strcat(obj.toutDir,"cfg.txt"); 

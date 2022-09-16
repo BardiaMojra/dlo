@@ -1,9 +1,11 @@
-%% DLO main
+%% dlo main
 %% init sys 
 warning('off','all')
 close all; clear; clc;
-cfg  = cfg_class(TID    = ['T001', '10', '_piDMD_', 'circs_200'], ...
+cfg  = cfg_class(TID    = ['T001', '001', ...
+                           '_piDMD', ''], ...
                  brief  = ["testing circ const at diff bands over diff lengths."], ...
+                 btype  = "dp", ... %
                  bnum   = 1, ...
                  end_frame  = 200);
 dlgr  = dlgr_class(); dlgr.load_cfg(cfg);
@@ -22,12 +24,12 @@ pi_m  = pi.get_model(pi.X, pi.Y, "exact", ''); % piDMD baseline
 
 % piDMD methods B000
 %extS_mA = pi.get_model(pi.X, pi.Y, "exactSVDS",  "A"); % 01
-%orth_mA = pi.get_model(pi.X, pi.Y, "orthogonal", "A"); % 02 r
+orth_mA = pi.get_model(pi.X, pi.Y, "orthogonal", "A"); % 02 r
 %orth_mB = pi.get_model(pi.X, pi.Y, "orthogonal", "B:r40",40); % 02 r
 %D_mA  = pi.get_model(pi.X, pi.Y, "uppertriangular"); % 03 <<-------------- 
 %C_mA  = pi.get_model(pi.X, pi.Y, "lowertriangular"); % 04 <<-------------- 
-%diag_mA  = pi.get_model(pi.X,pi.Y, "diagonal", "A"); % 05
-%diag_mB  = pi.get_model(pi.X,pi.Y, "diagonal", "B:d2",2); % 05
+diag_mA  = pi.get_model(pi.X,pi.Y, "diagonal", "A"); % 05
+diag_mB  = pi.get_model(pi.X,pi.Y, "diagonal", "B:d2",2); % 05
 %diag_mC  = pi.get_model(pi.X,pi.Y, "diagonal", "C:d3",3); % 05
 %diag_mD  = pi.get_model(pi.X,pi.Y, "diagonal", "C:d4",4); % 05
 %diag_mE  = pi.get_model(pi.X,pi.Y, "diagonal", "C:d30",30); % 05
@@ -63,10 +65,10 @@ dlgr.add_mdl(pi_m); % piDMD baseline
 %dlgr.add_mdl(B_mA);
 %dlgr.add_mdl(C_mA);
 %dlgr.add_mdl(extS_mA);
-%dlgr.add_mdl(orth_mA);
+dlgr.add_mdl(orth_mA);
 %dlgr.add_mdl(orth_mB);
-%dlgr.add_mdl(diag_mA);
-%dlgr.add_mdl(diag_mB);
+dlgr.add_mdl(diag_mA);
+dlgr.add_mdl(diag_mB);
 %dlgr.add_mdl(diag_mC);
 %dlgr.add_mdl(diag_mD);
 %dlgr.add_mdl(diag_mE);
@@ -84,7 +86,7 @@ dlgr.add_mdl(cSSm_mA);
 %% post processing 
 dlgr.get_errs(); 
 dlgr.get_tab(); % get res table
-dlgr.plt_recons_grid();
+%dlgr.plt_recons_grid();
 dlgr.plt_A_roots(); % overlay in one fig
 dlgr.plt_A_roots_sep(); % separate figs 
 dlgr.plt_A_bmaps_sep(); % separate figs 

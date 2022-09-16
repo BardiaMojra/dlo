@@ -17,7 +17,6 @@ classdef dlgr_class < matlab.System
     bnum
     dat % ground truth
     %% logs
-    freq    
     dt    
     tspan   
     nSamps  
@@ -52,12 +51,13 @@ classdef dlgr_class < matlab.System
     fig_LW       = .75
     fig_ylim     = "auto" %= [-2 2] 
     fig_Cr       = [	"#000000", "#A2142F", "#77AC30", "#0072BD", "#c451db", ...
-                    "#EDB120", "#4DBEEE", "#D95319", "#77AC30"] % unique per alg
+                    "#EDB120", "#4DBEEE", "#D95319", "#77AC30", "#008B8B", ...
+                    "#D2691E"                    ] % unique per alg
     fig_MK       = ["o", "+", "*", ".", ...
                     "x", "s", "d", "^", ...
                     "v", ">", "<", "h"]
     fig_PT       = ["bo:", "gx:", "r+:", "c*:", ...
-                    "ms:", "kd:", "b^", ...
+                    "ms:", "kd:", "b^", "kd:", "b^", "gv" ...
                     "g<:"]
   end
   methods  % constructor
@@ -83,7 +83,6 @@ classdef dlgr_class < matlab.System
       obj.logs{1,11}    = obj.lcols{11}; %"L2" 
       obj.logs{1,12}    = obj.lcols{12}; %"MAE" 
       obj.logs{1,13}    = obj.lcols{13}; %"MSE"
-      obj.freq          = obj.dat.freq;
       obj.dt            = obj.dat.dt;
       obj.tspan         = obj.dat.tspan;
       obj.nSamps        = obj.dat.nSamps; 
