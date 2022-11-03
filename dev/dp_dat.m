@@ -73,8 +73,8 @@ classdef dp_dat < matlab.System
       else
         error('[dp_dat.init]->> undefined dataset...\n');
       end    
-      obj.load_dat(); 
-      obj.select_dat();
+      %obj.load_dat(); 
+      %obj.select_dat();
     end
 
     function load_dat(obj)
