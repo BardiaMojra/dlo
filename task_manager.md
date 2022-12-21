@@ -18,7 +18,7 @@
 ## Reading List
 
 [x] L515 datasheet
-[] L515 User Guide
+[x] L515 User Guide
 [] Realsense docs [link](https://dev.intelrealsense.com/docs)
 [] ROS2 docs
 [] Realsense docs
