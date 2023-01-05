@@ -2,11 +2,29 @@
 
 ## ToDo
 
-- Setup ROS2 for L515 data processing
-- Read from reading list
-- Setup work cell
-- Order parts
-- Write paper
+- Read:
+  - [x] L515 datasheet
+  - [x] L515 User Guide
+  - [x] RealSense docs
+  - [x] Realsense examples
+  - [ ] [Depth post-processing for intel rs d400 series](https://dev.intelrealsense.com/docs/depth-post-processing)
+  - [ ] ROS2 docs
+- [ ] Setup work cell:
+  - [ ] Update DLO mount
+  - [ ] Print DLO mount
+  - [ ] Order parts
+- [ ] Write paper
+
+## Important
+
+- 1. [Realsense docs](https://dev.intelrealsense.com/docs)
+- [RealSense Tools](https://github.com/IntelRealSense/librealsense/tree/master/tools)
+- [depth post-processing for intel rs d400 series](https://dev.intelrealsense.com/docs/depth-post-processing)
+
+## Hardware
+
+- D455 x2
+-
 
 ## Project Setup
 
@@ -17,11 +35,10 @@
 
 ## Reading List
 
-[x] L515 datasheet
-[x] L515 User Guide
-[] Realsense docs [link](https://dev.intelrealsense.com/docs)
-[] ROS2 docs
-[] Realsense docs
+## Code and Dev
+
+- [Intel Realsense (v2.5) Repo](https://github.com/IntelRealSense/librealsense)
+-
 
 ## Test Goals
 
