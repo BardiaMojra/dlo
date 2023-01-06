@@ -65,6 +65,7 @@
 
 ```bash
 pip install urdfpy
+pip install pyrealsense2
 ```
 
 ## Test Goals
@@ -73,16 +74,16 @@ pip install urdfpy
   twist on DLO:\@ omega shape, s shape, u shape, circle shape, ellipse shape,
   spiral.
 - Clamped end low, DLO on table and 3D, with a twist: same shapes.
-- Clamped end low, DLO angles at 30 degrees and 3D, without twist.
-- Clamped end low, DLO angles at 45 degrees and 3D, without wist.
-- Clamped end low, DLO angles at 60 degrees and 3D, without twist.
-- Clamped end low, DLO angles at 75 degrees and 3D, without twist.
-- Clamped end low, DLO angles at 90 degrees and 3D, without twist.
-- Clamped end low, DLO angles at 30 degrees and 3D, with twist.
-- Clamped end low, DLO angles at 45 degrees and 3D, with twist.
-- Clamped end low, DLO angles at 60 degrees and 3D, with twist.
-- Clamped end low, DLO angles at 75 degrees and 3D, with twist.
-- Clamped end low, DLO angles at 90 degrees and 3D, with twist.
+- Clamped end low, DLO angles at 30 degrees and 3D, without a twist.
+- Clamped end low, DLO angles at 45 degrees and 3D, without a twist.
+- Clamped end low, DLO angles at 60 degrees and 3D, without a twist.
+- Clamped end low, DLO angles at 75 degrees and 3D, without a twist.
+- Clamped end low, DLO angles at 90 degrees and 3D, without a twist.
+- Clamped end low, DLO angles at 30 degrees and 3D, with a twist.
+- Clamped end low, DLO angles at 45 degrees and 3D, with a twist.
+- Clamped end low, DLO angles at 60 degrees and 3D, with a twist.
+- Clamped end low, DLO angles at 75 degrees and 3D, with a twist.
+- Clamped end low, DLO angles at 90 degrees and 3D, with a twist.
 
 ## DLOs and Cables
 
