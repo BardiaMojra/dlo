@@ -1,5 +1,9 @@
 # DLO Dataset Paper - Master
 
+## TOP
+
+- [Paper on Overleaf](https://www.overleaf.com/project/63b719f4df73f6372419b627)
+
 ## Tasks Assignments
 
 - Paper structure and sections (Bardia, due Mon. 1/9)
@@ -29,14 +33,23 @@
   - [ ] AprilTags
 - [ ] Write paper
 
-## Important Links
+## Links
+
+### Important Links
 
 - [Realsense docs](https://dev.intelrealsense.com/docs)
 - [RealSense Tools](https://github.com/IntelRealSense/librealsense/tree/master/tools)
+- [Intel Realsense (v2.5) Repo](https://github.com/IntelRealSense/librealsense)
 
-## Other Links
+### Other Links
 
 - [depth post-processing for intel rs d400 series](https://dev.intelrealsense.com/docs/depth-post-processing)
+
+### Software Environment and Dependencies
+
+- Ubuntu 20.04
+- [LibRealSense v2.50.0](https://github.com/IntelRealSense/librealsense)
+- Python
 
 ## Setup
 
@@ -45,18 +58,14 @@
 - D455 - overhead depth camera
 - L515 - gripper depth camera
 - UR5e
-- DLO
+- DLOs
+- DLO Mount
 
-### Software Environment and Dependencies
+### Installation
 
-- Ubuntu 20.04
-- [LibRealSense v2.50.0](https://github.com/IntelRealSense/librealsense)
--
-
-## Code and Dev
-
-- [Intel Realsense (v2.5) Repo](https://github.com/IntelRealSense/librealsense)
--
+```bash
+pip install urdfpy
+```
 
 ## Test Goals
 
@@ -81,6 +90,8 @@
 - AWG 10 red and black and CAT-6 bundle
 - CSA LL90485 Water resistant with three AWG 16 conductors
 - Yellow Southwire E51583(UL) AWG 14 wire
+
+## Archive
 
 ### Will not use ROS
 
