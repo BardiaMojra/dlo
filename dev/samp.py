@@ -18,7 +18,7 @@ for j in robot.joints:
         joints.append(j)
 
 # Create a connection to the URP interface
-urp_conn = create_urp_connection("192.168.1.100")
+urp_conn = create_urp_connection("192.168.1.147")
 
 # Set up the RealSense D435i depth camera
 pipeline = rs.pipeline()

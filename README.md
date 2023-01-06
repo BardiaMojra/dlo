@@ -17,29 +17,41 @@
 
 ## ToDo - Bardia
 
+- [ ] Write paper
 - Read:
+- UR5
+  - IP: 192.168.1.147
   - [ ] [urdfpy - URDF parser in Python](https://urdfpy.readthedocs.io/en/latest/)
-  - [ ] [Making Apriltags](https://berndpfrommer.github.io/tagslam_web/making_tags/#:~:text=Use%20an%20inkjet%20printer%20to,on%20the%20foam%20board%2C%20done.)
-  - [ ] [6D pose est. with Apriltags](https://april.eecs.umich.edu/software/apriltag)
-- [ ] UR5 tutorials
-  - [ ] Ethernet access
   - [ ] program and record
   - [ ] pick and placement
+  - [ ] [UR5 bullet sim](https://github.com/josepdaniel/ur5-bullet)
 - [ ] Setup work cell:
-  - [ ] Update DLO mount
-  - [ ] Print DLO mount
-  - [ ] Order parts
+  - [x] Order parts
   - [ ] Black cloth
-  - [ ] AprilTags
-- [ ] Write paper
+- [ ] Gripper
+- [ ] AprilTags
+  - [ ] [Making Apriltags](https://berndpfrommer.github.io/tagslam_web/making_tags/#:~:text=Use%20an%20inkjet%20printer%20to,on%20the%20foam%20board%2C%20done.)
+  - [ ] [6D pose est. with Apriltags](https://april.eecs.umich.edu/software/apriltag)
+
+## ToDo - Maicol
+
+- Update DLO mount design
+- Print new design
+- Setup CAD/Drawing
+- DLO mount drawing
 
 ## Links
+
+### UR5e Docs
+
+- [UR5e script manual](https://s3-eu-west-1.amazonaws.com/ur-support-site/163530/scriptmanual_5.12.pdf)
 
 ### Important Links
 
 - [Realsense docs](https://dev.intelrealsense.com/docs)
 - [RealSense Tools](https://github.com/IntelRealSense/librealsense/tree/master/tools)
 - [Intel Realsense (v2.5) Repo](https://github.com/IntelRealSense/librealsense)
+- [Cobot control via python sockets](https://axisnj.com/controlling-a-universal-robots-cobot-using-python/)
 
 ### Other Links
 
@@ -56,7 +68,7 @@
 ### Hardware
 
 - D455 - overhead depth camera
-- L515 - gripper depth camera
+- L515 - gripper depth camera (maybe)
 - UR5e
 - DLOs
 - DLO Mount
