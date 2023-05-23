@@ -1,0 +1,76 @@
+def path_offset_sine_weave_UR10():
+  set_safety_mode_transition_hardness(1)
+  set_gravity([0.0, 0.0, 9.82])
+  set_tcp(p[0.0,0.0,0.0,0.0,0.0,0.0])
+  set_payload(0.0)
+  set_tool_communication(False, 115200, 0, 1, 1.5, 3.5)
+  set_tool_output_mode(0)
+  set_tool_digital_output_mode(0, 1)
+  set_tool_digital_output_mode(1, 1)
+  set_tool_voltage(0)
+  step_count_dbef4d50_f640_478e_9ca9_6db389a27ffc = 0
+  thread Step_Counter_Thread_cb551e02_2de8_49a6_bd92_98518775d4e5():
+    while (True):
+      step_count_dbef4d50_f640_478e_9ca9_6db389a27ffc = step_count_dbef4d50_f640_478e_9ca9_6db389a27ffc + 1
+      sync()
+    end
+  end
+  run Step_Counter_Thread_cb551e02_2de8_49a6_bd92_98518775d4e5()
+  set_standard_analog_input_domain(0, 1)
+  set_standard_analog_input_domain(1, 1)
+  set_tool_analog_input_domain(0, 1)
+  set_tool_analog_input_domain(1, 1)
+  set_analog_outputdomain(0, 0)
+  set_analog_outputdomain(1, 0)
+  set_input_actions_to_default()
+  global start_pos_p=p[-.200000000000, -.700000000000, .100000000000, .000000000019, 3.116766277848, -.000000000025]
+  global start_pos_q=[-1.6116278251415634, -2.089880015790861, -2.10269889350808, -0.5208236952381196, 1.5956020055535836, -0.040844070590248194]
+  global end_pos_p=p[.100000000000, -.700000000000, .100000000000, .000000000000, 3.116766277848, .000000001556]
+  global end_pos_q=[-1.1839614485770333, -2.0707251416241963, -2.146952079606433, -0.4853441338579394, 1.5937878901656435, 0.38694257213114014]
+  $ 5 "Thread_1"
+  thread Thread_1():
+    while (True):
+      $ 6 "setup"
+      $ 7 "ctrl_frequency≔500.0"
+      global ctrl_frequency=500.0
+      $ 8 "weave_frequency≔3.0"
+      global weave_frequency=3.0
+      $ 9 "amplitude≔0.006"
+      global amplitude=0.006
+      $ 10 "cycle_duration≔ctrl_frequency / weave_frequency"
+      global cycle_duration=ctrl_frequency / weave_frequency
+      $ 11 "pi≔3.14159"
+      global pi=3.14159
+      $ 12 "enable"
+      $ 13 "offset≔[0.0, 0.0, 0.0, 0.0, 0.0, 0.0]"
+      global offset=[0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+      $ 14 "i≔0"
+      global i=0
+      $ 15 "path_offset_enable()"
+      path_offset_enable()
+      $ 16 "alpha≔0.27"
+      global alpha=0.27
+      $ 17 "path_offset_set_alpha_filter(alpha)"
+      path_offset_set_alpha_filter(alpha)
+      $ 18 "weave"
+      $ 19 "Loop"
+      while (True):
+        $ 20 "offset[1]=sin((i / cycle_duration) * 2.0 * pi) * amplitude"
+        offset[1]=sin((i / cycle_duration) * 2.0 * pi) * amplitude
+        $ 21 "path_offset_set(offset, 2)"
+        path_offset_set(offset, 2)
+        $ 22 "i≔i+1"
+        global i=i+1
+        $ 23 "sync()"
+        sync()
+      end
+    end
+  end
+  threadId_Thread_1 = run Thread_1()
+  $ 1 "Robot Program"
+  $ 2 "MoveP"
+  $ 3 "start_pos" "breakAfter"
+  movep(start_pos_p, a=1.2, v=0.008, r=0.025)
+  $ 4 "end_pos" "breakAfter"
+  movep(end_pos_p, a=1.2, v=0.008, r=0.025)
+end

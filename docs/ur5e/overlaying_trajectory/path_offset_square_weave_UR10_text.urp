@@ -1,0 +1,948 @@
+<URProgram name="path_offset_square_weave_UR10" installation="path_offset_square_weave_UR10" installationRelativePath="path_offset_square_weave_UR10" directory="/home/ask/git/polyscope/staging/programs" createdIn="5.5.0.0" lastSavedIn="5.5.0.0" robotSerialNumber="20175099999" crcValue="1041004964">
+  <kinematics status="NOT_INITIALIZED" validChecksum="false">
+    <deltaTheta value="0.0, 0.0, 0.0, 0.0, 0.0, 0.0"/>
+    <a value="0.0, -0.6127, -0.57155, 0.0, 0.0, 0.0"/>
+    <d value="0.1807, 0.0, 0.0, 0.17415, 0.11985, 0.11655"/>
+    <alpha value="1.570796327, 0.0, 0.0, 1.570796327, -1.570796327, 0.0"/>
+    <jointChecksum value="-1, -1, -1, -1, -1, -1"/>
+  </kinematics>
+  <children>
+    <MainProgram runOnlyOnce="true" InitVariablesNode="false">
+      <children>
+        <Move motionType="MoveP" speed="0.008" acceleration="1.2" blendRadius="0.025" useActiveTCP="true" positionType="CartesianPose">
+          <feature class="GeomFeatureReference" referencedName="Joint_0_name"/>
+          <children>
+            <Waypoint type="Fixed" name="start_pos" kinematicsFlags="4">
+              <position>
+                <JointAngles angles="-1.6074731942095886, -2.0892362040100014, -2.10434021547169, -0.5187976238561856, 1.570389254128683, -0.036676870249862326"/>
+                <TCPOffset pose="2.380595720552492E-13, -6.956657472301231E-13, 4.365952044338428E-14, 0.0, 0.0, 0.0"/>
+                <Kinematics status="NOT_INITIALIZED" validChecksum="false">
+                  <deltaTheta value="0.0, 0.0, 0.0, 0.0, 0.0, 0.0"/>
+                  <a value="0.0, -0.6127, -0.57155, 0.0, 0.0, 0.0"/>
+                  <d value="0.1807, 0.0, 0.0, 0.17415, 0.11985, 0.11655"/>
+                  <alpha value="1.570796327, 0.0, 0.0, 1.570796327, -1.570796327, 0.0"/>
+                  <jointChecksum value="-1, -1, -1, -1, -1, -1"/>
+                </Kinematics>
+              </position>
+              <BaseToFeature pose="0.0, 0.0, 0.0, 0.0, 0.0, 0.0"/>
+            </Waypoint>
+            <Waypoint type="Fixed" name="end_pos" kinematicsFlags="4">
+              <position>
+                <JointAngles angles="-1.1839614483671355, -2.070725141848989, -2.146952079820861, -0.48534413248530583, 1.5937878897965136, 0.3869425723500477"/>
+                <TCPOffset pose="-1.664196558337494E-12, -3.821387650759789E-13, 1.0901002323038256E-13, 0.0, 0.0, 0.0"/>
+                <Kinematics status="NOT_INITIALIZED" validChecksum="false">
+                  <deltaTheta value="0.0, 0.0, 0.0, 0.0, 0.0, 0.0"/>
+                  <a value="0.0, -0.6127, -0.57155, 0.0, 0.0, 0.0"/>
+                  <d value="0.1807, 0.0, 0.0, 0.17415, 0.11985, 0.11655"/>
+                  <alpha value="1.570796327, 0.0, 0.0, 1.570796327, -1.570796327, 0.0"/>
+                  <jointChecksum value="-1, -1, -1, -1, -1, -1"/>
+                </Kinematics>
+              </position>
+              <BaseToFeature pose="0.0, 0.0, 0.0, 0.0, 0.0, 0.0"/>
+            </Waypoint>
+          </children>
+        </Move>
+      </children>
+    </MainProgram>
+    <Thread name="Thread_1" runOnlyOnce="false">
+      <children>
+        <Folder name="setup" keepHidden="false">
+          <children>
+            <Assignment valueSource="Expression">
+              <variable name="ctrl_frequency" prefersPersistentValue="false">
+                <initializeExpression/>
+              </variable>
+              <expression>
+                <ExpressionChar character="5"/>
+                <ExpressionChar character="0"/>
+                <ExpressionChar character="0"/>
+                <ExpressionChar character="."/>
+                <ExpressionChar character="0"/>
+              </expression>
+            </Assignment>
+            <Assignment valueSource="Expression">
+              <variable name="weave_frequency" prefersPersistentValue="false">
+                <initializeExpression/>
+              </variable>
+              <expression>
+                <ExpressionChar character="3"/>
+                <ExpressionChar character="."/>
+                <ExpressionChar character="0"/>
+              </expression>
+            </Assignment>
+            <Assignment valueSource="Expression">
+              <variable name="amplitude" prefersPersistentValue="false">
+                <initializeExpression/>
+              </variable>
+              <expression>
+                <ExpressionChar character="0"/>
+                <ExpressionChar character="."/>
+                <ExpressionChar character="0"/>
+                <ExpressionChar character="0"/>
+                <ExpressionChar character="6"/>
+              </expression>
+            </Assignment>
+            <Assignment valueSource="Expression">
+              <variable name="speed" prefersPersistentValue="false">
+                <initializeExpression/>
+              </variable>
+              <expression>
+                <ExpressionChar character="0"/>
+                <ExpressionChar character="."/>
+                <ExpressionChar character="0"/>
+                <ExpressionChar character="0"/>
+                <ExpressionChar character="8"/>
+              </expression>
+            </Assignment>
+            <Assignment valueSource="Expression">
+              <variable name="in_out_distance" prefersPersistentValue="false">
+                <initializeExpression/>
+              </variable>
+              <expression>
+                <ExpressionVariable>
+                  <ProgramVariable reference="../../../../Assignment[3]/variable"/>
+                </ExpressionVariable>
+              </expression>
+            </Assignment>
+            <Assignment valueSource="Expression">
+              <variable name="follow_distance" prefersPersistentValue="false">
+                <initializeExpression/>
+              </variable>
+              <expression>
+                <ExpressionChar character="("/>
+                <ExpressionVariable>
+                  <ProgramVariable reference="../../../../Assignment[4]/variable"/>
+                </ExpressionVariable>
+                <ExpressionChar character=" "/>
+                <ExpressionChar character="/"/>
+                <ExpressionChar character=" "/>
+                <ExpressionVariable>
+                  <ProgramVariable reference="../../../../Assignment[2]/variable"/>
+                </ExpressionVariable>
+                <ExpressionChar character=")"/>
+                <ExpressionChar character=" "/>
+                <ExpressionChar character="/"/>
+                <ExpressionChar character=" "/>
+                <ExpressionChar character="2"/>
+                <ExpressionChar character="."/>
+                <ExpressionChar character="0"/>
+              </expression>
+            </Assignment>
+            <Assignment valueSource="Expression">
+              <variable name="cycle_distance" prefersPersistentValue="false">
+                <initializeExpression/>
+              </variable>
+              <expression>
+                <ExpressionChar character="("/>
+                <ExpressionChar character="4"/>
+                <ExpressionChar character="."/>
+                <ExpressionChar character="0"/>
+                <ExpressionChar character=" "/>
+                <ExpressionChar character="*"/>
+                <ExpressionChar character=" "/>
+                <ExpressionVariable>
+                  <ProgramVariable reference="../../../../Assignment[5]/variable"/>
+                </ExpressionVariable>
+                <ExpressionChar character=")"/>
+                <ExpressionChar character=" "/>
+                <ExpressionChar character="+"/>
+                <ExpressionChar character=" "/>
+                <ExpressionChar character="("/>
+                <ExpressionChar character="2"/>
+                <ExpressionChar character="."/>
+                <ExpressionChar character="0"/>
+                <ExpressionChar character=" "/>
+                <ExpressionChar character="*"/>
+                <ExpressionChar character=" "/>
+                <ExpressionVariable>
+                  <ProgramVariable reference="../../../../Assignment[6]/variable"/>
+                </ExpressionVariable>
+                <ExpressionChar character=")"/>
+              </expression>
+            </Assignment>
+            <Assignment valueSource="Expression">
+              <variable name="in_out_duration" prefersPersistentValue="false">
+                <initializeExpression/>
+              </variable>
+              <expression>
+                <ExpressionChar character="f"/>
+                <ExpressionChar character="l"/>
+                <ExpressionChar character="o"/>
+                <ExpressionChar character="o"/>
+                <ExpressionChar character="r"/>
+                <ExpressionChar character="("/>
+                <ExpressionChar character="("/>
+                <ExpressionVariable>
+                  <ProgramVariable reference="../../../../Assignment/variable"/>
+                </ExpressionVariable>
+                <ExpressionChar character=" "/>
+                <ExpressionChar character="/"/>
+                <ExpressionChar character=" "/>
+                <ExpressionVariable>
+                  <ProgramVariable reference="../../../../Assignment[2]/variable"/>
+                </ExpressionVariable>
+                <ExpressionChar character=")"/>
+                <ExpressionChar character=" "/>
+                <ExpressionChar character="*"/>
+                <ExpressionChar character=" "/>
+                <ExpressionChar character="("/>
+                <ExpressionVariable>
+                  <ProgramVariable reference="../../../../Assignment[5]/variable"/>
+                </ExpressionVariable>
+                <ExpressionChar character=" "/>
+                <ExpressionChar character="/"/>
+                <ExpressionChar character=" "/>
+                <ExpressionVariable>
+                  <ProgramVariable reference="../../../../Assignment[7]/variable"/>
+                </ExpressionVariable>
+                <ExpressionChar character=")"/>
+                <ExpressionChar character=")"/>
+              </expression>
+            </Assignment>
+            <Assignment valueSource="Expression">
+              <variable name="follow_duration" prefersPersistentValue="false">
+                <initializeExpression/>
+              </variable>
+              <expression>
+                <ExpressionChar character="f"/>
+                <ExpressionChar character="l"/>
+                <ExpressionChar character="o"/>
+                <ExpressionChar character="o"/>
+                <ExpressionChar character="r"/>
+                <ExpressionChar character="("/>
+                <ExpressionChar character="("/>
+                <ExpressionVariable>
+                  <ProgramVariable reference="../../../../Assignment/variable"/>
+                </ExpressionVariable>
+                <ExpressionChar character=" "/>
+                <ExpressionChar character="/"/>
+                <ExpressionChar character=" "/>
+                <ExpressionVariable>
+                  <ProgramVariable reference="../../../../Assignment[2]/variable"/>
+                </ExpressionVariable>
+                <ExpressionChar character=")"/>
+                <ExpressionChar character=" "/>
+                <ExpressionChar character="*"/>
+                <ExpressionChar character=" "/>
+                <ExpressionChar character="("/>
+                <ExpressionVariable>
+                  <ProgramVariable reference="../../../../Assignment[6]/variable"/>
+                </ExpressionVariable>
+                <ExpressionChar character=" "/>
+                <ExpressionChar character="/"/>
+                <ExpressionChar character=" "/>
+                <ExpressionVariable>
+                  <ProgramVariable reference="../../../../Assignment[7]/variable"/>
+                </ExpressionVariable>
+                <ExpressionChar character=")"/>
+                <ExpressionChar character=")"/>
+              </expression>
+            </Assignment>
+            <Assignment valueSource="Expression">
+              <variable name="cycle_duration" prefersPersistentValue="false">
+                <initializeExpression/>
+              </variable>
+              <expression>
+                <ExpressionChar character="("/>
+                <ExpressionChar character="4"/>
+                <ExpressionChar character=" "/>
+                <ExpressionChar character="*"/>
+                <ExpressionChar character=" "/>
+                <ExpressionVariable>
+                  <ProgramVariable reference="../../../../Assignment[8]/variable"/>
+                </ExpressionVariable>
+                <ExpressionChar character=")"/>
+                <ExpressionChar character=" "/>
+                <ExpressionChar character="+"/>
+                <ExpressionChar character=" "/>
+                <ExpressionChar character="("/>
+                <ExpressionChar character="2"/>
+                <ExpressionChar character=" "/>
+                <ExpressionChar character="*"/>
+                <ExpressionChar character=" "/>
+                <ExpressionVariable>
+                  <ProgramVariable reference="../../../../Assignment[9]/variable"/>
+                </ExpressionVariable>
+                <ExpressionChar character=")"/>
+              </expression>
+            </Assignment>
+            <Assignment valueSource="Expression">
+              <variable name="in_out_addition" prefersPersistentValue="false">
+                <initializeExpression/>
+              </variable>
+              <expression>
+                <ExpressionVariable>
+                  <ProgramVariable reference="../../../../Assignment[5]/variable"/>
+                </ExpressionVariable>
+                <ExpressionChar character=" "/>
+                <ExpressionChar character="/"/>
+                <ExpressionChar character=" "/>
+                <ExpressionVariable>
+                  <ProgramVariable reference="../../../../Assignment[8]/variable"/>
+                </ExpressionVariable>
+              </expression>
+            </Assignment>
+            <Assignment valueSource="Expression">
+              <variable name="follow_mult" prefersPersistentValue="false">
+                <initializeExpression/>
+              </variable>
+              <expression>
+                <ExpressionChar character="2"/>
+                <ExpressionChar character="."/>
+                <ExpressionChar character="0"/>
+                <ExpressionChar character=" "/>
+                <ExpressionChar character="*"/>
+                <ExpressionChar character=" "/>
+                <ExpressionChar character="("/>
+                <ExpressionVariable>
+                  <ProgramVariable reference="../../../../Assignment[8]/variable"/>
+                </ExpressionVariable>
+                <ExpressionChar character=" "/>
+                <ExpressionChar character="/"/>
+                <ExpressionChar character=" "/>
+                <ExpressionVariable>
+                  <ProgramVariable reference="../../../../Assignment[9]/variable"/>
+                </ExpressionVariable>
+                <ExpressionChar character=")"/>
+              </expression>
+            </Assignment>
+          </children>
+        </Folder>
+        <Folder name="enable" keepHidden="false">
+          <children>
+            <Assignment valueSource="Expression">
+              <variable name="offset" prefersPersistentValue="false">
+                <initializeExpression/>
+              </variable>
+              <expression>
+                <ExpressionChar character="["/>
+                <ExpressionChar character="0"/>
+                <ExpressionChar character="."/>
+                <ExpressionChar character="0"/>
+                <ExpressionChar character=","/>
+                <ExpressionChar character=" "/>
+                <ExpressionChar character="0"/>
+                <ExpressionChar character="."/>
+                <ExpressionChar character="0"/>
+                <ExpressionChar character=","/>
+                <ExpressionChar character=" "/>
+                <ExpressionChar character="0"/>
+                <ExpressionChar character="."/>
+                <ExpressionChar character="0"/>
+                <ExpressionChar character=","/>
+                <ExpressionChar character=" "/>
+                <ExpressionChar character="0"/>
+                <ExpressionChar character="."/>
+                <ExpressionChar character="0"/>
+                <ExpressionChar character=","/>
+                <ExpressionChar character=" "/>
+                <ExpressionChar character="0"/>
+                <ExpressionChar character="."/>
+                <ExpressionChar character="0"/>
+                <ExpressionChar character=","/>
+                <ExpressionChar character=" "/>
+                <ExpressionChar character="0"/>
+                <ExpressionChar character="."/>
+                <ExpressionChar character="0"/>
+                <ExpressionChar character="]"/>
+              </expression>
+            </Assignment>
+            <Assignment valueSource="Expression">
+              <variable name="i" prefersPersistentValue="false">
+                <initializeExpression/>
+              </variable>
+              <expression>
+                <ExpressionChar character="0"/>
+              </expression>
+            </Assignment>
+            <Script type="Line">
+              <expression>
+                <ExpressionChar character="p"/>
+                <ExpressionChar character="a"/>
+                <ExpressionChar character="t"/>
+                <ExpressionChar character="h"/>
+                <ExpressionChar character="_"/>
+                <ExpressionChar character="o"/>
+                <ExpressionChar character="f"/>
+                <ExpressionChar character="f"/>
+                <ExpressionChar character="s"/>
+                <ExpressionChar character="e"/>
+                <ExpressionChar character="t"/>
+                <ExpressionChar character="_"/>
+                <ExpressionChar character="e"/>
+                <ExpressionChar character="n"/>
+                <ExpressionChar character="a"/>
+                <ExpressionChar character="b"/>
+                <ExpressionChar character="l"/>
+                <ExpressionChar character="e"/>
+                <ExpressionChar character="("/>
+                <ExpressionChar character=")"/>
+              </expression>
+            </Script>
+            <Assignment valueSource="Expression">
+              <variable name="alpha" prefersPersistentValue="false">
+                <initializeExpression/>
+              </variable>
+              <expression>
+                <ExpressionChar character="0"/>
+                <ExpressionChar character="."/>
+                <ExpressionChar character="1"/>
+                <ExpressionChar character="6"/>
+                <ExpressionChar character="5"/>
+              </expression>
+            </Assignment>
+            <Script type="Line">
+              <expression>
+                <ExpressionChar character="p"/>
+                <ExpressionChar character="a"/>
+                <ExpressionChar character="t"/>
+                <ExpressionChar character="h"/>
+                <ExpressionChar character="_"/>
+                <ExpressionChar character="o"/>
+                <ExpressionChar character="f"/>
+                <ExpressionChar character="f"/>
+                <ExpressionChar character="s"/>
+                <ExpressionChar character="e"/>
+                <ExpressionChar character="t"/>
+                <ExpressionChar character="_"/>
+                <ExpressionChar character="s"/>
+                <ExpressionChar character="e"/>
+                <ExpressionChar character="t"/>
+                <ExpressionChar character="_"/>
+                <ExpressionChar character="a"/>
+                <ExpressionChar character="l"/>
+                <ExpressionChar character="p"/>
+                <ExpressionChar character="h"/>
+                <ExpressionChar character="a"/>
+                <ExpressionChar character="_"/>
+                <ExpressionChar character="f"/>
+                <ExpressionChar character="i"/>
+                <ExpressionChar character="l"/>
+                <ExpressionChar character="t"/>
+                <ExpressionChar character="e"/>
+                <ExpressionChar character="r"/>
+                <ExpressionChar character="("/>
+                <ExpressionVariable>
+                  <ProgramVariable reference="../../../../Assignment[3]/variable"/>
+                </ExpressionVariable>
+                <ExpressionChar character=")"/>
+              </expression>
+            </Script>
+          </children>
+        </Folder>
+        <Folder name="weave" keepHidden="false">
+          <children>
+            <Loop type="Forever">
+              <children>
+                <Assignment valueSource="Expression">
+                  <variable name="traj_vel" prefersPersistentValue="false">
+                    <initializeExpression/>
+                  </variable>
+                  <expression>
+                    <ExpressionChar character="g"/>
+                    <ExpressionChar character="e"/>
+                    <ExpressionChar character="t"/>
+                    <ExpressionChar character="_"/>
+                    <ExpressionChar character="t"/>
+                    <ExpressionChar character="a"/>
+                    <ExpressionChar character="r"/>
+                    <ExpressionChar character="g"/>
+                    <ExpressionChar character="e"/>
+                    <ExpressionChar character="t"/>
+                    <ExpressionChar character="_"/>
+                    <ExpressionChar character="t"/>
+                    <ExpressionChar character="c"/>
+                    <ExpressionChar character="p"/>
+                    <ExpressionChar character="_"/>
+                    <ExpressionChar character="s"/>
+                    <ExpressionChar character="p"/>
+                    <ExpressionChar character="e"/>
+                    <ExpressionChar character="e"/>
+                    <ExpressionChar character="d"/>
+                    <ExpressionChar character="_"/>
+                    <ExpressionChar character="a"/>
+                    <ExpressionChar character="l"/>
+                    <ExpressionChar character="o"/>
+                    <ExpressionChar character="n"/>
+                    <ExpressionChar character="g"/>
+                    <ExpressionChar character="_"/>
+                    <ExpressionChar character="p"/>
+                    <ExpressionChar character="a"/>
+                    <ExpressionChar character="t"/>
+                    <ExpressionChar character="h"/>
+                    <ExpressionChar character="("/>
+                    <ExpressionChar character=")"/>
+                  </expression>
+                </Assignment>
+                <Assignment valueSource="Expression">
+                  <variable name="traj_vel_pos" prefersPersistentValue="false">
+                    <initializeExpression/>
+                  </variable>
+                  <expression>
+                    <ExpressionChar character="["/>
+                    <ExpressionVariable>
+                      <ProgramVariable reference="../../../../Assignment/variable"/>
+                    </ExpressionVariable>
+                    <ExpressionChar character="["/>
+                    <ExpressionChar character="0"/>
+                    <ExpressionChar character="]"/>
+                    <ExpressionChar character=","/>
+                    <ExpressionChar character=" "/>
+                    <ExpressionVariable>
+                      <ProgramVariable reference="../../../../Assignment/variable"/>
+                    </ExpressionVariable>
+                    <ExpressionChar character="["/>
+                    <ExpressionChar character="1"/>
+                    <ExpressionChar character="]"/>
+                    <ExpressionChar character=","/>
+                    <ExpressionChar character=" "/>
+                    <ExpressionVariable>
+                      <ProgramVariable reference="../../../../Assignment/variable"/>
+                    </ExpressionVariable>
+                    <ExpressionChar character="["/>
+                    <ExpressionChar character="2"/>
+                    <ExpressionChar character="]"/>
+                    <ExpressionChar character="]"/>
+                  </expression>
+                </Assignment>
+                <If type="If" checkContinuously="false">
+                  <expression>
+                    <ExpressionVariable>
+                      <ProgramVariable reference="../../../../../../../../Folder[2]/children/Assignment[2]/variable"/>
+                    </ExpressionVariable>
+                    <ExpressionChar character="&lt;"/>
+                    <ExpressionVariable>
+                      <ProgramVariable reference="../../../../../../../../Folder/children/Assignment[8]/variable"/>
+                    </ExpressionVariable>
+                  </expression>
+                  <children>
+                    <Script type="Line">
+                      <expression>
+                        <ExpressionVariable>
+                          <ProgramVariable reference="../../../../../../../../../../Folder[2]/children/Assignment/variable"/>
+                        </ExpressionVariable>
+                        <ExpressionChar character="["/>
+                        <ExpressionChar character="0"/>
+                        <ExpressionChar character="]"/>
+                        <ExpressionChar character=" "/>
+                        <ExpressionChar character="="/>
+                        <ExpressionChar character=" "/>
+                        <ExpressionVariable>
+                          <ProgramVariable reference="../../../../../../../../../../Folder[2]/children/Assignment/variable"/>
+                        </ExpressionVariable>
+                        <ExpressionChar character="["/>
+                        <ExpressionChar character="0"/>
+                        <ExpressionChar character="]"/>
+                        <ExpressionChar character="-"/>
+                        <ExpressionChar character="("/>
+                        <ExpressionChar character="n"/>
+                        <ExpressionChar character="o"/>
+                        <ExpressionChar character="r"/>
+                        <ExpressionChar character="m"/>
+                        <ExpressionChar character="("/>
+                        <ExpressionVariable>
+                          <ProgramVariable reference="../../../../../../Assignment[2]/variable"/>
+                        </ExpressionVariable>
+                        <ExpressionChar character=")"/>
+                        <ExpressionChar character=" "/>
+                        <ExpressionChar character="/"/>
+                        <ExpressionChar character=" "/>
+                        <ExpressionVariable>
+                          <ProgramVariable reference="../../../../../../../../../../Folder/children/Assignment/variable"/>
+                        </ExpressionVariable>
+                        <ExpressionChar character=")"/>
+                      </expression>
+                    </Script>
+                    <Script type="Line">
+                      <expression>
+                        <ExpressionVariable>
+                          <ProgramVariable reference="../../../../../../../../../../Folder[2]/children/Assignment/variable"/>
+                        </ExpressionVariable>
+                        <ExpressionChar character="["/>
+                        <ExpressionChar character="1"/>
+                        <ExpressionChar character="]"/>
+                        <ExpressionChar character=" "/>
+                        <ExpressionChar character="="/>
+                        <ExpressionChar character=" "/>
+                        <ExpressionVariable>
+                          <ProgramVariable reference="../../../../../../../../../../Folder[2]/children/Assignment/variable"/>
+                        </ExpressionVariable>
+                        <ExpressionChar character="["/>
+                        <ExpressionChar character="1"/>
+                        <ExpressionChar character="]"/>
+                        <ExpressionChar character="+"/>
+                        <ExpressionVariable>
+                          <ProgramVariable reference="../../../../../../../../../../Folder/children/Assignment[11]/variable"/>
+                        </ExpressionVariable>
+                      </expression>
+                    </Script>
+                  </children>
+                </If>
+                <If type="ElseIf" checkContinuously="false">
+                  <expression>
+                    <ExpressionVariable>
+                      <ProgramVariable reference="../../../../../../../../Folder[2]/children/Assignment[2]/variable"/>
+                    </ExpressionVariable>
+                    <ExpressionChar character="&lt;"/>
+                    <ExpressionChar character="("/>
+                    <ExpressionVariable>
+                      <ProgramVariable reference="../../../../../../../../Folder/children/Assignment[8]/variable"/>
+                    </ExpressionVariable>
+                    <ExpressionChar character="+"/>
+                    <ExpressionVariable>
+                      <ProgramVariable reference="../../../../../../../../Folder/children/Assignment[9]/variable"/>
+                    </ExpressionVariable>
+                    <ExpressionChar character=")"/>
+                  </expression>
+                  <children>
+                    <Script type="Line">
+                      <expression>
+                        <ExpressionVariable>
+                          <ProgramVariable reference="../../../../../../../../../../Folder[2]/children/Assignment/variable"/>
+                        </ExpressionVariable>
+                        <ExpressionChar character="["/>
+                        <ExpressionChar character="0"/>
+                        <ExpressionChar character="]"/>
+                        <ExpressionChar character=" "/>
+                        <ExpressionChar character="="/>
+                        <ExpressionChar character=" "/>
+                        <ExpressionVariable>
+                          <ProgramVariable reference="../../../../../../../../../../Folder[2]/children/Assignment/variable"/>
+                        </ExpressionVariable>
+                        <ExpressionChar character="["/>
+                        <ExpressionChar character="0"/>
+                        <ExpressionChar character="]"/>
+                        <ExpressionChar character="+"/>
+                        <ExpressionChar character="("/>
+                        <ExpressionVariable>
+                          <ProgramVariable reference="../../../../../../../../../../Folder/children/Assignment[12]/variable"/>
+                        </ExpressionVariable>
+                        <ExpressionChar character=" "/>
+                        <ExpressionChar character="*"/>
+                        <ExpressionChar character=" "/>
+                        <ExpressionChar character="("/>
+                        <ExpressionChar character="n"/>
+                        <ExpressionChar character="o"/>
+                        <ExpressionChar character="r"/>
+                        <ExpressionChar character="m"/>
+                        <ExpressionChar character="("/>
+                        <ExpressionVariable>
+                          <ProgramVariable reference="../../../../../../Assignment[2]/variable"/>
+                        </ExpressionVariable>
+                        <ExpressionChar character=")"/>
+                        <ExpressionChar character=" "/>
+                        <ExpressionChar character="/"/>
+                        <ExpressionChar character=" "/>
+                        <ExpressionVariable>
+                          <ProgramVariable reference="../../../../../../../../../../Folder/children/Assignment/variable"/>
+                        </ExpressionVariable>
+                        <ExpressionChar character=")"/>
+                        <ExpressionChar character=")"/>
+                      </expression>
+                    </Script>
+                  </children>
+                </If>
+                <If type="ElseIf" checkContinuously="false">
+                  <expression>
+                    <ExpressionVariable>
+                      <ProgramVariable reference="../../../../../../../../Folder[2]/children/Assignment[2]/variable"/>
+                    </ExpressionVariable>
+                    <ExpressionChar character="&lt;"/>
+                    <ExpressionChar character="("/>
+                    <ExpressionChar character="("/>
+                    <ExpressionChar character="3"/>
+                    <ExpressionChar character=" "/>
+                    <ExpressionChar character="*"/>
+                    <ExpressionChar character=" "/>
+                    <ExpressionVariable>
+                      <ProgramVariable reference="../../../../../../../../Folder/children/Assignment[8]/variable"/>
+                    </ExpressionVariable>
+                    <ExpressionChar character=")"/>
+                    <ExpressionChar character=" "/>
+                    <ExpressionChar character="+"/>
+                    <ExpressionChar character=" "/>
+                    <ExpressionVariable>
+                      <ProgramVariable reference="../../../../../../../../Folder/children/Assignment[9]/variable"/>
+                    </ExpressionVariable>
+                    <ExpressionChar character=")"/>
+                  </expression>
+                  <children>
+                    <Script type="Line">
+                      <expression>
+                        <ExpressionVariable>
+                          <ProgramVariable reference="../../../../../../../../../../Folder[2]/children/Assignment/variable"/>
+                        </ExpressionVariable>
+                        <ExpressionChar character="["/>
+                        <ExpressionChar character="0"/>
+                        <ExpressionChar character="]"/>
+                        <ExpressionChar character=" "/>
+                        <ExpressionChar character="="/>
+                        <ExpressionChar character=" "/>
+                        <ExpressionVariable>
+                          <ProgramVariable reference="../../../../../../../../../../Folder[2]/children/Assignment/variable"/>
+                        </ExpressionVariable>
+                        <ExpressionChar character="["/>
+                        <ExpressionChar character="0"/>
+                        <ExpressionChar character="]"/>
+                        <ExpressionChar character="-"/>
+                        <ExpressionChar character="("/>
+                        <ExpressionChar character="n"/>
+                        <ExpressionChar character="o"/>
+                        <ExpressionChar character="r"/>
+                        <ExpressionChar character="m"/>
+                        <ExpressionChar character="("/>
+                        <ExpressionVariable>
+                          <ProgramVariable reference="../../../../../../Assignment[2]/variable"/>
+                        </ExpressionVariable>
+                        <ExpressionChar character=")"/>
+                        <ExpressionChar character=" "/>
+                        <ExpressionChar character="/"/>
+                        <ExpressionChar character=" "/>
+                        <ExpressionVariable>
+                          <ProgramVariable reference="../../../../../../../../../../Folder/children/Assignment/variable"/>
+                        </ExpressionVariable>
+                        <ExpressionChar character=")"/>
+                      </expression>
+                    </Script>
+                    <Script type="Line">
+                      <expression>
+                        <ExpressionVariable>
+                          <ProgramVariable reference="../../../../../../../../../../Folder[2]/children/Assignment/variable"/>
+                        </ExpressionVariable>
+                        <ExpressionChar character="["/>
+                        <ExpressionChar character="1"/>
+                        <ExpressionChar character="]"/>
+                        <ExpressionChar character=" "/>
+                        <ExpressionChar character="="/>
+                        <ExpressionChar character=" "/>
+                        <ExpressionVariable>
+                          <ProgramVariable reference="../../../../../../../../../../Folder[2]/children/Assignment/variable"/>
+                        </ExpressionVariable>
+                        <ExpressionChar character="["/>
+                        <ExpressionChar character="1"/>
+                        <ExpressionChar character="]"/>
+                        <ExpressionChar character="-"/>
+                        <ExpressionVariable>
+                          <ProgramVariable reference="../../../../../../../../../../Folder/children/Assignment[11]/variable"/>
+                        </ExpressionVariable>
+                      </expression>
+                    </Script>
+                  </children>
+                </If>
+                <If type="ElseIf" checkContinuously="false">
+                  <expression>
+                    <ExpressionVariable>
+                      <ProgramVariable reference="../../../../../../../../Folder[2]/children/Assignment[2]/variable"/>
+                    </ExpressionVariable>
+                    <ExpressionChar character="&lt;"/>
+                    <ExpressionChar character="("/>
+                    <ExpressionChar character="("/>
+                    <ExpressionChar character="3"/>
+                    <ExpressionChar character=" "/>
+                    <ExpressionChar character="*"/>
+                    <ExpressionChar character=" "/>
+                    <ExpressionVariable>
+                      <ProgramVariable reference="../../../../../../../../Folder/children/Assignment[8]/variable"/>
+                    </ExpressionVariable>
+                    <ExpressionChar character=")"/>
+                    <ExpressionChar character=" "/>
+                    <ExpressionChar character="+"/>
+                    <ExpressionChar character=" "/>
+                    <ExpressionChar character="("/>
+                    <ExpressionChar character="2"/>
+                    <ExpressionChar character=" "/>
+                    <ExpressionChar character="*"/>
+                    <ExpressionChar character=" "/>
+                    <ExpressionVariable>
+                      <ProgramVariable reference="../../../../../../../../Folder/children/Assignment[9]/variable"/>
+                    </ExpressionVariable>
+                    <ExpressionChar character=")"/>
+                    <ExpressionChar character=")"/>
+                  </expression>
+                  <children>
+                    <Script type="Line">
+                      <expression>
+                        <ExpressionVariable>
+                          <ProgramVariable reference="../../../../../../../../../../Folder[2]/children/Assignment/variable"/>
+                        </ExpressionVariable>
+                        <ExpressionChar character="["/>
+                        <ExpressionChar character="0"/>
+                        <ExpressionChar character="]"/>
+                        <ExpressionChar character=" "/>
+                        <ExpressionChar character="="/>
+                        <ExpressionChar character=" "/>
+                        <ExpressionVariable>
+                          <ProgramVariable reference="../../../../../../../../../../Folder[2]/children/Assignment/variable"/>
+                        </ExpressionVariable>
+                        <ExpressionChar character="["/>
+                        <ExpressionChar character="0"/>
+                        <ExpressionChar character="]"/>
+                        <ExpressionChar character="+"/>
+                        <ExpressionChar character="("/>
+                        <ExpressionVariable>
+                          <ProgramVariable reference="../../../../../../../../../../Folder/children/Assignment[12]/variable"/>
+                        </ExpressionVariable>
+                        <ExpressionChar character=" "/>
+                        <ExpressionChar character="*"/>
+                        <ExpressionChar character=" "/>
+                        <ExpressionChar character="("/>
+                        <ExpressionChar character="n"/>
+                        <ExpressionChar character="o"/>
+                        <ExpressionChar character="r"/>
+                        <ExpressionChar character="m"/>
+                        <ExpressionChar character="("/>
+                        <ExpressionVariable>
+                          <ProgramVariable reference="../../../../../../Assignment[2]/variable"/>
+                        </ExpressionVariable>
+                        <ExpressionChar character=")"/>
+                        <ExpressionChar character=" "/>
+                        <ExpressionChar character="/"/>
+                        <ExpressionChar character=" "/>
+                        <ExpressionVariable>
+                          <ProgramVariable reference="../../../../../../../../../../Folder/children/Assignment/variable"/>
+                        </ExpressionVariable>
+                        <ExpressionChar character=")"/>
+                        <ExpressionChar character=")"/>
+                      </expression>
+                    </Script>
+                  </children>
+                </If>
+                <If type="Else" checkContinuously="false">
+                  <expression/>
+                  <children>
+                    <Script type="Line">
+                      <expression>
+                        <ExpressionVariable>
+                          <ProgramVariable reference="../../../../../../../../../../Folder[2]/children/Assignment/variable"/>
+                        </ExpressionVariable>
+                        <ExpressionChar character="["/>
+                        <ExpressionChar character="0"/>
+                        <ExpressionChar character="]"/>
+                        <ExpressionChar character=" "/>
+                        <ExpressionChar character="="/>
+                        <ExpressionChar character=" "/>
+                        <ExpressionVariable>
+                          <ProgramVariable reference="../../../../../../../../../../Folder[2]/children/Assignment/variable"/>
+                        </ExpressionVariable>
+                        <ExpressionChar character="["/>
+                        <ExpressionChar character="0"/>
+                        <ExpressionChar character="]"/>
+                        <ExpressionChar character="-"/>
+                        <ExpressionChar character="("/>
+                        <ExpressionChar character="n"/>
+                        <ExpressionChar character="o"/>
+                        <ExpressionChar character="r"/>
+                        <ExpressionChar character="m"/>
+                        <ExpressionChar character="("/>
+                        <ExpressionVariable>
+                          <ProgramVariable reference="../../../../../../Assignment[2]/variable"/>
+                        </ExpressionVariable>
+                        <ExpressionChar character=")"/>
+                        <ExpressionChar character=" "/>
+                        <ExpressionChar character="/"/>
+                        <ExpressionChar character=" "/>
+                        <ExpressionVariable>
+                          <ProgramVariable reference="../../../../../../../../../../Folder/children/Assignment/variable"/>
+                        </ExpressionVariable>
+                        <ExpressionChar character=")"/>
+                      </expression>
+                    </Script>
+                    <Script type="Line">
+                      <expression>
+                        <ExpressionVariable>
+                          <ProgramVariable reference="../../../../../../../../../../Folder[2]/children/Assignment/variable"/>
+                        </ExpressionVariable>
+                        <ExpressionChar character="["/>
+                        <ExpressionChar character="1"/>
+                        <ExpressionChar character="]"/>
+                        <ExpressionChar character=" "/>
+                        <ExpressionChar character="="/>
+                        <ExpressionChar character=" "/>
+                        <ExpressionVariable>
+                          <ProgramVariable reference="../../../../../../../../../../Folder[2]/children/Assignment/variable"/>
+                        </ExpressionVariable>
+                        <ExpressionChar character="["/>
+                        <ExpressionChar character="1"/>
+                        <ExpressionChar character="]"/>
+                        <ExpressionChar character="+"/>
+                        <ExpressionVariable>
+                          <ProgramVariable reference="../../../../../../../../../../Folder/children/Assignment[11]/variable"/>
+                        </ExpressionVariable>
+                      </expression>
+                    </Script>
+                  </children>
+                </If>
+                <Script type="Line">
+                  <expression>
+                    <ExpressionChar character="p"/>
+                    <ExpressionChar character="a"/>
+                    <ExpressionChar character="t"/>
+                    <ExpressionChar character="h"/>
+                    <ExpressionChar character="_"/>
+                    <ExpressionChar character="o"/>
+                    <ExpressionChar character="f"/>
+                    <ExpressionChar character="f"/>
+                    <ExpressionChar character="s"/>
+                    <ExpressionChar character="e"/>
+                    <ExpressionChar character="t"/>
+                    <ExpressionChar character="_"/>
+                    <ExpressionChar character="s"/>
+                    <ExpressionChar character="e"/>
+                    <ExpressionChar character="t"/>
+                    <ExpressionChar character="("/>
+                    <ExpressionVariable>
+                      <ProgramVariable reference="../../../../../../../../Folder[2]/children/Assignment/variable"/>
+                    </ExpressionVariable>
+                    <ExpressionChar character=","/>
+                    <ExpressionChar character=" "/>
+                    <ExpressionChar character="3"/>
+                    <ExpressionChar character=")"/>
+                  </expression>
+                </Script>
+                <Assignment valueSource="Expression">
+                  <variable reference="../../../../../../Folder[2]/children/Assignment[2]/variable"/>
+                  <expression>
+                    <ExpressionVariable>
+                      <ProgramVariable reference="../../../../../../../../Folder[2]/children/Assignment[2]/variable"/>
+                    </ExpressionVariable>
+                    <ExpressionChar character="+"/>
+                    <ExpressionChar character="1"/>
+                  </expression>
+                </Assignment>
+                <If type="If" checkContinuously="false">
+                  <expression>
+                    <ExpressionVariable>
+                      <ProgramVariable reference="../../../../../../../../Folder[2]/children/Assignment[2]/variable"/>
+                    </ExpressionVariable>
+                    <ExpressionChar character="≥"/>
+                    <ExpressionVariable>
+                      <ProgramVariable reference="../../../../../../../../Folder/children/Assignment[10]/variable"/>
+                    </ExpressionVariable>
+                  </expression>
+                  <children>
+                    <Assignment valueSource="Expression">
+                      <variable reference="../../../../../../../../Folder[2]/children/Assignment[2]/variable"/>
+                      <expression>
+                        <ExpressionChar character="0"/>
+                      </expression>
+                    </Assignment>
+                  </children>
+                </If>
+                <Script type="Line">
+                  <expression>
+                    <ExpressionChar character="s"/>
+                    <ExpressionChar character="y"/>
+                    <ExpressionChar character="n"/>
+                    <ExpressionChar character="c"/>
+                    <ExpressionChar character="("/>
+                    <ExpressionChar character=")"/>
+                  </expression>
+                </Script>
+              </children>
+            </Loop>
+          </children>
+        </Folder>
+      </children>
+    </Thread>
+  </children>
+</URProgram>

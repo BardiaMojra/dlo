@@ -1,9 +1,60 @@
-# DLO Dataset Paper - Master
+# DLO-Dynamics-Dataset - Master
 
-## TOP
+A dataset for capturing the intrinsic dynamics of deformable linear objects (DLOs).
+
+## Test Data
+
+- Video:
+  - RGBD
+
+## TOP LINKS
 
 - [Paper on Overleaf](https://www.overleaf.com/project/63b719f4df73f6372419b627)
 - [This master repo](https://github.com/BardiaMojra/dlo.git)
+
+## Read
+
+- [Matlab UR5 Glue Dispensing](https://www.mathworks.com/help/supportpkg/robotmanipulator/ug/simulate-glue-dispensing-example.html)
+
+## Paper Structure - Material and Notes
+
+- Abstract
+- Intro
+  - Deformable Linear Objects
+  - DLO Manipulation
+  - DLO Dynamics
+  - Contributions
+- Related Work
+  - Manipulations Tasks
+  - Learning the Dynamics
+  - Reinforcement Learning
+  - Modeling DLO Dynamics
+- Method
+  - Path Planning
+  - Trajectory Generation
+    - Coordinate Frame: Task Space vs. Join Space --> pros and cons
+    - Trapezoidal Velocity Trajectory
+    - Polynomial Trajectories: --> great for changing velocities
+      - Cubic
+      - Quintic
+    - Spherical Linear Interpolation (SLERP) --> interpolates quaternions along a sphere to find the shortest path between two points
+      - Uniform angular velocities
+  - Dynamic Dataset
+  - Pose and Configuration Estimation
+    - Segmentation
+    - DLO configuration estimation
+  - Data-Driven Models for DLO Dynamics
+  - Model Predictive Control
+  - Online Model Learning with MPC
+- Evaluation
+  - Setup
+  - Performance Metrics
+    - Accuracy
+    - ...
+  - Comparison
+    - Other models
+  - Results
+- Conclusion
 
 ## Tasks Assignments
 
@@ -19,9 +70,17 @@
 ## ToDo - Bardia
 
 - [ ] Write paper
+  - [x] Structure
+  - [ ] Collect data
 - Read:
-- UR5
+  - Remote Operation Guide v1.1: on sec 5.1.1
+  - [Remote TCP and Toolpath](https://www.universal-robots.com/articles/ur/programming/remote-tcp-toolpath-urcap-urscript-functions-and-examples/)
+  - [Tabletop Demo of remote toolpath moves](https://www.universal-robots.com/articles/ur/programming/tabletop-demo-of-remote-tcp-toolpath-moves-object-path/)
+- UR5e
   - IP: 192.168.1.147
+  - File system:
+    - address: <ftp://192.168.1.147/root/>
+    - password: easybot
   - [ ] [urdfpy - URDF parser in Python](https://urdfpy.readthedocs.io/en/latest/)
   - [ ] program and record
   - [ ] pick and placement
@@ -36,10 +95,9 @@
 
 ## ToDo - Maicol
 
-- Update DLO mount design
-- Print new design
-- Setup CAD/Drawing
-- DLO mount drawing
+- Update DLO mount design -- done
+- Print new design -- done
+- Setup CAD/Drawing -- done
 
 ## Links
 
@@ -83,7 +141,8 @@ pip install pyrealsense2
 
 ## Test Goals
 
-- Clamped end low, DLO on table and flat, change gripper pose, no
+- Start with simple shapes and motion
+- Clamped end low, DLO on flat on a table, change gripper pose, no
   twist on DLO:\@ omega shape, s shape, u shape, circle shape, ellipse shape,
   spiral.
 - Clamped end low, DLO on table and 3D, with a twist: same shapes.

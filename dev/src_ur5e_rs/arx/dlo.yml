@@ -1,0 +1,16 @@
+name: dlo
+channels:
+  #- jmcmurray # sjon
+  - conda-forge
+  - anaconda
+  - defaults
+dependencies:
+  - python
+  - numpy
+  - matplotlib
+  - pandas
+  #- json
+  - pip:
+      #- pyrealsense2 # install via cd <Anaconda installation path>/envs/<environment_name> && ./Scripts/pip install pyrealsense2
+      # - xlrd
+      # - openpyxl

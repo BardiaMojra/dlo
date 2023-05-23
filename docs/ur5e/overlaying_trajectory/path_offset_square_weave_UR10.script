@@ -1,0 +1,130 @@
+def path_offset_square_weave_UR10():
+  step_count_da3cdbee_4cea_471b_a76d_6bf1077d1391 = 0
+  thread Step_Counter_Thread_b65766fd_3fa8_4247_aaf8_68b68bf4b419():
+    while (True):
+      step_count_da3cdbee_4cea_471b_a76d_6bf1077d1391 = step_count_da3cdbee_4cea_471b_a76d_6bf1077d1391 + 1
+      sync()
+    end
+  end
+  run Step_Counter_Thread_b65766fd_3fa8_4247_aaf8_68b68bf4b419()
+  set_tool_communication(False, 115200, 0, 1, 1.5, 3.5)
+  set_tool_output_mode(0)
+  set_tool_digital_output_mode(0, 1)
+  set_tool_digital_output_mode(1, 1)
+  set_tool_voltage(0)
+  set_safety_mode_transition_hardness(1)
+  set_standard_analog_input_domain(0, 1)
+  set_standard_analog_input_domain(1, 1)
+  set_tool_analog_input_domain(0, 1)
+  set_tool_analog_input_domain(1, 1)
+  set_analog_outputdomain(0, 0)
+  set_analog_outputdomain(1, 0)
+  set_input_actions_to_default()
+  set_tcp(p[0.0,0.0,0.0,0.0,0.0,0.0])
+  set_payload(0.0)
+  set_gravity([0.0, 0.0, 9.82])
+  global start_pos_p=p[-.200000000000, -.700000000000, .099999999925, .000000000000, -3.141185307180, .000000000000]
+  global start_pos_q=[-1.6074731942095886, -2.0892362040100014, -2.10434021547169, -0.5187976238561856, 1.570389254128683, -0.036676870249862326]
+  global end_pos_p=p[.100000000109, -.700000000000, .099999999925, .000000000000, 3.116766277838, -.000000000000]
+  global end_pos_q=[-1.1839614483671355, -2.070725141848989, -2.146952079820861, -0.48534413248530583, 1.5937878897965136, 0.3869425723500477]
+  $ 5 "Thread_1"
+  thread Thread_1():
+    while (True):
+      $ 6 "setup"
+      $ 7 "ctrl_frequency≔500.0"
+      global ctrl_frequency=500.0
+      $ 8 "weave_frequency≔3.0"
+      global weave_frequency=3.0
+      $ 9 "amplitude≔0.006"
+      global amplitude=0.006
+      $ 10 "speed≔0.008"
+      global speed=0.008
+      $ 11 "in_out_distance≔amplitude"
+      global in_out_distance=amplitude
+      $ 12 "follow_distance≔(speed / weave_frequency) / 2.0"
+      global follow_distance=(speed / weave_frequency) / 2.0
+      $ 13 "cycle_distance≔(4.0 * in_out_distance) + (2.0 * follow_distance)"
+      global cycle_distance=(4.0 * in_out_distance) + (2.0 * follow_distance)
+      $ 14 "in_out_duration≔floor((ctrl_frequency / weave_frequency) * (in_out_distance / cycle_distance))"
+      global in_out_duration=floor((ctrl_frequency / weave_frequency) * (in_out_distance / cycle_distance))
+      $ 15 "follow_duration≔floor((ctrl_frequency / weave_frequency) * (follow_distance / cycle_distance))"
+      global follow_duration=floor((ctrl_frequency / weave_frequency) * (follow_distance / cycle_distance))
+      $ 16 "cycle_duration≔(4 * in_out_duration) + (2 * follow_duration)"
+      global cycle_duration=(4 * in_out_duration) + (2 * follow_duration)
+      $ 17 "in_out_addition≔in_out_distance / in_out_duration"
+      global in_out_addition=in_out_distance / in_out_duration
+      $ 18 "follow_mult≔2.0 * (in_out_duration / follow_duration)"
+      global follow_mult=2.0 * (in_out_duration / follow_duration)
+      $ 19 "enable"
+      $ 20 "offset≔[0.0, 0.0, 0.0, 0.0, 0.0, 0.0]"
+      global offset=[0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+      $ 21 "i≔0"
+      global i=0
+      $ 22 "path_offset_enable()"
+      path_offset_enable()
+      $ 23 "alpha≔0.165"
+      global alpha=0.165
+      $ 24 "path_offset_set_alpha_filter(alpha)"
+      path_offset_set_alpha_filter(alpha)
+      $ 25 "weave"
+      $ 26 "Loop"
+      while (True):
+        $ 27 "traj_vel≔get_target_tcp_speed_along_path()"
+        global traj_vel=get_target_tcp_speed_along_path()
+        $ 28 "traj_vel_pos≔[traj_vel[0], traj_vel[1], traj_vel[2]]"
+        global traj_vel_pos=[traj_vel[0], traj_vel[1], traj_vel[2]]
+        $ 29 "If i<in_out_duration"
+        if (i<in_out_duration):
+          $ 30 "offset[0] = offset[0]-(norm(traj_vel_pos) / ctrl_frequency)"
+          offset[0] = offset[0]-(norm(traj_vel_pos) / ctrl_frequency)
+          $ 31 "offset[1] = offset[1]+in_out_addition"
+          offset[1] = offset[1]+in_out_addition
+        else:
+          $ 32 "ElseIf i<(in_out_duration+follow_duration)"
+          if (i<(in_out_duration+follow_duration)):
+            $ 33 "offset[0] = offset[0]+(follow_mult * (norm(traj_vel_pos) / ctrl_frequency))"
+            offset[0] = offset[0]+(follow_mult * (norm(traj_vel_pos) / ctrl_frequency))
+          else:
+            $ 34 "ElseIf i<((3 * in_out_duration) + follow_duration)"
+            if (i<((3 * in_out_duration) + follow_duration)):
+              $ 35 "offset[0] = offset[0]-(norm(traj_vel_pos) / ctrl_frequency)"
+              offset[0] = offset[0]-(norm(traj_vel_pos) / ctrl_frequency)
+              $ 36 "offset[1] = offset[1]-in_out_addition"
+              offset[1] = offset[1]-in_out_addition
+            else:
+              $ 37 "ElseIf i<((3 * in_out_duration) + (2 * follow_duration))"
+              if (i<((3 * in_out_duration) + (2 * follow_duration))):
+                $ 38 "offset[0] = offset[0]+(follow_mult * (norm(traj_vel_pos) / ctrl_frequency))"
+                offset[0] = offset[0]+(follow_mult * (norm(traj_vel_pos) / ctrl_frequency))
+              else:
+                $ 39 "Else" "noBreak"
+                $ 40 "offset[0] = offset[0]-(norm(traj_vel_pos) / ctrl_frequency)"
+                offset[0] = offset[0]-(norm(traj_vel_pos) / ctrl_frequency)
+                $ 41 "offset[1] = offset[1]+in_out_addition"
+                offset[1] = offset[1]+in_out_addition
+              end
+            end
+          end
+        end
+        $ 42 "path_offset_set(offset, 3)"
+        path_offset_set(offset, 3)
+        $ 43 "i≔i+1"
+        global i=i+1
+        $ 44 "If i≥cycle_duration"
+        if (i >= cycle_duration):
+          $ 45 "i≔0"
+          global i=0
+        end
+        $ 46 "sync()"
+        sync()
+      end
+    end
+  end
+  threadId_Thread_1 = run Thread_1()
+  $ 1 "Robot Program"
+  $ 2 "MoveP"
+  $ 3 "start_pos" "breakAfter"
+  movep(start_pos_p, a=1.2, v=0.008, r=0.025)
+  $ 4 "end_pos" "breakAfter"
+  movep(end_pos_p, a=1.2, v=0.008, r=0.025)
+end

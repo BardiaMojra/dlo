@@ -1,0 +1,75 @@
+> /home/smerx/git/dlo/dev/src/main.py(3)<module>()
+-> import sys, os
+(Pdb) DOES EXIST:
+/home/smerx/git/dlo/dev/out
+Use existing dir: /home/smerx/git/dlo/dev/out
+
+DOES NOT EXIST:
+/home/smerx/git/dlo/dev/out/001_basic_x_2023-01-27_04-32-25
+IT WILL BE CREATED....
+
+DOES NOT EXIST: pc_dir
+/home/smerx/git/dlo/dev/out/001_basic_x_2023-01-27_04-32-25/pc_frames
+
+DOES NOT EXIST: rgb_dir
+/home/smerx/git/dlo/dev/out/001_basic_x_2023-01-27_04-32-25/rgb_frames
+
+DOES NOT EXIST: dm_dir
+/home/smerx/git/dlo/dev/out/001_basic_x_2023-01-27_04-32-25/d_frames
+
+DOES NOT EXIST: cfg_file
+/home/smerx/git/dlo/dev/out/001_basic_x_2023-01-27_04-32-25/cfg.txt
+
+DOES NOT EXIST: notes_file
+/home/smerx/git/dlo/dev/out/001_basic_x_2023-01-27_04-32-25/notes.txt
+
+DOES NOT EXIST: st_file
+/home/smerx/git/dlo/dev/out/001_basic_x_2023-01-27_04-32-25/dat.txt
+
+cfg:
+{'__header__': 'DLO Dataset Test Config',
+ '_nbug': True,
+ '_prt': True,
+ '_repeat_wps': False,
+ '_sav': True,
+ '_shw': True,
+ 'cfg_file': '/home/smerx/git/dlo/dev/out/001_basic_x_2023-01-27_04-32-25/cfg.txt',
+ 'dm_dir': '/home/smerx/git/dlo/dev/out/001_basic_x_2023-01-27_04-32-25/d_frames',
+ 'st_file': '/home/smerx/git/dlo/dev/out/001_basic_x_2023-01-27_04-32-25/dat.txt',
+ 'st_labs': ['timestamp',
+              'robot_mode',
+              'target_q',
+              'actual_q',
+              'actual_qd',
+              'target_TCP_pose',
+              'actual_TCP_pose',
+              'actual_TCP_speed',
+              'output_int_register_0'],
+ 'dlo_diameter': '50 mm',
+ 'dlo_length': '1000 mm',
+ 'dlo_name': 'reinforced tube',
+ 'freq': 10,
+ 'host': '192.168.1.147',
+ 'log_file': '/home/smerx/git/dlo/dev/out/001_basic_x_2023-01-27_04-32-25/run.log',
+ 'notes_file': '/home/smerx/git/dlo/dev/out/001_basic_x_2023-01-27_04-32-25/notes.txt',
+ 'odir': '/home/smerx/git/dlo/dev/out',
+ 'pc_dir': '/home/smerx/git/dlo/dev/out/001_basic_x_2023-01-27_04-32-25/pc_frames',
+ 'port': 30004,
+ 'rgb_dir': '/home/smerx/git/dlo/dev/out/001_basic_x_2023-01-27_04-32-25/rgb_frames',
+ 'rtde_cfg_file': '/home/smerx/git/dlo/dev/src/comms_config.xml',
+ 'tdtime': '2023-01-27_04-32-25',
+ 'tid': '001_basic_x_2023-01-27_04-32-25',
+ 'tname': 'basic_x',
+ 'tnum': 1,
+ 'todir': '/home/smerx/git/dlo/dev/out/001_basic_x_2023-01-27_04-32-25',
+ 'wdir': '/home/smerx/git/dlo/dev/src',
+ 'wps_file': '/home/smerx/git/dlo/dev/out/001_basic_x_2023-01-27_04-32-25/wps.txt',
+ 'wps_labs': ['x', 'y', 'z', 'rx', 'ry', 'rz'],
+ 'wps_units': ['m', 'm', 'm', 'rad', 'rad', 'rad']}
+> /home/smerx/git/dlo/dev/src/main.py(107)main()
+-> keep_running = True
+(Pdb) Uncaught exception. Entering post mortem debugging
+Running 'cont' or 'step' will restart the program
+> /home/smerx/git/dlo/dev/src/main.py(141)main()
+-> writeModes = "wb" if cfg.binary else "w"
+(Pdb)
