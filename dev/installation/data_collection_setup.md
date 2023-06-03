@@ -19,63 +19,6 @@ It's because of a dependency issue, running a force install will fix it:
 sudo apt -f install
 ```
 
-#### Install Kernel 5.16
-
-This is an example of installing a specific kernel version.
-
-```bash
-cd ~/Downloads
-
-wget -c https://kernel.ubuntu.com/~kernel-ppa/mainline/v5.16/amd64/linux-headers-5.16.0-051600_5.16.0-051600.202201092355_all.deb
-wget -c https://kernel.ubuntu.com/~kernel-ppa/mainline/v5.16/amd64/linux-headers-5.16.0-051600-generic_5.16.0-051600.202201092355_amd64.deb
-wget -c https://kernel.ubuntu.com/~kernel-ppa/mainline/v5.16/amd64/linux-image-unsigned-5.16.0-051600-generic_5.16.0-051600.202201092355_amd64.deb
-wget -c https://kernel.ubuntu.com/~kernel-ppa/mainline/v5.16/amd64/linux-modules-5.16.0-051600-generic_5.16.0-051600.202201092355_amd64.deb
-
-sudo dpkg -i *.deb
-sudo apt -f install
-```
-
-#### Install the Latest Mainline Kernel (Latest LTS Release)
-
-Use an automated bash script to install the latest mainline kernel.
-
-1. Download and install the shell script.
-
-```bash
-wget https://raw.githubusercontent.com/pimlie/ubuntu-mainline-kernel.sh/master/ubuntu-mainline-kernel.sh
-sudo install ubuntu-mainline-kernel.sh /usr/local/bin/
-```
-
-2. Run the script with c option.
-
-```bash
-sudo ubuntu-mainline-kernel.sh -c
-```
-
-3. Install the latest stable Kernel.
-
-```bash
-sudo ubuntu-mainline-kernel.sh -i
-```
-
-4. Reboot
-
-```bash
-sudo reboot
-```
-
-- For the future, if you'd like to recheck and reinstall the latest stable kernel, you can simply run:
-
-```bash
-sudo ubuntu-mainline-kernel.sh -i
-```
-
-- Note: You can check the kernel you are using, using the following command:
-
-```bash
-uname -r
-```
-
 ## Environment Setup
 
 - Ubuntu 20.04: Linux 5.15.0-72-generic x86_64
@@ -125,6 +68,12 @@ This section is based on [Franka-Emika's Panda arm setup tutorial](https://frank
 
 This section is based on [PBVS with Panda Tutorial by Visual Servoing Platform](https://visp-doc.inria.fr/doxygen/visp-daily/tutorial-franka-pbvs.html).
 
+Install dependencies.
+
+```bash
+sudo apt-get install build-essential bc curl ca-certificates gnupg2 libssl-dev lsb-release libelf-dev bison flex dwarves zstd libncurses-dev
+```
+
 Check the kernel version and install the Real-Time Kernel with the closest version number.
 
 ```bash
@@ -132,46 +81,126 @@ $ uname -mrs
 Linux 5.15.0-72-generic x86_64
 ```
 
+Download a kernel with the same major and minor version (5.15), and the latest update (113). Make sure to pick the latest kernel update with an available RT patch.
+
 ```bash
 cd ~/git
 mkdir rt-linux; cd rt-linux
-curl -SLO https://www.kernel.org/pub/linux/kernel/v5.x/linux-5.15.111.tar.gz
-curl -SLO https://mirrors.edge.kernel.org/pub/linux/kernel/projects/rt/5.15/patch-5.15.111-rt63.patch.gz
+# download the latest kernel uodate
+curl -SLO https://mirrors.edge.kernel.org/pub/linux/kernel/v5.x/linux-5.15.113.tar.xz
+curl -SLO https://mirrors.edge.kernel.org/pub/linux/kernel/v5.x/linux-5.15.113.tar.sign
+```
+
+Download the corresponding rt patch from [rt-kernel patch repo](https://www.kernel.org/pub/linux/kernel/projects/rt/).
+
+```bash
+curl -SLO https://mirrors.edge.kernel.org/pub/linux/kernel/projects/rt/5.15/patch-5.15.113-rt64.patch.xz
+curl -SLO https://mirrors.edge.kernel.org/pub/linux/kernel/projects/rt/5.15/patch-5.15.113-rt64.patch.sign
+
 ```
 
 Decompress the files.
 
 ```bash
-tar xvzf linux-5.15.111.tar.gz
-gunzip patch-5.15.111-rt63.patch.gz
+xz -d *.xz
+```
+
+Checksum the files. First, get the public keys from files.
+
+```bash
+gpg2 --verify linux-*.tar.sign
+gpg2 --verify patch-*.patch.sign
+```
+
+Download the public keys using the following command.
+
+```bash
+gpg2  --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys [key ID]
+```
+
+Download the public keys. Update signatures accordingly.
+
+```bash
+gpg2 --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 647F28654894E3BD457199BE38DBBDC86092693E
+gpg2 --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys AD85102A6BE1CDFE9BCA84F36CEF3D27CA5B141E
+```
+
+Verify checksum.
+
+```bash
+gpg2 --verify linux-*.tar.sign
+```
+
+If you face an error when compiling the kernel, resolve the error, then
+delete the source directory and try again front this point. Else, skip this step
+and continue with the extraction and patching step.
+
+```bash
+cd .. && sudo rm -rf linux-*/
 ```
 
 Extract the source code and apply the patch.
 
 ```bash
-cd linux-5.15.111
-patch -p1 < ../patch-5.15.111-rt63.patch
+tar xf linux-*.tar
+cd linux-*/
+patch -p1 < ../patch-*.patch
 ```
 
-#### Configure RT Kernel and Build it
-
-Install dependencies.
+Next, copy current kernel configs to local.
 
 ```bash
-sudo apt-get install build-essential bc curl ca-certificates fakeroot gnupg2 libssl-dev lsb-release libelf-dev bison flex
+cp -v /boot/config-$(uname -r) .config
 ```
 
 Configure. Choose Fully Preemptible Kernel. Select default settings, it would
 be printed first and in CAPITAL, i.e. (N/m/y/?).
 
 ```bash
-make oldconfig
+make olddefconfig
+make menuconfig
 ```
+
+The second command brings up a terminal interface in which you can configure the preemption model. Navigate with the arrow keys to General Setup > Preemption Model and select Fully Preemptible Kernel (Real-Time).
+
+After that navigate to Cryptographic API > Certificates for signature checking (at the very bottom of the list) > Provide system-wide ring of trusted keys > Additional X.509 keys for default system keyring
+
+Remove the “debian/canonical-certs.pem” from the prompt and press Ok. Save this configuration to .config and exit the TUI.
+
+NOTE: If you prefer GUIs over TUIs use make `xconfig` instead of `make menuconfig`.
+
+Run the following to prevent compilation errors:
+
+```bash
+scripts/config --disable SYSTEM_TRUSTED_KEYS
+scripts/config --disable CONFIG_TRUSTED_KEY
+scripts/config --disable CONFIG_SYSTEM_TRUSTED_KEYRING
+scripts/config --set-str CONFIG_SYSTEM_TRUSTED_KEYS ""
+```
+
+# CONFIG_TRUSTED_KEY
+
+# CONFIG_SYSTEM_TRUSTED_KEYRING
+
+# CONFIG_SYSTEM_TRUSTED_KEYS=""
 
 Compile RT kernel.
 
 ```bash
-fakeroot make -j4 deb-pkg
+fakeroot make -j10 deb-pkg
+```
+
+If you encounter an error during the build process, remake with 1 processor to
+read the error message.
+
+```bash
+fakeroot make -j1 deb-pkg
+```
+
+Finally, you are ready to install the newly created package. The exact names depend on your environment, but you are looking for headers and images packages without the dbg suffix. To install:
+
+```bash
+sudo dpkg -i ../linux-headers-*.deb ../linux-image-*.deb
 ```
 
 ## Hardware
