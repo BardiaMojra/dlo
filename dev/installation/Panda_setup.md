@@ -181,7 +181,7 @@ scripts/config --set-str CONFIG_SYSTEM_TRUSTED_KEYS ""
 scripts/config --set-str CONFIG_SYSTEM_REVOCATION_KEYS ""
 ```
 
-### Build The Latest RT Kernel
+### Build RT Kernel
 
 Compile RT kernel.
 
@@ -198,11 +198,43 @@ fakeroot make -j1 deb-pkg
 
 ### Install the RT Kernel
 
-Finally, you are ready to install the newly created package. The exact names depend on your environment, but you are looking for headers and images packages without the dbg suffix. To install:
+Finally, you are ready to install the newly created package. The exact names depend on your environment, but you are looking for headers and image packages without the dbg suffix. To install:
 
 ```bash
 sudo dpkg -i ../linux-headers-*.deb ../linux-image-*.deb
 ```
+
+### Verify New Kernel
+
+Reboot.
+GRUB or ReFind UEFI boot menu should now allow you to choose your newly installed kernel.
+To see which one is currently being used, see the output of the `uname -a command`.
+It should contain the string `PREEMPT RT` and the version number you chose.
+Additionally, `/sys/kernel/realtime` should exist and contain the number 1.
+
+Note: If you encounter errors that you fail to boot the new kernel see [Cannot boot realtime kernel because of “Invalid Signature”](https://frankaemika.github.io/docs/troubleshooting.html#troubleshooting-realtime-kernel).
+
+### Create RT User Group and Setup Permissions
+
+Once logged into `PREEMPT_RT` kernel, run the following commands:
+
+```bash
+sudo addgroup realtime
+sudo usermod -a -G realtime $(whoami)
+```
+
+Afterwards, add the following limits to the realtime group in `/etc/security/limits.conf`:
+
+```text
+@realtime soft rtprio 99
+@realtime soft priority 99
+@realtime soft memlock 102400
+@realtime hard rtprio 99
+@realtime hard priority 99
+@realtime hard memlock 102400
+```
+
+The limits will be applied after you log out and in again. So, reboot.
 
 ## Hardware
 

@@ -10,7 +10,7 @@
 <h3 id="keep-in-mind">Keep in Mind</h3>
 <h4 id="fixing-installation-issues">Fixing Installation issues</h4>
 <p>It’s because of a dependency issue, running a force install will fix it:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="fu">sudo</span> apt -f install [package]</span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb1-1" title="1"><span class="fu">sudo</span> apt -f install [package]</a></code></pre></div>
 <h2 id="environment-setup">Environment Setup</h2>
 <ul>
 <li>Ubuntu 20.04: Linux 5.15.0-72-generic x86_64 <!-- - Install Nvidia GPU drivers  --></li>
@@ -28,113 +28,128 @@
 <h3 id="install-dependencies">Install Dependencies</h3>
 <p>Make sure to enable all ‘source code’ repositories in Software &amp; Updates.</p>
 <p>Install dependencies.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="fu">sudo</span> apt-get build-dep linux linux-image-<span class="va">$(</span><span class="fu">uname</span> -r<span class="va">)</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a><span class="fu">sudo</span> apt-get install libncurses-dev gawk flex bison openssl libssl-dev dkms <span class="kw">\</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a>  <span class="ex">libelf-dev</span> libudev-dev libpci-dev libiberty-dev autoconf llvm</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a><span class="fu">sudo</span> apt-get install git</span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb2-1" title="1"><span class="fu">sudo</span> apt-get build-dep linux linux-image-<span class="va">$(</span><span class="fu">uname</span> -r<span class="va">)</span></a>
+<a class="sourceLine" id="cb2-2" title="2"><span class="fu">sudo</span> apt-get install libncurses-dev gawk flex bison openssl libssl-dev dkms \</a>
+<a class="sourceLine" id="cb2-3" title="3">  libelf-dev libudev-dev libpci-dev libiberty-dev autoconf llvm</a>
+<a class="sourceLine" id="cb2-4" title="4"><span class="fu">sudo</span> apt-get install git</a></code></pre></div>
 <p>We are using Ubuntu 20.04 distribution so the release code is “focal”.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="fu">git</span> clone git://kernel.ubuntu.com/ubuntu/ubuntu-focal.git</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb3-1" title="1"><span class="fu">git</span> clone git://kernel.ubuntu.com/ubuntu/ubuntu-focal.git</a></code></pre></div>
 <p>Set up the correct Debian source code repository.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a><span class="ex">deb-src</span> http://archive.ubuntu.com/ubuntu/ubuntu focal main</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a><span class="ex">deb-src</span> http://archive.ubuntu.com/ubuntu/ubuntu focal-updates main</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb4-1" title="1"><span class="ex">deb-src</span> http://archive.ubuntu.com/ubuntu/ubuntu focal main</a>
+<a class="sourceLine" id="cb4-2" title="2"><span class="ex">deb-src</span> http://archive.ubuntu.com/ubuntu/ubuntu focal-updates main</a></code></pre></div>
 <h3 id="download-the-latest-rt-kernel">Download The Latest RT Kernel</h3>
 <p>This section is based on <a href="https://frankaemika.github.io/docs/installation_linux.html#setting-up-the-real-time-kernel">Franka-Emika’s Panda arm setup tutorial</a>.</p>
 <p>This section is based on <a href="https://visp-doc.inria.fr/doxygen/visp-daily/tutorial-franka-pbvs.html">PBVS with Panda Tutorial by Visual Servoing Platform</a>.</p>
 <p>Install dependencies.</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a><span class="fu">sudo</span> apt-get install build-essential bc curl ca-certificates gnupg2 <span class="kw">\</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a>  <span class="ex">libssl-dev</span> lsb-release libelf-dev bison flex dwarves zstd libncurses-dev</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb5-1" title="1"><span class="fu">sudo</span> apt-get install build-essential bc curl ca-certificates gnupg2 \</a>
+<a class="sourceLine" id="cb5-2" title="2">  libssl-dev lsb-release libelf-dev bison flex dwarves zstd libncurses-dev</a></code></pre></div>
 <p>Check the kernel version and install the Real-Time Kernel with the closest version number.</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a>$ <span class="fu">uname</span> -mrs</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true"></a><span class="ex">Linux</span> 5.15.0-72-generic x86_64</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb6-1" title="1">$ <span class="fu">uname</span> -mrs</a>
+<a class="sourceLine" id="cb6-2" title="2"><span class="ex">Linux</span> 5.15.0-72-generic x86_64</a></code></pre></div>
 <p>Download a kernel with the same major and minor version (5.15), and the latest update (113). Make sure to pick the latest kernel update with an available RT patch.</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true"></a><span class="bu">cd</span> ~/git</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true"></a><span class="fu">mkdir</span> rt-linux<span class="kw">;</span> <span class="bu">cd</span> rt-linux</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true"></a><span class="co"># download the latest kernel uodate</span></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true"></a><span class="ex">curl</span> -SLO https://mirrors.edge.kernel.org/pub/linux/kernel/v5.x/linux-5.15.113.tar.xz</span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true"></a><span class="ex">curl</span> -SLO https://mirrors.edge.kernel.org/pub/linux/kernel/v5.x/linux-5.15.113.tar.sign</span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb7-1" title="1"><span class="bu">cd</span> ~/git</a>
+<a class="sourceLine" id="cb7-2" title="2"><span class="fu">mkdir</span> rt-linux<span class="kw">;</span> <span class="bu">cd</span> rt-linux</a>
+<a class="sourceLine" id="cb7-3" title="3"><span class="co"># download the latest kernel uodate</span></a>
+<a class="sourceLine" id="cb7-4" title="4"><span class="ex">curl</span> -SLO https://mirrors.edge.kernel.org/pub/linux/kernel/v5.x/linux-5.15.113.tar.xz</a>
+<a class="sourceLine" id="cb7-5" title="5"><span class="ex">curl</span> -SLO https://mirrors.edge.kernel.org/pub/linux/kernel/v5.x/linux-5.15.113.tar.sign</a></code></pre></div>
 <p>Download the corresponding rt patch from <a href="https://www.kernel.org/pub/linux/kernel/projects/rt/">rt-kernel patch repo</a>.</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true"></a><span class="ex">curl</span> -SLO https://mirrors.edge.kernel.org/pub/linux/kernel/projects/rt/5.15/patch-5.15.113-rt64.patch.xz</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true"></a><span class="ex">curl</span> -SLO https://mirrors.edge.kernel.org/pub/linux/kernel/projects/rt/5.15/patch-5.15.113-rt64.patch.sign</span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb8-1" title="1"><span class="ex">curl</span> -SLO https://mirrors.edge.kernel.org/pub/linux/kernel/projects/rt/5.15/patch-5.15.113-rt64.patch.xz</a>
+<a class="sourceLine" id="cb8-2" title="2"><span class="ex">curl</span> -SLO https://mirrors.edge.kernel.org/pub/linux/kernel/projects/rt/5.15/patch-5.15.113-rt64.patch.sign</a></code></pre></div>
 <p>Decompress the files.</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true"></a><span class="fu">xz</span> -d *.xz</span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb9-1" title="1"><span class="fu">xz</span> -d *.xz</a></code></pre></div>
 <p>Checksum the files. First, get the public keys from files.</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true"></a><span class="ex">gpg2</span> --verify linux-*.tar.sign</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true"></a><span class="ex">gpg2</span> --verify patch-*.patch.sign</span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb10-1" title="1"><span class="ex">gpg2</span> --verify linux-*.tar.sign</a>
+<a class="sourceLine" id="cb10-2" title="2"><span class="ex">gpg2</span> --verify patch-*.patch.sign</a></code></pre></div>
 <p>Download the public keys using the following command.</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true"></a><span class="ex">gpg2</span>  --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys [key ID]</span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb11-1" title="1"><span class="ex">gpg2</span>  --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys [key ID]</a></code></pre></div>
 <p>Download the public keys. Update signatures accordingly.</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true"></a><span class="ex">gpg2</span> --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 647F28654894E3BD457199BE38DBBDC86092693E</span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true"></a><span class="ex">gpg2</span> --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys AD85102A6BE1CDFE9BCA84F36CEF3D27CA5B141E</span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb12-1" title="1"><span class="ex">gpg2</span> --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 647F28654894E3BD457199BE38DBBDC86092693E</a>
+<a class="sourceLine" id="cb12-2" title="2"><span class="ex">gpg2</span> --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys AD85102A6BE1CDFE9BCA84F36CEF3D27CA5B141E</a></code></pre></div>
 <p>Verify checksum.</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true"></a><span class="ex">gpg2</span> --verify linux-*.tar.sign</span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb13-1" title="1"><span class="ex">gpg2</span> --verify linux-*.tar.sign</a></code></pre></div>
 <h3 id="extract-and-configure">Extract and Configure</h3>
 <p>If you face an error when compiling the kernel, resolve the error, then delete the source directory and try again front this point. Else, skip this step and continue with the extraction and patching step.</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true"></a><span class="bu">cd</span> .. <span class="kw">&amp;&amp;</span> <span class="fu">sudo</span> rm -rf linux-*/</span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb14-1" title="1"><span class="bu">cd</span> .. <span class="kw">&amp;&amp;</span> <span class="fu">sudo</span> rm -rf linux-*/</a></code></pre></div>
 <p>Extract the source code and apply the patch.</p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true"></a><span class="fu">tar</span> xf linux-*.tar <span class="kw">&amp;&amp;</span> <span class="bu">cd</span> linux-*/ <span class="kw">&amp;&amp;</span> <span class="fu">patch</span> -p1 <span class="op">&lt;</span> ../patch-*.patch</span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb15-1" title="1"><span class="fu">tar</span> xf linux-*.tar <span class="kw">&amp;&amp;</span> <span class="bu">cd</span> linux-*/ <span class="kw">&amp;&amp;</span> <span class="fu">patch</span> -p1 <span class="op">&lt;</span> ../patch-*.patch</a></code></pre></div>
 <p>Next, copy current kernel configs to local.</p>
-<div class="sourceCode" id="cb16"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true"></a><span class="fu">cp</span> -v /boot/config-<span class="va">$(</span><span class="fu">uname</span> -r<span class="va">)</span> .config</span></code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb16-1" title="1"><span class="fu">cp</span> -v /boot/config-<span class="va">$(</span><span class="fu">uname</span> -r<span class="va">)</span> .config</a></code></pre></div>
 <p>Configure. Choose Fully Preemptible Kernel. Select default settings, it would be printed first and in CAPITAL, i.e. (N/m/y/?).</p>
-<div class="sourceCode" id="cb17"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true"></a><span class="fu">make</span> olddefconfig</span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true"></a><span class="fu">make</span> menuconfig</span></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb17-1" title="1"><span class="fu">make</span> olddefconfig</a>
+<a class="sourceLine" id="cb17-2" title="2"><span class="fu">make</span> menuconfig</a></code></pre></div>
 <p>The second command brings up a terminal interface in which you can configure the preemption model. Navigate with the arrow keys to General Setup &gt; Preemption Model and select Fully Preemptible Kernel (Real-Time).</p>
 <p>After that navigate to Cryptographic API &gt; Certificates for signature checking (at the very bottom of the list) &gt; Provide system-wide ring of trusted keys &gt; Additional X.509 keys for default system keyring</p>
 <p>Remove the “debian/canonical-certs.pem” from the prompt and press Ok. Save this configuration to .config and exit the TUI.</p>
 <p>NOTE: If you prefer GUIs over TUIs use make <code>xconfig</code> instead of <code>make menuconfig</code>.</p>
 <p>Run the following to prevent compilation errors:</p>
-<div class="sourceCode" id="cb18"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true"></a><span class="ex">scripts/config</span> --disable SYSTEM_TRUSTED_KEYS</span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true"></a><span class="ex">scripts/config</span> --disable CONFIG_TRUSTED_KEY</span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true"></a><span class="ex">scripts/config</span> --disable CONFIG_SYSTEM_TRUSTED_KEYRING</span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true"></a><span class="ex">scripts/config</span> --set-str CONFIG_SYSTEM_TRUSTED_KEYS <span class="st">&quot;&quot;</span></span>
-<span id="cb18-5"><a href="#cb18-5" aria-hidden="true"></a><span class="ex">scripts/config</span> --set-str CONFIG_SYSTEM_REVOCATION_KEYS <span class="st">&quot;&quot;</span></span></code></pre></div>
+<div class="sourceCode" id="cb18"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb18-1" title="1"><span class="ex">scripts/config</span> --disable SYSTEM_TRUSTED_KEYS</a>
+<a class="sourceLine" id="cb18-2" title="2"><span class="ex">scripts/config</span> --disable CONFIG_TRUSTED_KEY</a>
+<a class="sourceLine" id="cb18-3" title="3"><span class="ex">scripts/config</span> --disable CONFIG_SYSTEM_TRUSTED_KEYRING</a>
+<a class="sourceLine" id="cb18-4" title="4"><span class="ex">scripts/config</span> --set-str CONFIG_SYSTEM_TRUSTED_KEYS <span class="st">&quot;&quot;</span></a>
+<a class="sourceLine" id="cb18-5" title="5"><span class="ex">scripts/config</span> --set-str CONFIG_SYSTEM_REVOCATION_KEYS <span class="st">&quot;&quot;</span></a></code></pre></div>
 <h3 id="build-the-latest-rt-kernel">Build The Latest RT Kernel</h3>
 <p>Compile RT kernel.</p>
-<div class="sourceCode" id="cb19"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true"></a><span class="ex">fakeroot</span> make -j10 deb-pkg</span></code></pre></div>
+<div class="sourceCode" id="cb19"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb19-1" title="1"><span class="ex">fakeroot</span> make -j10 deb-pkg</a></code></pre></div>
 <p>If you encounter an error during the build process, remake with 1 processor to read the error message.</p>
-<div class="sourceCode" id="cb20"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true"></a><span class="ex">fakeroot</span> make -j1 deb-pkg</span></code></pre></div>
+<div class="sourceCode" id="cb20"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb20-1" title="1"><span class="ex">fakeroot</span> make -j1 deb-pkg</a></code></pre></div>
 <h3 id="install-the-rt-kernel">Install the RT Kernel</h3>
-<p>Finally, you are ready to install the newly created package. The exact names depend on your environment, but you are looking for headers and images packages without the dbg suffix. To install:</p>
-<div class="sourceCode" id="cb21"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true"></a><span class="fu">sudo</span> dpkg -i ../linux-headers-*.deb ../linux-image-*.deb</span></code></pre></div>
+<p>Finally, you are ready to install the newly created package. The exact names depend on your environment, but you are looking for headers and image packages without the dbg suffix. To install:</p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb21-1" title="1"><span class="fu">sudo</span> dpkg -i ../linux-headers-*.deb ../linux-image-*.deb</a></code></pre></div>
+<h3 id="verify-new-kernel">Verify New Kernel</h3>
+<p>Restart your system. GRUB or ReFind UEFI boot menu should now allow you to choose your newly installed kernel. To see which one is currently being used, see the output of the <code>uname -a command</code>. It should contain the string <code>PREEMPT RT</code> and the version number you chose. Additionally, <code>/sys/kernel/realtime</code> should exist and contain the number 1.</p>
+<p>Note: If you encounter errors that you fail to boot the new kernel see <a href="https://frankaemika.github.io/docs/troubleshooting.html#troubleshooting-realtime-kernel">Cannot boot realtime kernel because of “Invalid Signature”</a>.</p>
+<h3 id="create-rt-user-group-and-setup-permissions">Create RT User Group and Setup Permissions</h3>
+<p>Once logged into <code>PREEMPT_RT</code> kernel, run the following commands:</p>
+<div class="sourceCode" id="cb22"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb22-1" title="1"><span class="fu">sudo</span> addgroup realtime</a>
+<a class="sourceLine" id="cb22-2" title="2"><span class="fu">sudo</span> usermod -a -G realtime <span class="va">$(</span><span class="fu">whoami</span><span class="va">)</span></a></code></pre></div>
+<p>Afterwards, add the following limits to the realtime group in <code>/etc/security/limits.conf</code>:</p>
+<pre class="text"><code>@realtime soft rtprio 99
+@realtime soft priority 99
+@realtime soft memlock 102400
+@realtime hard rtprio 99
+@realtime hard priority 99
+@realtime hard memlock 102400</code></pre>
+<p>The limits will be applied after you log out and in again. So, reboot.</p>
 <h2 id="hardware">Hardware</h2>
 <p>The following hardware setup was used for the development of this application.</p>
-<div class="sourceCode" id="cb22"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true"></a><span class="ex">H/W</span> path         Device        Class          Description</span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true"></a>=========================================================</span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true"></a>                               <span class="ex">system</span>         Computer</span>
-<span id="cb22-4"><a href="#cb22-4" aria-hidden="true"></a><span class="ex">/0</span>                             bus            Motherboard</span>
-<span id="cb22-5"><a href="#cb22-5" aria-hidden="true"></a><span class="ex">/0/0</span>                           memory         16GiB System memory</span>
-<span id="cb22-6"><a href="#cb22-6" aria-hidden="true"></a><span class="ex">/0/1</span>                           processor      Intel(R) <span class="ex">Core</span>(TM) <span class="ex">i7-9750H</span> CPU @ 2.60GHz</span>
-<span id="cb22-7"><a href="#cb22-7" aria-hidden="true"></a><span class="ex">/0/100</span>                         bridge         8th Gen Core Processor Host Bridge/DRAM Registers</span>
-<span id="cb22-8"><a href="#cb22-8" aria-hidden="true"></a><span class="ex">/0/100/1</span>                       bridge         Xeon E3-1200 v5/E3-1500 v5/6th Gen Core Processor PCIe</span>
-<span id="cb22-9"><a href="#cb22-9" aria-hidden="true"></a><span class="ex">/0/100/1/0</span>                     display        TU106M [GeForce RTX 2060 Mobile]</span>
-<span id="cb22-10"><a href="#cb22-10" aria-hidden="true"></a><span class="ex">/0/100/1/0.1</span>                   multimedia     TU106 High Definition Audio Controller</span>
-<span id="cb22-11"><a href="#cb22-11" aria-hidden="true"></a><span class="ex">/0/100/1/0.2</span>                   bus            TU106 USB 3.1 Host Controller</span>
-<span id="cb22-12"><a href="#cb22-12" aria-hidden="true"></a><span class="ex">/0/100/1/0.3</span>                   bus            TU106 USB Type-C UCSI Controller</span>
-<span id="cb22-13"><a href="#cb22-13" aria-hidden="true"></a><span class="ex">/0/100/2</span>                       display        UHD Graphics 630 (Mobile)</span>
-<span id="cb22-14"><a href="#cb22-14" aria-hidden="true"></a><span class="ex">/0/100/4</span>                       generic        Xeon E3-1200 v5/E3-1500 v5/6th Gen Core Processor Therm</span>
-<span id="cb22-15"><a href="#cb22-15" aria-hidden="true"></a><span class="ex">/0/100/8</span>                       generic        Xeon E3-1200 v5/v6 / E3-1500 v5 / 6th/7th/8th Gen Core</span>
-<span id="cb22-16"><a href="#cb22-16" aria-hidden="true"></a><span class="ex">/0/100/12</span>                      generic        Cannon Lake PCH Thermal Controller</span>
-<span id="cb22-17"><a href="#cb22-17" aria-hidden="true"></a><span class="ex">/0/100/14</span>                      bus            Cannon Lake PCH USB 3.1 xHCI Host Controller</span>
-<span id="cb22-18"><a href="#cb22-18" aria-hidden="true"></a><span class="ex">/0/100/14.2</span>                    memory         RAM memory</span>
-<span id="cb22-19"><a href="#cb22-19" aria-hidden="true"></a><span class="ex">/0/100/14.3</span>      wlo1          network        Wireless-AC 9560 [Jefferson Peak]</span>
-<span id="cb22-20"><a href="#cb22-20" aria-hidden="true"></a><span class="ex">/0/100/15</span>                      bus            Cannon Lake PCH Serial IO I2C Controller <span class="co">#0</span></span>
-<span id="cb22-21"><a href="#cb22-21" aria-hidden="true"></a><span class="ex">/0/100/15.1</span>                    bus            Cannon Lake PCH Serial IO I2C Controller <span class="co">#1</span></span>
-<span id="cb22-22"><a href="#cb22-22" aria-hidden="true"></a><span class="ex">/0/100/16</span>                      communication  Cannon Lake PCH HECI Controller</span>
-<span id="cb22-23"><a href="#cb22-23" aria-hidden="true"></a><span class="ex">/0/100/17</span>                      storage        Cannon Lake Mobile PCH SATA AHCI Controller</span>
-<span id="cb22-24"><a href="#cb22-24" aria-hidden="true"></a><span class="ex">/0/100/1d</span>                      bridge         Cannon Lake PCH PCI Express Root Port <span class="co">#9</span></span>
-<span id="cb22-25"><a href="#cb22-25" aria-hidden="true"></a><span class="ex">/0/100/1d/0</span>                    storage        NVMe SSD Controller SM981/PM981/PM983</span>
-<span id="cb22-26"><a href="#cb22-26" aria-hidden="true"></a><span class="ex">/0/100/1d/0/0</span>    /dev/nvme0    storage        Samsung SSD 970 EVO Plus 2TB</span>
-<span id="cb22-27"><a href="#cb22-27" aria-hidden="true"></a><span class="ex">/0/100/1d/0/0/1</span>  /dev/nvme0n1  disk           NVMe namespace</span>
-<span id="cb22-28"><a href="#cb22-28" aria-hidden="true"></a><span class="ex">/0/100/1d.6</span>                    bridge         Cannon Lake PCH PCI Express Root Port <span class="co">#15</span></span>
-<span id="cb22-29"><a href="#cb22-29" aria-hidden="true"></a><span class="ex">/0/100/1d.6/0</span>    eno2          network        RTL8111/8168/8411 PCI Express Gigabit Ethernet Controll</span>
-<span id="cb22-30"><a href="#cb22-30" aria-hidden="true"></a><span class="ex">/0/100/1f</span>                      bridge         HM470 Chipset LPC/eSPI Controller</span>
-<span id="cb22-31"><a href="#cb22-31" aria-hidden="true"></a><span class="ex">/0/100/1f.3</span>                    multimedia     Cannon Lake PCH cAVS</span>
-<span id="cb22-32"><a href="#cb22-32" aria-hidden="true"></a><span class="ex">/0/100/1f.4</span>                    bus            Cannon Lake PCH SMBus Controller</span>
-<span id="cb22-33"><a href="#cb22-33" aria-hidden="true"></a><span class="ex">/0/100/1f.5</span>                    bus            Cannon Lake PCH SPI Controller</span>
-<span id="cb22-34"><a href="#cb22-34" aria-hidden="true"></a><span class="ex">/0/2</span>                           system         PnP device PNP0c02</span>
-<span id="cb22-35"><a href="#cb22-35" aria-hidden="true"></a><span class="ex">/0/3</span>                           system         PnP device PNP0c02</span>
-<span id="cb22-36"><a href="#cb22-36" aria-hidden="true"></a><span class="ex">/0/4</span>                           generic        PnP device INT3f0d</span>
-<span id="cb22-37"><a href="#cb22-37" aria-hidden="true"></a><span class="ex">/0/5</span>                           generic        PnP device ATK3001</span>
-<span id="cb22-38"><a href="#cb22-38" aria-hidden="true"></a><span class="ex">/0/6</span>                           system         PnP device PNP0c02</span>
-<span id="cb22-39"><a href="#cb22-39" aria-hidden="true"></a><span class="ex">/0/7</span>                           system         PnP device PNP0c02</span>
-<span id="cb22-40"><a href="#cb22-40" aria-hidden="true"></a><span class="ex">/0/8</span>                           system         PnP device PNP0c02</span>
-<span id="cb22-41"><a href="#cb22-41" aria-hidden="true"></a><span class="ex">/0/9</span>                           system         PnP device PNP0c02</span></code></pre></div>
+<div class="sourceCode" id="cb24"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb24-1" title="1"><span class="ex">H/W</span> path         Device        Class          Description</a>
+<a class="sourceLine" id="cb24-2" title="2">=========================================================</a>
+<a class="sourceLine" id="cb24-3" title="3">                               <span class="ex">system</span>         Computer</a>
+<a class="sourceLine" id="cb24-4" title="4"><span class="ex">/0</span>                             bus            Motherboard</a>
+<a class="sourceLine" id="cb24-5" title="5"><span class="ex">/0/0</span>                           memory         16GiB System memory</a>
+<a class="sourceLine" id="cb24-6" title="6"><span class="ex">/0/1</span>                           processor      Intel(R) <span class="ex">Core</span>(TM) <span class="ex">i7-9750H</span> CPU @ 2.60GHz</a>
+<a class="sourceLine" id="cb24-7" title="7"><span class="ex">/0/100</span>                         bridge         8th Gen Core Processor Host Bridge/DRAM Registers</a>
+<a class="sourceLine" id="cb24-8" title="8"><span class="ex">/0/100/1</span>                       bridge         Xeon E3-1200 v5/E3-1500 v5/6th Gen Core Processor PCIe</a>
+<a class="sourceLine" id="cb24-9" title="9"><span class="ex">/0/100/1/0</span>                     display        TU106M [GeForce RTX 2060 Mobile]</a>
+<a class="sourceLine" id="cb24-10" title="10"><span class="ex">/0/100/1/0.1</span>                   multimedia     TU106 High Definition Audio Controller</a>
+<a class="sourceLine" id="cb24-11" title="11"><span class="ex">/0/100/1/0.2</span>                   bus            TU106 USB 3.1 Host Controller</a>
+<a class="sourceLine" id="cb24-12" title="12"><span class="ex">/0/100/1/0.3</span>                   bus            TU106 USB Type-C UCSI Controller</a>
+<a class="sourceLine" id="cb24-13" title="13"><span class="ex">/0/100/2</span>                       display        UHD Graphics 630 (Mobile)</a>
+<a class="sourceLine" id="cb24-14" title="14"><span class="ex">/0/100/4</span>                       generic        Xeon E3-1200 v5/E3-1500 v5/6th Gen Core Processor Therm</a>
+<a class="sourceLine" id="cb24-15" title="15"><span class="ex">/0/100/8</span>                       generic        Xeon E3-1200 v5/v6 / E3-1500 v5 / 6th/7th/8th Gen Core</a>
+<a class="sourceLine" id="cb24-16" title="16"><span class="ex">/0/100/12</span>                      generic        Cannon Lake PCH Thermal Controller</a>
+<a class="sourceLine" id="cb24-17" title="17"><span class="ex">/0/100/14</span>                      bus            Cannon Lake PCH USB 3.1 xHCI Host Controller</a>
+<a class="sourceLine" id="cb24-18" title="18"><span class="ex">/0/100/14.2</span>                    memory         RAM memory</a>
+<a class="sourceLine" id="cb24-19" title="19"><span class="ex">/0/100/14.3</span>      wlo1          network        Wireless-AC 9560 [Jefferson Peak]</a>
+<a class="sourceLine" id="cb24-20" title="20"><span class="ex">/0/100/15</span>                      bus            Cannon Lake PCH Serial IO I2C Controller <span class="co">#0</span></a>
+<a class="sourceLine" id="cb24-21" title="21"><span class="ex">/0/100/15.1</span>                    bus            Cannon Lake PCH Serial IO I2C Controller <span class="co">#1</span></a>
+<a class="sourceLine" id="cb24-22" title="22"><span class="ex">/0/100/16</span>                      communication  Cannon Lake PCH HECI Controller</a>
+<a class="sourceLine" id="cb24-23" title="23"><span class="ex">/0/100/17</span>                      storage        Cannon Lake Mobile PCH SATA AHCI Controller</a>
+<a class="sourceLine" id="cb24-24" title="24"><span class="ex">/0/100/1d</span>                      bridge         Cannon Lake PCH PCI Express Root Port <span class="co">#9</span></a>
+<a class="sourceLine" id="cb24-25" title="25"><span class="ex">/0/100/1d/0</span>                    storage        NVMe SSD Controller SM981/PM981/PM983</a>
+<a class="sourceLine" id="cb24-26" title="26"><span class="ex">/0/100/1d/0/0</span>    /dev/nvme0    storage        Samsung SSD 970 EVO Plus 2TB</a>
+<a class="sourceLine" id="cb24-27" title="27"><span class="ex">/0/100/1d/0/0/1</span>  /dev/nvme0n1  disk           NVMe namespace</a>
+<a class="sourceLine" id="cb24-28" title="28"><span class="ex">/0/100/1d.6</span>                    bridge         Cannon Lake PCH PCI Express Root Port <span class="co">#15</span></a>
+<a class="sourceLine" id="cb24-29" title="29"><span class="ex">/0/100/1d.6/0</span>    eno2          network        RTL8111/8168/8411 PCI Express Gigabit Ethernet Controll</a>
+<a class="sourceLine" id="cb24-30" title="30"><span class="ex">/0/100/1f</span>                      bridge         HM470 Chipset LPC/eSPI Controller</a>
+<a class="sourceLine" id="cb24-31" title="31"><span class="ex">/0/100/1f.3</span>                    multimedia     Cannon Lake PCH cAVS</a>
+<a class="sourceLine" id="cb24-32" title="32"><span class="ex">/0/100/1f.4</span>                    bus            Cannon Lake PCH SMBus Controller</a>
+<a class="sourceLine" id="cb24-33" title="33"><span class="ex">/0/100/1f.5</span>                    bus            Cannon Lake PCH SPI Controller</a>
+<a class="sourceLine" id="cb24-34" title="34"><span class="ex">/0/2</span>                           system         PnP device PNP0c02</a>
+<a class="sourceLine" id="cb24-35" title="35"><span class="ex">/0/3</span>                           system         PnP device PNP0c02</a>
+<a class="sourceLine" id="cb24-36" title="36"><span class="ex">/0/4</span>                           generic        PnP device INT3f0d</a>
+<a class="sourceLine" id="cb24-37" title="37"><span class="ex">/0/5</span>                           generic        PnP device ATK3001</a>
+<a class="sourceLine" id="cb24-38" title="38"><span class="ex">/0/6</span>                           system         PnP device PNP0c02</a>
+<a class="sourceLine" id="cb24-39" title="39"><span class="ex">/0/7</span>                           system         PnP device PNP0c02</a>
+<a class="sourceLine" id="cb24-40" title="40"><span class="ex">/0/8</span>                           system         PnP device PNP0c02</a>
+<a class="sourceLine" id="cb24-41" title="41"><span class="ex">/0/9</span>                           system         PnP device PNP0c02</a></code></pre></div>
