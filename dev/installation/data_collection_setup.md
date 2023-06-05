@@ -71,7 +71,8 @@ This section is based on [PBVS with Panda Tutorial by Visual Servoing Platform](
 Install dependencies.
 
 ```bash
-sudo apt-get install build-essential bc curl ca-certificates gnupg2 libssl-dev lsb-release libelf-dev bison flex dwarves zstd libncurses-dev
+sudo apt-get install build-essential bc curl ca-certificates gnupg2 \
+  libssl-dev lsb-release libelf-dev bison flex dwarves zstd libncurses-dev
 ```
 
 Check the kernel version and install the Real-Time Kernel with the closest version number.
@@ -175,7 +176,6 @@ scripts/config --disable CONFIG_TRUSTED_KEY
 scripts/config --disable CONFIG_SYSTEM_TRUSTED_KEYRING
 scripts/config --set-str CONFIG_SYSTEM_TRUSTED_KEYS ""
 scripts/config --set-str CONFIG_SYSTEM_REVOCATION_KEYS ""
-
 ```
 
 Compile RT kernel.
