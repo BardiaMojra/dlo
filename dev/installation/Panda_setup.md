@@ -1,4 +1,4 @@
-# DLO Data Collection System Setup
+# Panda Arm Setup Instructions
 
 ## Notes
 
@@ -16,13 +16,13 @@
 It's because of a dependency issue, running a force install will fix it:
 
 ```bash
-sudo apt -f install
+sudo apt -f install [package]
 ```
 
 ## Environment Setup
 
 - Ubuntu 20.04: Linux 5.15.0-72-generic x86_64
-- Install Nvidia GPU drivers
+<!-- - Install Nvidia GPU drivers  -->
 - Install Real Time Kernel with a fully preemptible feature
 - Install Franka-Panda library
 - Install RealSense library
@@ -31,13 +31,13 @@ sudo apt -f install
 - Install Franka-ROS library
 - Install RealSense-ROS library
 
-### Install RT Kernel, Franka-Panda, and RS Libraries
+## Install RT Kernel, Franka-Panda, and RS Libraries
 
-#### Update Kernel to the Latest Supported Version
+### Update Kernel to the Latest Supported Version
 
 This section is based on Ubuntu Wiki's [Build Your Own Kernel Tutorial](https://wiki.ubuntu.com/Kernel/BuildYourOwnKernel).
 
-##### Install Dependencies
+### Install Dependencies
 
 Make sure to enable all 'source code' repositories in Software & Updates.
 
@@ -45,7 +45,8 @@ Install dependencies.
 
 ```bash
 sudo apt-get build-dep linux linux-image-$(uname -r)
-sudo apt-get install libncurses-dev gawk flex bison openssl libssl-dev dkms libelf-dev libudev-dev libpci-dev libiberty-dev autoconf llvm
+sudo apt-get install libncurses-dev gawk flex bison openssl libssl-dev dkms \
+  libelf-dev libudev-dev libpci-dev libiberty-dev autoconf llvm
 sudo apt-get install git
 ```
 
@@ -62,7 +63,7 @@ deb-src http://archive.ubuntu.com/ubuntu/ubuntu focal main
 deb-src http://archive.ubuntu.com/ubuntu/ubuntu focal-updates main
 ```
 
-#### Download The Latest RT Kernel
+### Download The Latest RT Kernel
 
 This section is based on [Franka-Emika's Panda arm setup tutorial](https://frankaemika.github.io/docs/installation_linux.html#setting-up-the-real-time-kernel).
 
@@ -132,6 +133,8 @@ Verify checksum.
 gpg2 --verify linux-*.tar.sign
 ```
 
+### Extract and Configure
+
 If you face an error when compiling the kernel, resolve the error, then
 delete the source directory and try again front this point. Else, skip this step
 and continue with the extraction and patching step.
@@ -178,6 +181,8 @@ scripts/config --set-str CONFIG_SYSTEM_TRUSTED_KEYS ""
 scripts/config --set-str CONFIG_SYSTEM_REVOCATION_KEYS ""
 ```
 
+### Build The Latest RT Kernel
+
 Compile RT kernel.
 
 ```bash
@@ -190,6 +195,8 @@ read the error message.
 ```bash
 fakeroot make -j1 deb-pkg
 ```
+
+### Install the RT Kernel
 
 Finally, you are ready to install the newly created package. The exact names depend on your environment, but you are looking for headers and images packages without the dbg suffix. To install:
 
