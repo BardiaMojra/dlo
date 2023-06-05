@@ -142,9 +142,7 @@ cd .. && sudo rm -rf linux-*/
 Extract the source code and apply the patch.
 
 ```bash
-tar xf linux-*.tar
-cd linux-*/
-patch -p1 < ../patch-*.patch
+tar xf linux-*.tar && cd linux-*/ && patch -p1 < ../patch-*.patch
 ```
 
 Next, copy current kernel configs to local.
@@ -176,13 +174,9 @@ scripts/config --disable SYSTEM_TRUSTED_KEYS
 scripts/config --disable CONFIG_TRUSTED_KEY
 scripts/config --disable CONFIG_SYSTEM_TRUSTED_KEYRING
 scripts/config --set-str CONFIG_SYSTEM_TRUSTED_KEYS ""
+scripts/config --set-str CONFIG_SYSTEM_REVOCATION_KEYS ""
+
 ```
-
-# CONFIG_TRUSTED_KEY
-
-# CONFIG_SYSTEM_TRUSTED_KEYRING
-
-# CONFIG_SYSTEM_TRUSTED_KEYS=""
 
 Compile RT kernel.
 
