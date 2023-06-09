@@ -183,7 +183,7 @@ scripts/config --set-str CONFIG_SYSTEM_REVOCATION_KEYS ""
 
 ### Build RT Kernel
 
-Compile RT kernel.
+Compile the kernel.
 
 ```bash
 fakeroot make -j10 deb-pkg
@@ -196,7 +196,7 @@ read the error message.
 fakeroot make -j1 deb-pkg
 ```
 
-### Install the RT Kernel
+### Install RT Kernel
 
 Finally, you are ready to install the newly created package. The exact names depend on your environment, but you are looking for headers and image packages without the dbg suffix. To install:
 
